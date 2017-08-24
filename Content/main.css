@@ -1,0 +1,54 @@
+﻿.dtm-divBox {
+    border-left: #388670 6px solid;
+    border-right: #388670 2px solid;
+    border-bottom: #388670 2px solid;
+    border-top: #388670 10px solid;
+    margin-bottom: 1em;
+}
+
+.dtm-para_green {
+    background-color: #bbddd9;
+    font-size: 14px;
+    padding: 0.5em;
+}
+
+.dtm-divBox .dtm-controls {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.1em 0.5em;
+}
+
+.dtm-divBox .dtm-controls span {
+    flex-grow: 1;
+    flex-basis: 0;
+    text-align: center;
+    white-space: nowrap;
+    min-width: 18%;
+    width: 19%;
+}
+
+.dtm-divBox button {
+    margin-left: 0.5em;
+}
+
+.dtm-error {
+    color: red;
+    max-width: 75%;
+    float: right;
+    padding: 3px 0;
+    margin: 2px 1em 0;
+}
+
+[data-selectall-target] span {
+    display: none;
+}
+
+[data-selectall-target].dtm-selectall .dtm-selectall,
+[data-selectall-target]:not(.dtm-selectall) :not(.dtm-selectall) {
+    display: inline;
+}
+
+label.bx-disabled {
+    opacity: 0.6;
+    pointer-events: none; /* workaround for checkboxes being disabled, but still send to model */
+}

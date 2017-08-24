@@ -1,0 +1,21 @@
+﻿@using System.Data
+@using Telerik.Web.Mvc.UI
+
+@model DataTable
+
+@(Html.Telerik().Grid(Model)
+    .Name("DataTableGrid")
+    .DataBinding(dataBinding => dataBinding
+        .Ajax()
+        .OperationMode(GridOperationMode.Client)
+        )
+    .Pageable(pageable =>
+    {
+        pageable
+            .PageSize(20, new[] { 20, 50, 100 })
+            .Style(GridPagerStyles.NextPreviousAndNumeric | GridPagerStyles.PageSizeDropDown)
+            .Position(GridPagerPosition.Both);
+    })
+    .Filterable()
+    .Sortable()
+)
