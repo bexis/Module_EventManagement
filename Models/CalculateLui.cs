@@ -350,7 +350,7 @@ namespace BExIS.Modules.Lui.UI.Models
             Dlm.Entities.Data.DatasetVersion dsv = dsm.GetDatasetLatestVersion(dsId);
 
             // convert
-            DataTable dt = OutputDataManager.ConvertPrimaryDataToDatatable(dsm, dsv);
+            DataTable dt = OutputDataManager.ConvertPrimaryDataToDatatable(dsm, dsv, "LUI input data", true );
 
             // set column shortcuts
             foreach (DataColumn col in dt.Columns)
