@@ -1,4 +1,7 @@
-﻿using Vaiona.Web.Mvc.Modularity;
+﻿using BExIS.Modules.Lui.UI.Helper;
+using System;
+using Vaiona.Logging;
+using Vaiona.Web.Mvc.Modularity;
 
 namespace BExIS.Modules.Lui.UI
 {
@@ -29,5 +32,22 @@ namespace BExIS.Modules.Lui.UI
         //    //    new { action = "Index", id = UrlParameter.Optional }
         //    //);
         //}
+
+        public override void Install()
+        {
+            LoggerFactory.GetFileLogger().LogCustom("... start install of LUI ...");
+            try
+            {
+                base.Install();
+                LUISeedDataGenerator.CreateFeatures();
+            }
+            catch (Exception e)
+            {
+                LoggerFactory.GetFileLogger().LogCustom(e.Message);
+                LoggerFactory.GetFileLogger().LogCustom(e.StackTrace);
+            }
+
+            LoggerFactory.GetFileLogger().LogCustom("... end install of LUI ...");
+        }
     }
 }
