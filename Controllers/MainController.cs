@@ -3,10 +3,10 @@ using System.Web.Mvc;
 using Vaiona.Web.Mvc.Models;
 using Vaiona.Web.Extensions;
 using System.Collections.Generic;
-using BExIS.IO.Transform.Output;
 using System;
 using System.Data;
 using System.IO;
+using BExIS.IO.Transform.Output;
 
 namespace BExIS.Modules.Lui.UI.Controllers
 {
@@ -59,7 +59,7 @@ namespace BExIS.Modules.Lui.UI.Controllers
             return PartialView("_results", results);
         }
 
-        /*
+        
         /// <summary>
         /// prepare the serialized data file for download
         /// </summary>
@@ -93,12 +93,12 @@ namespace BExIS.Modules.Lui.UI.Controllers
             {
                 case "text/csv":
                 case "text/tsv":
-                    path = outputDataManager.GenerateAsciiFile(FILE_NAMESPACE, Session[SESSION_FILE] as DataTable, filename, mimeType, dsId);
+                    path = outputDataManager.GenerateAsciiFile(FILE_NAMESPACE, Session[SESSION_TABLE] as DataTable, filename, mimeType, dsId);
                     break;
 
                 case "application/vnd.ms-excel.sheet.macroEnabled.12":
                 case "application/vnd.ms-excel":
-                    path = outputDataManager.GenerateExcelFile(FILE_NAMESPACE, Session[SESSION_FILE] as DataTable, filename, dsId);
+                    path = outputDataManager.GenerateExcelFile(FILE_NAMESPACE, Session[SESSION_TABLE] as DataTable, filename, dsId);
                     break;
 
                 default:
@@ -144,7 +144,7 @@ namespace BExIS.Modules.Lui.UI.Controllers
             return File(path, mimeType, Path.GetFileName(path));
         }
 
-    */
+    
 
     }
 }
