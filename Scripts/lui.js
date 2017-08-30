@@ -45,6 +45,15 @@
                         // disable loading spinner
                         $('#dtmLuiSpinner').hide();
 
+                    })
+                    .fail(function (err) {
+
+                        // add data to result
+                        $('#divResultGrid').html(err.responseText);
+
+                        // disable loading spinner
+                        $('#dtmLuiSpinner').hide();
+
                     });
             }
 
