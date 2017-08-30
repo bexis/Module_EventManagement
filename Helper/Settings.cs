@@ -32,7 +32,7 @@ namespace BExIS.Modules.Lui.UI.Models
         }
 
         /// <summary>
-        /// retrieve a value from the settinsg file
+        /// retrieve a value from the settings file
         /// </summary>
         /// <param name="key">the key for the parameter</param>
         /// <returns>the respective value</returns>

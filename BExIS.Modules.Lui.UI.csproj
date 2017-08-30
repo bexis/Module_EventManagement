@@ -172,11 +172,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\MainController.cs" />
+    <Compile Include="Helper\CalculateLui.cs" />
     <Compile Include="Helper\LUISeedDataGenerator.cs" />
+    <Compile Include="Helper\Settings.cs" />
     <Compile Include="LUIModule.cs" />
-    <Compile Include="Models\CalculateLui.cs" />
     <Compile Include="Models\LUIQueryModel.cs" />
-    <Compile Include="Models\Settings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +190,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Main\Index.cshtml" />
     <Content Include="Views\Main\_results.cshtml" />
+    <Content Include="Views\Main\Error.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

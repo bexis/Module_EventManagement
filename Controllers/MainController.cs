@@ -5,8 +5,11 @@ using Vaiona.Web.Extensions;
 using System.Collections.Generic;
 using System;
 using System.Data;
+using System.Linq;
 using System.IO;
 using BExIS.IO.Transform.Output;
+using BExIS.Dlm.Services.Data;
+using BExIS.Dlm.Services.DataStructure;
 
 namespace BExIS.Modules.Lui.UI.Controllers
 {
@@ -27,12 +30,23 @@ namespace BExIS.Modules.Lui.UI.Controllers
         // GET: Main
         public ActionResult Index()
         {
-            // set page title
-            ViewBag.Title = PresentationModel.GetViewTitleForTenant(TITLE, this.Session.GetTenant());
+            if( checkPreconditions() )
+            {
 
-            // show the view
-            LUIQueryModel model = new LUIQueryModel();
-            return View("Index", model);
+                // set page title
+                ViewBag.Title = PresentationModel.GetViewTitleForTenant(TITLE, this.Session.GetTenant());
+
+                // show the view
+                LUIQueryModel model = new LUIQueryModel();
+                return View("Index", model);
+
+            } else
+            {
+
+                // preconditions failed, show error page
+                return View("Error");
+
+            }
         }
 
         /// <summary>
@@ -145,6 +159,38 @@ namespace BExIS.Modules.Lui.UI.Controllers
         }
 
     
+        /// <summary>
+        /// check for preconditions, so that we can do all computations
+        /// * Link to LUI dataset
+        /// * Link to result data structure
+        /// </summary>
+        /// <returns></returns>
+        private bool checkPreconditions()
+        {
+            // check for LUI dataset
+            DatasetManager dm = new DatasetManager();
+            int luiId = (int)Settings.get("lui:dataset");
+            bool exists = dm.DatasetRepo.Query()
+                                        .Where(x => x.Id == luiId )
+                                        .Any();
+            if (!exists)
+            {
+                return false;
+            }
 
+            // check for export data structure
+            DataStructureManager dsm = new DataStructureManager();
+            int dsdId = (int)Settings.get("lui:datastructure");
+            exists = dsm.StructuredDataStructureRepo.Query()
+                                    .Where(x => x.Id == dsdId)
+                                    .Any();
+            if(!exists)
+            {
+                return false;
+            }
+
+            // if we came that far, all conditions are met
+            return true;
+        }
     }
 }
