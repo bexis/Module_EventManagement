@@ -45,7 +45,7 @@ namespace BExIS.Modules.Lui.UI.Helper
             Operation luiOp = operationManager.Find(luiOperation.module, luiOperation.controller, luiOperation.action);
             if( luiOp != null ) {
                 // there is already something there, so make sure it points to the correct feature
-                luiOp.Feature = root;
+                luiOp.Feature = luiEntry;
                 operationManager.Update(luiOp);
             } else
             {
