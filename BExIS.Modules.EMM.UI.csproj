@@ -24,6 +24,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -171,26 +172,32 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\MainController.cs" />
+    <Compile Include="Controllers\EventController.cs" />
+    <Compile Include="Controllers\EventRegistrationController.cs" />
     <Compile Include="Helper\CalculateLui.cs" />
     <Compile Include="Helper\LUISeedDataGenerator.cs" />
     <Compile Include="Helper\Settings.cs" />
-    <Compile Include="LUIModule.cs" />
-    <Compile Include="Models\LUIQueryModel.cs" />
+    <Compile Include="EMMModule.cs" />
+    <Compile Include="Models\EventModel.cs" />
+    <Compile Include="Models\EventRegistrationModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\main.css" />
-    <Content Include="LUI.Manifest.xml" />
+    <Content Include="EMM.Manifest.xml" />
     <Content Include="packages.config" />
     <Content Include="Scripts\lui.js" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="web.config" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Main\Index.cshtml" />
-    <Content Include="Views\Main\_results.cshtml" />
-    <Content Include="Views\Main\Error.cshtml" />
+    <Content Include="Views\Event\EditEvent.cshtml" />
+    <Content Include="Views\Event\EventManager.cshtml" />
+    <Content Include="Views\EventRegistration\_logInToEvent.cshtml" />
+    <Content Include="Views\EventRegistration\_selectEvent.cshtml" />
+    <Content Include="Views\EventRegistration\AvailableEventsList.cshtml" />
+    <Content Include="Views\EventRegistration\EventRegistrationResults.cshtml" />
+    <Content Include="Views\EventRegistration\FormEventRegistration.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -199,8 +206,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="fonts\" />
     <Folder Include="Properties\PublishProfiles\" />
+    <Folder Include="Views\fonts\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Components\AAA\BExIS.Security.Entities\BExIS.Security.Entities.csproj">

@@ -1,13 +1,13 @@
-﻿using BExIS.Modules.Lui.UI.Helper;
+﻿//using BExIS.Modules.Lui.UI.Helper;
 using System;
 using Vaiona.Logging;
 using Vaiona.Web.Mvc.Modularity;
 
-namespace BExIS.Modules.Lui.UI
+namespace BExIS.Modules.EMM.UI
 {
-    public class LUIModule : ModuleBase
+    public class EMMModule : ModuleBase
     {
-        public LUIModule(): base("LUI")
+        public EMMModule(): base("EMM")
         {
         }
 
@@ -33,21 +33,21 @@ namespace BExIS.Modules.Lui.UI
         //    //);
         //}
 
-        public override void Install()
-        {
-            LoggerFactory.GetFileLogger().LogCustom("... start install of LUI ...");
-            try
-            {
-                base.Install();
-                LUISeedDataGenerator.CreateFeatures();
-            }
-            catch (Exception e)
-            {
-                LoggerFactory.GetFileLogger().LogCustom(e.Message);
-                LoggerFactory.GetFileLogger().LogCustom(e.StackTrace);
-            }
+        //public override void Install()
+        //{
+        //    LoggerFactory.GetFileLogger().LogCustom("... start install of EMM ...");
+        //    try
+        //    {
+        //        base.Install();
+        //        EMMSeedDataGenerator.CreateFeatures();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        LoggerFactory.GetFileLogger().LogCustom(e.Message);
+        //        LoggerFactory.GetFileLogger().LogCustom(e.StackTrace);
+        //    }
 
-            LoggerFactory.GetFileLogger().LogCustom("... end install of LUI ...");
-        }
+        //    LoggerFactory.GetFileLogger().LogCustom("... end install of EMM ...");
+        //}
     }
 }

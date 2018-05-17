@@ -1,0 +1,50 @@
+﻿
+@using Telerik.Web.Mvc.UI
+@using BExIS.Web.Shell.Areas.EMM.Models;
+
+@model LogInToEventModel
+@using (Ajax.BeginForm("LoadForm", "EventRegistration", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "logInToEvent", OnSuccess = "logInToEvent_onSuccess" }))
+{
+
+    @Html.HiddenFor(m => m.EventId)
+    @Html.HiddenFor(m => m.Edit)
+
+    <div id="logInToEvent">
+        <table class="bx-table-form" style="width: 500px;">
+
+            <tr>
+                <td>
+                    @Html.LabelFor(m => m.LogInName)
+                </td>
+                <td>
+                    @Html.TextBoxFor(m => m.LogInName, new { @class = "t-input bx-input" })<br />
+                    @Html.ValidationMessage("username")
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.LabelFor(m => m.LogInPassword)
+                </td>
+                <td>
+                    @Html.PasswordFor(m => m.LogInPassword, new { @class = "t-input bx-input" })<br>
+                    @Html.ValidationMessage("passwort")
+                </td>
+            </tr>
+
+        </table>
+
+        <div class="bx-footer right">
+            <button type="submit" class="bx-button action">Go to event</button>
+            @*@Html.ActionLink("Go to Event", "LoadForm", "EventRegistration", new { id = Model.EventId }, new { @class = "bx-button action" })*@
+            <button type="button" class="bx-button action" onclick="Window_LogOn_Cancel()">Cancel</button>
+        </div>
+    </div>
+}
+
+
+<script type="text/javascript">
+
+
+
+
+</script>

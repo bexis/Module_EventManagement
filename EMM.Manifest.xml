@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Manifest moduleId="LUI" displayName="" version="1.0.0" builtin="false">
+<Manifest moduleId="EMM" displayName="" version="1.0.0" builtin="false">
   <Description>
     <!--add proper description-->
   </Description>
@@ -12,8 +12,8 @@
   <Exports>
     <!--add proper menu items-->
 	
-    <Export tag="menubar" id="luiMenu" order="10"
-            title="LUI" description="LUI desc" icon=""
+    <Export tag="menubar" id="emmMenu" order="10"
+            title="Event Tool" description="EMM desc" icon=""
             controller="main" action="index"
             extends="./menubarRoot" />
     

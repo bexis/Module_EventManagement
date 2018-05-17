@@ -1,0 +1,129 @@
+﻿@using Telerik.Web.Mvc.UI
+@using BExIS.Web.Shell.Areas.EMM.Models;
+
+@model List<EventModel>
+
+@section Information
+{
+    With this interface you are able to manage (e.g. create, edit or delete) events.
+    <p>
+        <a href="/RBM/Help/Index/#_Toc434570750" class="bx-informationLink" title="go to help" target="_blank">More</a>
+    </p>
+}
+
+@{
+    GridPagerStyles pagerStyles = GridPagerStyles.PageSizeDropDown;
+    pagerStyles |= GridPagerStyles.NextPreviousAndNumeric;
+    pagerStyles |= GridPagerStyles.Numeric;
+}
+
+@Html.ActionLink("Create", "Create", "Event", new { @class = "bx-button function" })
+<br />
+@(Html.Telerik().Grid(Model)
+            .Name("Grid_Event")
+            .DataKeys(keys =>
+            {
+                keys.Add(r => r.Id);
+            })
+            .Columns(columns =>
+            {
+
+                columns.Bound(r => r.Id).Width(90);
+                columns.Bound(r => r.Name);
+                columns.Bound(r => r.ParticipantsLimitation);
+                columns.Bound(r => r.StartDate);
+                columns.Bound(r => r.Deadline);
+                columns.Bound(r => r.EditAllowed);
+                columns.Template(
+                    @<text>
+                        @if (!item.InUse)
+                                    {
+
+                            <div>
+                                <div class="bx bx-grid-function bx-edit" title='Edit Unit "@item.Name"' onclick="OnClickEdit(@item.Id)"></div>
+                                <div class="bx bx-grid-function bx-trash" title='Delete Unit "@item.Name"' onclick="OnClickDelete(@item.Id)"></div>
+                            </div>
+                                    }
+                                    else
+                                    {
+                            <div>
+                                <div class="bx bx-grid-function bx-edit bx-disabled" disabled="disabled" title='Edit Unit "@item.Name"'></div>
+                                <div class="bx bx-grid-function bx-trash bx-disabled" disabled="disabled" title='Delete Unit "@item.Name"'></div>
+                            </div>
+                                    }
+                        /**/
+                    </text>
+                                    ).Title(" ")
+                                    .ClientTemplate(
+                                    "<div style='display:inline;'>" +
+                                    "<div style=\"<#= InUse ? 'display:none;' : 'display:inline;' #>\">" +
+                                    "<div style=\"<#= EditAccess ? 'display:inline;' : 'display:none;' #>\">" +
+                                    "<a id=\"<#= Id #>\" onclick=\"OnClickEdit('<#= Id #>')\" class=\"t-icon t-edit\" ></a>" +
+                                    "</div>" +
+                                    "<div style=\"<#= EditAccess ? 'display:none;' : 'display:inline;' #>\">" +
+                                    "<div class = \"bx bx-grid-function bx-edit bx-disabled\" disabled = \"disabled\" title = \'Edit Unit \"@item.Name\"\'></div>" +
+                                    "</div>" +
+                                    "<div style=\"<#= DeleteAccess ? 'display:inline;' : 'display:none;' #>\">" +
+                                    "<a id=\"<#= Id #>\" onclick=\"OnClickDelete('<#= Id #>')\" class=\"bx bx-grid-function bx-trash\" ></a>" +
+                                    "</div>" +
+                                    "<div style=\"<#= DeleteAccess ? 'display:none;' : 'display:inline;' #>\">" +
+                                    "<div class = \"bx bx-grid-function bx-trash bx-disabled\" disabled = \"disabled\" title = \'Edit Unit \"@item.Name\"\'></div>" +
+                                    "</div>" +
+                                    "</div>" +
+                                    "<div class=\"locked\" style=\"<#= InUse ? 'display:inline;' : 'display:none;' #>\">" +
+                                    "<div class = \"bx bx-grid-function bx-edit bx-disabled\" disabled = \"disabled\" title = \'Edit Unit \"@item.Name\"\'></div>" +
+                                    "<div class = \"bx bx-grid-function bx-trash bx-disabled\" disabled = \"disabled\" title = \'Edit Unit \"@item.Name\"\'></div>" +
+                                    "</div>"
+
+                                    ).Width(90);
+                    })
+                              .ClientEvents(clientevents => clientevents
+                                .OnDataBound("onDataBound")
+                              )
+                                      .DataBinding(databinding => databinding
+                                          .Ajax()
+                                          .Select("AllEvents", "Event")
+                                      )
+                              .Pageable(paging =>
+                            paging
+                                .Style(pagerStyles)
+                                .PageSize(50)
+                                .Position(GridPagerPosition.Both)
+                                )
+                    .Filterable()
+                    .Sortable(sortable => sortable
+                        .OrderBy(orderby => orderby
+                            .Add(r => r.Id).Descending()))
+)
+
+<script type="text/javascript">
+
+    function onDataBound() {
+    resetAllTelerikIconTitles();
+    addTooltips();
+    }
+
+    $(document).ready(function () {
+        resetAllTelerikIconTitles();
+        addTooltips();
+    })
+
+    function refreshGrid() {
+        $(".t-grid .t-refresh").trigger('click');
+    }
+
+    function OnClickEdit(id)
+    {
+        $.get('@Url.Action("Edit", "Event", new RouteValueDictionary { { "area", "EMM" } })', { id: id }, function (data) {
+            window.location.href = 'Edit/' + id;
+        });
+    }
+
+    function OnClickDelete(id)
+    {
+        $.get('@Url.Action("Delete", "Event", new RouteValueDictionary { { "area", "EMM" } })', { id: id }, function (data) {
+            refreshGrid();
+        });
+    }
+
+</script>

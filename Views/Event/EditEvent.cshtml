@@ -1,0 +1,88 @@
+﻿
+@using Telerik.Web.Mvc.UI
+@using BExIS.Web.Shell.Areas.EMM.Models;
+
+@model EventModel
+
+@Html.ValidationSummary(true)
+@using (Html.BeginForm("Save", "Event", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.HiddenFor(m => m.Id)
+    <table class="bx-table-form" style="width: 500px;">
+        <tr>
+            <td>@Html.LabelFor(m => m.Name)</td>
+            <td>
+                @Html.TextBoxFor(m => m.Name, new { @class = "bx-input", @tabindex = "2" })
+                <br />
+                <small>@Html.ValidationMessage("Name")</small>
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.StartDate)</td>
+            @if (Model.EditMode)
+            {
+                <td>@(Html.Telerik().DatePickerFor(m => m.StartDate).HtmlAttributes("class = 'bx-input', tabindex = '2'"))</td>
+            }
+            else
+            {
+                <td>@(Html.Telerik().DatePickerFor(m => m.StartDate).Value(DateTime.Now).HtmlAttributes("class = 'bx-input', tabindex = '2'"))</td>
+            }
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.Deadline)</td>
+            @if (Model.EditMode)
+            {
+                <td>@(Html.Telerik().DatePickerFor(m => m.Deadline).HtmlAttributes("class = 'bx-input', tabindex = '2'"))</td>
+            }
+            else
+            {
+                <td>@(Html.Telerik().DatePickerFor(m => m.Deadline).Value(DateTime.Now).HtmlAttributes("class = 'bx-input', tabindex = '2'"))</td>
+            }
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.ParticipantsLimitation)</td>
+            <td>
+                @(Html.Telerik().IntegerTextBoxFor(m => m.ParticipantsLimitation)
+                                                                        .MinValue(1)
+                                                                        .MaxValue(Int32.MaxValue)
+                                                                        .Value(Model.ParticipantsLimitation)
+                                                                        .HtmlAttributes(new { @class = "bx-input", tabindex = "2" })
+                )
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.EditAllowed)</td>
+            <td>@Html.CheckBoxFor(m => m.EditAllowed, new { @class = "js-switch" })</td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.LogInName)</td>
+            <td>
+                @Html.TextBoxFor(m => m.LogInName, new { @class = "bx-input", @tabindex = "2" })
+                <br />
+                <small>@Html.ValidationMessage("LogInName")</small>
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.LabelFor(m => m.LogInPassword)</td>
+            <td>
+                @Html.TextBoxFor(m => m.LogInPassword, new { @class = "bx-input", @tabindex = "2" })
+                <br />
+                <small>@Html.ValidationMessage("LogInPassword")</small>
+            </td>
+        </tr>
+
+        <tr>
+            <td>@Html.LabelFor(m => m.MetadataStructureId)</td>
+            <td>@Html.DropDownListFor(m => m.MetadataStructureId, new SelectList(Model.MetadataStructureList, "Id", "Name"))</td>
+        </tr>
+
+
+    </table>
+
+    <div class="bx-footer right">
+        <br />
+        <button name="save" type="submit" class="t-button action" title="Save">Save</button>
+        @Html.ActionLink("Cancel", "EventManager", "Event", new { area = "RBM", @class = "t-button action", @title = "Cancel", @tabindex = "5" })
+    </div><br />
+
+}

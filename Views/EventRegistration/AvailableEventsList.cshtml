@@ -1,0 +1,137 @@
+﻿@using Telerik.Web.Mvc.UI
+@using BExIS.Web.Shell.Areas.EMM.Models;
+
+@model List<EventRegistrationModel>
+
+@section Information
+{
+    With this interface you are able to manage (e.g. register, edit or delete) event registrations. Here are all available event are listed. You need a passwort to get access to a event. This passwort is usually send to via mail by the project administration.
+    <p>
+        <a href="/RBM/Help/Index/#_Toc434570750" class="bx-informationLink" title="go to help" target="_blank">More</a>
+    </p>
+}
+
+@{
+    GridPagerStyles pagerStyles = GridPagerStyles.PageSizeDropDown;
+    pagerStyles |= GridPagerStyles.NextPreviousAndNumeric;
+    pagerStyles |= GridPagerStyles.Numeric;
+}
+
+@(Html.Telerik().Grid(Model)
+            .Name("Events")
+            .Columns(columns =>
+            {
+                columns.Template(
+                @<text>
+                    @if (item.AlreadyRegistered == false)
+                                {
+                        <div onclick="onClickRegister(@item.Event.Id)" class="bx bx-grid-function bx-sign-in" title="Register for event"></div>
+                                }
+                                else
+                                {
+                        <div class="bx bx-grid-function bx-sign-in bx-disabled" disabled="disabled" title="Register for event"></div>
+
+                                }
+                    /**/
+                    @if (item.EditAllowed)
+                                {
+                        <div onclick="onClickEdit(@item.Event.Id)" class="bx bx-grid-function bx-edit" title="Edit event"></div>
+                                }
+                                else
+                                {
+                        <div class="bx bx-grid-function bx-edit bx-disabled" disabled="disabled" title="Edit event"></div>
+
+                                }
+                    /**/
+                </text>
+                    ).Width(90);
+                        columns.Bound(r => r.Event.Name);
+                        columns.Bound(r => r.Event.Deadline);
+                        columns.Template(
+                        @<text>
+                            @item.NumberOfRegistration/@item.Event.ParticipantsLimitation
+                        </text>
+                            ).Width(90);
+                    //columns.Bound(r => r.Event.ParticipantsLimitation);
+                })
+                                      .Pageable(paging =>
+                                    paging
+                                        .Style(pagerStyles)
+                                        .PageSize(50)
+                                        .Position(GridPagerPosition.Both)
+                                        )
+                            .Filterable()
+                    //.Sortable(sortable => sortable
+                    //    .OrderBy(orderby => orderby
+                    //        .Add(r => r.Id).Descending()))
+)
+
+@(Html.Telerik().Window()
+        .Name("Window_LogInToEvent")
+        .Title("Login to Event")
+        .Draggable(true)
+        .Modal(true)
+        .Visible(false)
+        .Scrollable(true)
+        .ContentHtmlAttributes(new { @style = "overflow:auto; width:auto; height:auto; min-height:225px; min-width:400px" })
+        .Content(@<text>
+            <div id="Content_Creation"></div>
+        </text>)
+                .ClientEvents(clientEvents => clientEvents
+                    .OnClose("Window_LogInToEvent_OnClose"))
+)
+
+
+
+<script type="text/javascript">
+
+    //function onDataBound() {
+    //resetAllTelerikIconTitles();
+    //addTooltips();
+    //}
+
+
+    function onClickRegister(id)
+    {
+        $.get('@Url.Action("LogInToEvent", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', { id: id }, function (data) {
+            $('#Content_Creation').html(data);
+            var window = $('#Window_LogInToEvent').data('tWindow');
+            window.center().open();
+        });
+    }
+
+    function onClickEdit(id)
+    {
+        $.get('@Url.Action("LogInToEvent", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', { id: id }, function (data) {
+            $('#Content_Creation').html(data);
+            var window = $('#Window_LogInToEvent').data('tWindow');
+            window.center().open();
+        });
+    }
+
+    function Window_LogInToEvent_OnClose() {
+
+        $('#Content_Creation').empty();
+    }
+
+    function logInToEvent_onSuccess(data) {
+        if (data.success) {
+            $('#Window_LogInToEvent').data('tWindow').close();
+            if (data.Edit) {
+                window.location.href = "../../DCM/Form/LoadMetadataFromExternal";
+            }
+            else {
+                window.location.href = "../../DCM/Form/StartMetadataEditor";
+            }
+
+        }
+        else {
+            $('#Content_Creation').html(data);
+            var window23 = $('#Window_LogInToEvent').data('tWindow');
+            window23.center().open();
+        }
+    }
+
+
+</script>
+

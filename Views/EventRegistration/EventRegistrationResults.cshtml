@@ -1,0 +1,62 @@
+﻿@using Telerik.Web.Mvc.UI
+@using System.Data
+@using BExIS.Web.Shell.Areas.EMM.Models;
+
+@model  DataTable
+
+@section Information
+{
+    With this interface you get all registration from all open and closed events.
+    <p>
+        <a href="/RBM/Help/Index/#_Toc434570750" class="bx-informationLink" title="go to help" target="_blank">More</a>
+    </p>
+}
+
+@(Html.Telerik().Grid(Model)
+            .Name("EventRegistrationResults")
+            .Pageable()
+           .Columns(columns =>
+           {
+               foreach (DataColumn dc in Model.Columns)
+               {
+                   string title;
+
+                   if (dc.Caption == "")
+                   {
+                       title = dc.ColumnName;
+                   }
+                   else
+                   {
+                       title = dc.Caption;
+                   }
+
+                   columns.Bound(dc.DataType, dc.ColumnName)
+                             .Title(title);
+               }
+           }
+
+        )
+)
+
+@Html.ActionLink("Export to excel", "ExportToExcel", "EventRegistration", new { @class = "bx-button function" })
+
+
+@section LeftPane
+{
+    <div id="Content_Events">
+
+    </div>
+}
+
+
+<script type="text/javascript">
+
+    $(window).load(function () {
+
+        $.get('@Url.Action("FillTree", "EventRegistration")', function (data) {
+
+            $('#Content_Events').html(data);
+        });
+    })
+
+</script>
