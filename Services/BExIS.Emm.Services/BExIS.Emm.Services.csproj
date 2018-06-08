@@ -39,10 +39,13 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="Vaiona.Entities">
-      <HintPath>..\Libraries\Vaiona\Vaiona.Entities.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Libraries\Vaiona\Vaiona.Entities.dll</HintPath>
     </Reference>
     <Reference Include="Vaiona.Persistence.Api">
-      <HintPath>..\Libraries\Vaiona\Vaiona.Persistence.Api.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Libraries\Vaiona\Vaiona.Persistence.Api.dll</HintPath>
+    </Reference>
+    <Reference Include="Vaiona.Utils">
+      <HintPath>..\..\..\..\..\..\Libraries\Vaiona\Vaiona.Utils.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -51,15 +54,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Components\DLM\BExIS.Dlm.Entities\BExIS.Dlm.Entities.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\Components\DLM\BExIS.Dlm.Entities\BExIS.Dlm.Entities.csproj">
       <Project>{b4e7b1bf-01b4-40af-8d19-b8f362167261}</Project>
       <Name>BExIS.Dlm.Entities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\BExIS.Emm.Entities\BExIS.Emm.Entities.csproj">
+    <ProjectReference Include="..\..\Entities\BExIS.Emm.Entities\BExIS.Emm.Entities.csproj">
       <Project>{2a701141-381e-4ad0-a446-094e4d22bee4}</Project>
       <Name>BExIS.Emm.Entities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Components\AAA\BExIS.Security.Entities\BExIS.Security.Entities.csproj">
+    <ProjectReference Include="..\..\..\..\..\..\Components\AAA\BExIS.Security.Entities\BExIS.Security.Entities.csproj">
       <Project>{c230693b-d780-438b-b26c-82257642dd5c}</Project>
       <Name>BExIS.Security.Entities</Name>
     </ProjectReference>
