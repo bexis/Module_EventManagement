@@ -43,24 +43,24 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Mappings\Default\Event\Event.hbm.xml">
+    <EmbeddedResource Include="Mappings\PostgreSQL82Dialect\Event\Event.hbm.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Mappings\Default\Event\EventRegistration.hbm.xml">
+    <EmbeddedResource Include="Mappings\PostgreSQL82Dialect\Event\EventRegistration.hbm.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Mappings\DB2Dialect\" />
+    <Folder Include="Mappings\Default\" />
     <Folder Include="Mappings\MsSql2008Dialect\" />
-    <Folder Include="Mappings\PostgreSQL82Dialect\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>rmdir /S /Q  "$(SolutionDir)Workspace\Modules\EMM\Db\Mappings"
-C:\Windows\System32\xcopy "$(ProjectDir)Mappings" "$(SolutionDir)Workspace\Modules\EMM\Db\Mappings" /E /C /Y /I</PostBuildEvent>
+    <PostBuildEvent>rmdir /S /Q  "$(SolutionDir)Console\Workspace\Modules\EMM\Db\Mappings"
+C:\Windows\System32\xcopy "$(ProjectDir)Mappings" "$(SolutionDir)Console\Workspace\Modules\EMM\Db\Mappings" /E /C /Y /I</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
