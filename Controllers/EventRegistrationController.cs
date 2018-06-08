@@ -55,7 +55,7 @@ namespace BExIS.Web.Shell.Areas.EMM.Controllers
 
             SubjectManager subManager = new SubjectManager();
             EventRegistrationManager erManager = new EventRegistrationManager();
-            User user = subManager.GetUserByName(HttpContext.User.Identity.Name);
+            User user = subManager.Subjects.Where(a=>a.Name== HttpContext.User.Identity.Name).FirstOrDefault() as User;
 
             foreach (Event e in allEvents)
             {
@@ -82,7 +82,7 @@ namespace BExIS.Web.Shell.Areas.EMM.Controllers
             //check if it is an edit
             SubjectManager subManager = new SubjectManager();
             EventRegistrationManager erManager = new EventRegistrationManager();
-            User user = subManager.GetUserByName(HttpContext.User.Identity.Name);
+            User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
             EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, long.Parse(id));
             if (reg != null)
             {
@@ -113,7 +113,7 @@ namespace BExIS.Web.Shell.Areas.EMM.Controllers
                 {
                     EventRegistrationManager erManager = new EventRegistrationManager();
                     SubjectManager subManager = new SubjectManager();
-                    User user = subManager.GetUserByName(HttpContext.User.Identity.Name);
+                    User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
                     EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
 
                     taskManager.AddToBus(CreateTaskmanager.METADATA_XML, XDocument.Load(new XmlNodeReader(reg.Data)));
@@ -165,7 +165,7 @@ namespace BExIS.Web.Shell.Areas.EMM.Controllers
                 }
             }
 
-            User user = subManager.GetUserByName(HttpContext.User.Identity.Name);
+            User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
             EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
             if (reg != null)
             {
@@ -349,7 +349,7 @@ namespace BExIS.Web.Shell.Areas.EMM.Controllers
             submitAction.ActionName = "Save";
             submitAction.ControllerName = "EventRegistration";
             submitAction.AreaName = "EMM";
-            submitAction.IsPartial = false;
+            //submitAction..IsPartial = false;
 
 
             //taskManager.Actions.Add(CreateTaskmanager.CANCEL_ACTION, cancelAction);
