@@ -4,7 +4,6 @@
     <!--add proper description-->
   </Description>
   <Assemblies>
-    <Assembly fullName="" role=""/>
   </Assemblies>
   <Dependencies>
     <!--<Dependency moduleId="dcm" version="*.*.*" />-->
@@ -12,10 +11,15 @@
   <Exports>
     <!--add proper menu items-->
 	
-    <Export tag="menubar" id="emmMenu" order="10"
+    <Export tag="menubar" id="EMMMenu" order="13"
             title="Event Tool" description="EMM desc" icon=""
-            controller="main" action="index"
+            controller="Event" action="EventManager"
             extends="./menubarRoot" />
+
+    <Export tag="menubar" id="BMMenu_EMM" order="13"
+            title="Event Manager" description="EMM desc" icon=""
+            controller="Event" action="EventManager"
+            extends="./menubarRoot/EMMMenu" />
     
 	<!-- Settings Example-->
     <!--<Export tag="settings" id="manageMetadata" order="1"
