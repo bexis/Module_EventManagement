@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Vaiona.Persistence.Api;
+using Vaiona.Entities;
 using E = BExIS.Emm.Entities.Event;
 
 namespace BExIS.Emm.Services.Event
