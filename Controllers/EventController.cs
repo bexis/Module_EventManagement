@@ -6,7 +6,7 @@ using Telerik.Web.Mvc;
 using BExIS.Security.Entities.Subjects;
 using BExIS.Security.Entities.Objects;
 using Vaiona.Web.Mvc.Models;
-
+using Vaiona.Model;
 using Vaiona.Web.Extensions;
 using BExIS.Web.Shell.Areas.EMM.Models;
 using BExIS.Emm.Services.Event;
@@ -17,7 +17,7 @@ using System.Text;
 using BExIS.Dlm.Services.MetadataStructure;
 using BExIS.Dlm.Entities.MetadataStructure;
 
-namespace BExIS.Web.Shell.Areas.EMM.Controllers
+namespace BExIS.Modules.EMM.UI.Controllers
 {
     public class EventController : Controller
     {
