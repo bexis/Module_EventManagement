@@ -25,7 +25,7 @@ using Vaiona.Utils.Cfg;
 using Vaiona.Web.Extensions;
 using Vaiona.Web.Mvc.Models;
 
-namespace BExIS.Web.Shell.Areas.EMM.Controllers
+namespace BExIS.Modules.EMM.UI.Controllers
 {
     public class EventRegistrationController : Controller
     {
