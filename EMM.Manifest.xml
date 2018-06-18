@@ -4,6 +4,8 @@
     <!--add proper description-->
   </Description>
   <Assemblies>
+    <Assembly fullName="BExIS.Emm.Entities" role=""/>
+    <Assembly fullName="BExIS.Emm.Services" role=""/>
   </Assemblies>
   <Dependencies>
     <!--<Dependency moduleId="dcm" version="*.*.*" />-->
