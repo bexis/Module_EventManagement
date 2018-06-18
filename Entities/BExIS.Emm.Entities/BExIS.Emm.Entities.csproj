@@ -46,8 +46,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Event\Event.cs" />
-    <Compile Include="Event\EventRegistration.cs" />
+    <Compile Include="Events\Event.cs" />
+    <Compile Include="Events\EventRegistration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
