@@ -44,6 +44,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Web.Helpers">
       <HintPath>..\..\..\..\packages\Microsoft.AspNet.WebHelpers.3.2.3\lib\net45\Microsoft.Web.Helpers.dll</HintPath>
       <Private>True</Private>
@@ -101,10 +102,28 @@
       <Private>True</Private>
       <HintPath>..\..\..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
+    <Reference Include="Telerik.Web.Mvc">
+      <HintPath>..\..\..\..\packages\TelerikMvcExtensions.2012.3.1018\lib\net40\Telerik.Web.Mvc.dll</HintPath>
+    </Reference>
     <Reference Include="Vaiona.Entities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="Vaiona.Logging, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Libraries\Vaiona\Vaiona.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Vaiona.Model">
+      <HintPath>..\..\..\..\Libraries\Vaiona\Vaiona.Model.dll</HintPath>
+    </Reference>
+    <Reference Include="Vaiona.Persistence.Api">
+      <HintPath>..\..\..\..\Libraries\Vaiona\Vaiona.Persistence.Api.dll</HintPath>
+    </Reference>
+    <Reference Include="Vaiona.Utils">
+      <HintPath>..\..\..\..\Libraries\Vaiona\Vaiona.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Vaiona.Web">
+      <HintPath>..\..\..\..\Libraries\Vaiona\Vaiona.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="Vaiona.Web.Mvc">
+      <HintPath>..\..\..\..\Libraries\Vaiona\Vaiona.Web.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="Vaiona.Web.Mvc.Modularity, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -112,7 +131,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\EventController.cs" />
+    <Compile Include="Controllers\EventRegistrationController.cs" />
     <Compile Include="EMMModule.cs" />
+    <Compile Include="Models\EventModel.cs" />
+    <Compile Include="Models\EventRegistrationModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -124,6 +147,13 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="web.config" />
     <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Event\EditEvent.cshtml" />
+    <Content Include="Views\Event\EventManager.cshtml" />
+    <Content Include="Views\EventRegistration\AvailableEventsList.cshtml" />
+    <Content Include="Views\EventRegistration\EventRegistrationResults.cshtml" />
+    <Content Include="Views\EventRegistration\FormEventRegistration.cshtml" />
+    <Content Include="Views\EventRegistration\_logInToEvent.cshtml" />
+    <Content Include="Views\EventRegistration\_selectEvent.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -132,11 +162,51 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controllers\" />
     <Folder Include="Helper\" />
-    <Folder Include="Models\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\fonts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Components\AAA\BExIS.Security.Entities\BExIS.Security.Entities.csproj">
+      <Project>{c230693b-d780-438b-b26c-82257642dd5c}</Project>
+      <Name>BExIS.Security.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Components\AAA\BExIS.Security.Services\BExIS.Security.Services.csproj">
+      <Project>{681c8bc4-55f0-4f43-a685-90e246a88cb1}</Project>
+      <Name>BExIS.Security.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Components\DLM\BExIS.Dlm.Entities\BExIS.Dlm.Entities.csproj">
+      <Project>{b4e7b1bf-01b4-40af-8d19-b8f362167261}</Project>
+      <Name>BExIS.Dlm.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Components\DLM\BExIS.Dlm.Services\BExIS.Dlm.Services.csproj">
+      <Project>{c4ca0a99-0af3-4372-a9b7-b9073599bd8b}</Project>
+      <Name>BExIS.Dlm.Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Components\IO\BExIS.IO.Transform.Output\BExIS.IO.Transform.Output.csproj">
+      <Project>{455ec826-9a92-40ff-bd3b-388c288955ce}</Project>
+      <Name>BExIS.IO.Transform.Output</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Components\XML\BExIS.Xml.Helpers\BExIS.Xml.Helpers.csproj">
+      <Project>{252f7872-a69c-43a6-84b4-4d2abdbdd9ab}</Project>
+      <Name>BExIS.Xml.Helpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Modules\DCM\BExIS.Dcm.CreateDatasetWizard\BExIS.Dcm.CreateDatasetWizard.csproj">
+      <Project>{93eeeda5-6d79-41a1-947b-0a3fc9e46abc}</Project>
+      <Name>BExIS.Dcm.CreateDatasetWizard</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Modules\DCM\BExIS.Dcm.Wizard\BExIS.Dcm.Wizard.csproj">
+      <Project>{d17cdd9d-b87b-441b-9248-5c54e92ffc81}</Project>
+      <Name>BExIS.Dcm.Wizard</Name>
+    </ProjectReference>
+    <ProjectReference Include="Entities\BExIS.Emm.Entities\BExIS.Emm.Entities.csproj">
+      <Project>{2a701141-381e-4ad0-a446-094e4d22bee4}</Project>
+      <Name>BExIS.Emm.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="Services\BExIS.Emm.Services\BExIS.Emm.Services.csproj">
+      <Project>{0a9199f6-3cd0-4eee-9ebd-5d4ae7916c9d}</Project>
+      <Name>BExIS.Emm.Services</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
