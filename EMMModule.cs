@@ -7,7 +7,7 @@ namespace BExIS.Modules.EMM.UI
 {
     public class EMMModule : ModuleBase
     {
-        public EMMModule(): base("emm")
+        public EMMModule(): base("EMM")
         {
 
         }
