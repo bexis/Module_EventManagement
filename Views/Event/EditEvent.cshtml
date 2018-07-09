@@ -3,6 +3,8 @@
 @using BExIS.Web.Shell.Areas.EMM.Models;
 
 @model EventModel
+<link href="@Url.Content("~/Areas/EMM/Content/main.css")" rel="stylesheet" type="text/css" />
+
 
 @Html.ValidationSummary(true)
 @using (Html.BeginForm("Save", "Event", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -10,26 +12,40 @@
     @Html.HiddenFor(m => m.Id)
     <table class="bx-table-form" style="width: 500px;">
         <tr>
-            <td>@Html.LabelFor(m => m.Name)</td>
+            <td>
+                <b title="This field is required" style="color:red">*</b>
+                @Html.LabelFor(m => m.Name)
+            </td>
             <td>
                 @Html.TextBoxFor(m => m.Name, new { @class = "bx-input", @tabindex = "2" })
-                <br />
                 <small>@Html.ValidationMessage("Name")</small>
             </td>
         </tr>
         <tr>
-            <td>@Html.LabelFor(m => m.StartDate)</td>
+            <td>
+                <b title="This field is required" style="color:red">*</b>
+                @Html.LabelFor(m => m.StartDate)
+            </td>
             @if (Model.EditMode)
             {
-                <td>@(Html.Telerik().DatePickerFor(m => m.StartDate).HtmlAttributes("class = 'bx-input', tabindex = '2'"))</td>
+                <td>
+                    @(Html.Telerik().DatePickerFor(m => m.StartDate).HtmlAttributes("class = 'bx-input', tabindex = '2'"))
+                    <small>@Html.ValidationMessage("StartDate")</small>
+                </td>
             }
             else
             {
-                <td>@(Html.Telerik().DatePickerFor(m => m.StartDate).Value(DateTime.Now).HtmlAttributes("class = 'bx-input', tabindex = '2'"))</td>
+                <td>
+                    @(Html.Telerik().DatePickerFor(m => m.StartDate).Value(DateTime.Now).HtmlAttributes("class = 'bx-input', tabindex = '2'"))
+                    <small>@Html.ValidationMessage("StartDate")</small>
+                </td>
             }
         </tr>
         <tr>
-            <td>@Html.LabelFor(m => m.Deadline)</td>
+            <td>
+                <b title="This field is required" style="color:red">*</b>
+                @Html.LabelFor(m => m.Deadline)
+            </td>
             @if (Model.EditMode)
             {
                 <td>@(Html.Telerik().DatePickerFor(m => m.Deadline).HtmlAttributes("class = 'bx-input', tabindex = '2'"))</td>
@@ -40,13 +56,16 @@
             }
         </tr>
         <tr>
-            <td>@Html.LabelFor(m => m.ParticipantsLimitation)</td>
+            <td>
+                <b title="This field is required" style="color:red">*</b>
+                @Html.LabelFor(m => m.ParticipantsLimitation)
+            </td>
             <td>
                 @(Html.Telerik().IntegerTextBoxFor(m => m.ParticipantsLimitation)
-                                                                        .MinValue(1)
-                                                                        .MaxValue(Int32.MaxValue)
-                                                                        .Value(Model.ParticipantsLimitation)
-                                                                        .HtmlAttributes(new { @class = "bx-input", tabindex = "2" })
+                                                                                                .MinValue(1)
+                                                                                                .MaxValue(Int32.MaxValue)
+                                                                                                .Value(Model.ParticipantsLimitation)
+                                                                                                .HtmlAttributes(new { tabindex = "2", style = "border-width: 2px; height: 30px;" })
                 )
             </td>
         </tr>
@@ -55,25 +74,25 @@
             <td>@Html.CheckBoxFor(m => m.EditAllowed, new { @class = "js-switch" })</td>
         </tr>
         <tr>
-            <td>@Html.LabelFor(m => m.LogInName)</td>
             <td>
-                @Html.TextBoxFor(m => m.LogInName, new { @class = "bx-input", @tabindex = "2" })
-                <br />
-                <small>@Html.ValidationMessage("LogInName")</small>
+                <b title="This field is required" style="color:red">*</b>
+                @Html.LabelFor(m => m.LogInPassword)
             </td>
-        </tr>
-        <tr>
-            <td>@Html.LabelFor(m => m.LogInPassword)</td>
             <td>
                 @Html.TextBoxFor(m => m.LogInPassword, new { @class = "bx-input", @tabindex = "2" })
-                <br />
                 <small>@Html.ValidationMessage("LogInPassword")</small>
             </td>
         </tr>
 
         <tr>
-            <td>@Html.LabelFor(m => m.MetadataStructureId)</td>
-            <td>@Html.DropDownListFor(m => m.MetadataStructureId, new SelectList(Model.MetadataStructureList, "Id", "Name"))</td>
+            <td>
+                <b title="This field is required" style="color:red">*</b>
+                @Html.LabelFor(m => m.MetadataStructureList)
+            </td>
+            <td>
+                @Html.DropDownListFor(m => m.MetadataStructureId, new SelectList(Model.MetadataStructureList, "Id", "Name"),new { @class= "bx-dropdown",
+           style = "-webkit-appearance: menulist; height: 30px;"})
+            </td> <!--temporty style to fix removed arrow-->
         </tr>
 
 

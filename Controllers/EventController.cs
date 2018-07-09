@@ -16,11 +16,13 @@ using BExIS.Emm.Entities.Event;
 using System.Text;
 using BExIS.Dlm.Services.MetadataStructure;
 using BExIS.Dlm.Entities.MetadataStructure;
+using BExIS.Xml.Helpers;
 
 namespace BExIS.Modules.EMM.UI.Controllers
 {
     public class EventController : Controller
     {
+
         public ActionResult EventManager()
         {
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Manage Events", this.Session.GetTenant());
@@ -85,11 +87,12 @@ namespace BExIS.Modules.EMM.UI.Controllers
             if (model.Name == null)
                 ModelState.AddModelError("Name", "Name is required.");
 
-            if (model.LogInName == null)
-                ModelState.AddModelError("LogInName", "Login name is required.");
-
             if (model.LogInPassword == null)
                 ModelState.AddModelError("LogInPassword", "Login password is required.");
+
+            if (model.StartDate > model.Deadline)
+                ModelState.AddModelError("StartDate", "Start date needs to be before deadline.");
+
 
             //check if schema file is uploaded
             //if (attachments ==null &&model.Id == 0)
@@ -103,7 +106,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 MetadataStructure ms = mManager.Repo.Get(model.MetadataStructureId);
                 EventManager eManager = new EventManager();
                 if (model.Id == 0)
-                    eManager.CreateEvent(model.Name, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.EditAllowed, model.LogInName, model.LogInPassword, ms);
+                    eManager.CreateEvent(model.Name, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.EditAllowed, model.LogInPassword, ms);
                 else
                 {
                     Event e = eManager.GetEventById(model.Id);
@@ -112,7 +115,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     e.Deadline = model.Deadline;
                     e.ParticipantsLimitation = model.ParticipantsLimitation;
                     e.EditAllowed = model.EditAllowed;
-                    e.LogInName = model.LogInName;
                     e.LogInPassword = model.LogInPassword;
                     e.MetadataStructure = ms;
 
@@ -122,6 +124,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 return View("EventManager");
             }
             else
+                model.MetadataStructureList = GetMetadataStructureList();
                 return View("EditEvent", model);
 
         }
@@ -141,22 +144,35 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         #region helpers
 
-        private List<ListItem> GetMetadataStructureList()
+
+        public List<ListItem> GetMetadataStructureList()
         {
-            List<ListItem> tmp = new List<ListItem>();
-
             MetadataStructureManager metadataStructureManager = new MetadataStructureManager();
-
-            foreach (var item in metadataStructureManager.Repo.Get())
+            XmlDatasetHelper xmlDatasetHelper = new XmlDatasetHelper();
+            try
             {
-                tmp.Add(new ListItem()
-                {
-                    Id = item.Id,
-                    Name = item.Name
-                });
 
+                IEnumerable<MetadataStructure> metadataStructureList = metadataStructureManager.Repo.Get();
+
+                List<ListItem> temp = new List<ListItem>();
+
+                foreach (MetadataStructure metadataStructure in metadataStructureList)
+                {
+                    if (xmlDatasetHelper.IsActive(metadataStructure.Id) &&
+                        xmlDatasetHelper.HasEntityType(metadataStructure.Id, "BExIS.Emm.Entities.Event.Event"))
+                    {
+                        string title = metadataStructure.Name;
+
+                        temp.Add(new ListItem(metadataStructure.Id, title));
+                    }
+                }
+
+                return temp.OrderBy(p => p.Name).ToList();
             }
-            return tmp;
+            finally
+            {
+                metadataStructureManager.Dispose();
+            }
         }
 
         #endregion

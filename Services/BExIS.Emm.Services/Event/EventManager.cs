@@ -9,10 +9,11 @@ using System.Xml;
 using Vaiona.Persistence.Api;
 using Vaiona.Entities;
 using E = BExIS.Emm.Entities.Event;
+using BExIS.Security.Services.Objects;
 
 namespace BExIS.Emm.Services.Event
 {
-    public class EventManager
+    public class EventManager: IEntityStore
     {
         public EventManager()
         {
@@ -32,7 +33,7 @@ namespace BExIS.Emm.Services.Event
         /// <summary>
         /// Creates an EventRegistration <seealso cref="EventRegistration"/> and persists the entity in the database.
         /// </summary>
-        public E.Event CreateEvent(string name, DateTime startDate, DateTime deadline, int participantsLimitation, bool editAllowed, string logInName, string logInPassword, MetadataStructure metadataStructure)
+        public E.Event CreateEvent(string name, DateTime startDate, DateTime deadline, int participantsLimitation, bool editAllowed, string logInPassword, MetadataStructure metadataStructure)
         {
             E.Event newEvent = new E.Event();
             newEvent.Name = name;
@@ -41,7 +42,6 @@ namespace BExIS.Emm.Services.Event
             newEvent.Deadline = deadline;
             newEvent.ParticipantsLimitation = participantsLimitation;
             newEvent.EditAllowed = editAllowed;
-            newEvent.LogInName = logInName;
             newEvent.LogInPassword = logInPassword;
 
             using (IUnitOfWork uow = this.GetUnitOfWork())
@@ -96,7 +96,13 @@ namespace BExIS.Emm.Services.Event
             return EventRepo.Query(u => u.Id == id).FirstOrDefault();
         }
 
+        public List<EntityStoreItem> GetEntities()
+        {
+            throw new NotImplementedException();
+        }
+
 
         #endregion
     }
+
 }

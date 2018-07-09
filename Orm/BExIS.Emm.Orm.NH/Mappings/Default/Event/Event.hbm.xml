@@ -72,10 +72,6 @@
       <column name="EditAllowed" />
     </property>
 
-    <property name="LogInName" type="string">
-      <column name="LogInName" />
-    </property>
-
     <property name="LogInPassword" type="string">
       <column name="LogInPassword" />
     </property>

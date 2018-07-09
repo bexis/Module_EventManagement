@@ -14,15 +14,6 @@
 
             <tr>
                 <td>
-                    @Html.LabelFor(m => m.LogInName)
-                </td>
-                <td>
-                    @Html.TextBoxFor(m => m.LogInName, new { @class = "t-input bx-input" })<br />
-                    @Html.ValidationMessage("username")
-                </td>
-            </tr>
-            <tr>
-                <td>
                     @Html.LabelFor(m => m.LogInPassword)
                 </td>
                 <td>
@@ -34,7 +25,7 @@
         </table>
 
         <div class="bx-footer right">
-            <button type="submit" class="bx-button action">Go to event</button>
+            <button type="submit" class="bx-button action">Continue registration</button>
             @*@Html.ActionLink("Go to Event", "LoadForm", "EventRegistration", new { id = Model.EventId }, new { @class = "bx-button action" })*@
             <button type="button" class="bx-button action" onclick="Window_LogOn_Cancel()">Cancel</button>
         </div>

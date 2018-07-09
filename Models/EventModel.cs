@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Xml;
+using System.ComponentModel;
 
 namespace BExIS.Web.Shell.Areas.EMM.Models
 {
@@ -11,24 +12,27 @@ namespace BExIS.Web.Shell.Areas.EMM.Models
     {
         public long Id { get; set; }
 
+        [DisplayName("Event name")]
         public string Name { get; set; }
 
         public XmlDocument Schema { get; set; }
 
         public string SchemaFileName { get; set; }
 
+        [DisplayName("Start date")]
         public DateTime StartDate { get; set; }
 
         public DateTime Deadline { get; set; }
 
+        [DisplayName("Participants limitation")]
         public int ParticipantsLimitation { get; set; }
 
+        [DisplayName("Allow edit")]
         public bool EditAllowed { get; set; }
 
         public bool EditMode { get; set; }
 
-        public string LogInName { get; set; }
-
+        [DisplayName("Event password")]
         public string LogInPassword { get; set; }
 
         public bool InUse { get; set; }
@@ -37,6 +41,7 @@ namespace BExIS.Web.Shell.Areas.EMM.Models
 
         public bool EditAccess { get; set; }
 
+        [DisplayName("Registration Template")]
         public List<ListItem> MetadataStructureList { get; set; }
 
         public long MetadataStructureId { get; set; }
@@ -67,7 +72,6 @@ namespace BExIS.Web.Shell.Areas.EMM.Models
             //    ParticipantsLimitation = eEvent.ParticipantsLimitation.ToString();
 
             EditAllowed = eEvent.EditAllowed;
-            LogInName = eEvent.LogInName;
             LogInPassword = eEvent.LogInPassword;
 
             DeleteAccess = true;
@@ -82,5 +86,11 @@ namespace BExIS.Web.Shell.Areas.EMM.Models
     {
         public long Id { get; set; }
         public string Name { get; set; }
+
+        public ListItem(long id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
     }
 }

@@ -68,7 +68,7 @@
 
 @(Html.Telerik().Window()
         .Name("Window_LogInToEvent")
-        .Title("Login to Event")
+        .Title("Event registration")
         .Draggable(true)
         .Modal(true)
         .Visible(false)
@@ -117,12 +117,8 @@
     function logInToEvent_onSuccess(data) {
         if (data.success) {
             $('#Window_LogInToEvent').data('tWindow').close();
-            if (data.Edit) {
-                window.location.href = "../../DCM/Form/LoadMetadataFromExternal";
-            }
-            else {
-                window.location.href = "../../DCM/Form/StartMetadataEditor";
-            }
+
+            window.location.href = "../../EMM/EventRegistration/LoadMetadataForm";
 
         }
         else {

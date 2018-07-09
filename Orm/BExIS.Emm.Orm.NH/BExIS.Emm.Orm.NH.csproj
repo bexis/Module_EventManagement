@@ -43,19 +43,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Mappings\PostgreSQL82Dialect\Event\Event.hbm.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Mappings\PostgreSQL82Dialect\Event\EventRegistration.hbm.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <Folder Include="Mappings\DB2Dialect\" />
+    <Folder Include="Mappings\MsSql2008Dialect\" />
+    <Folder Include="Mappings\PostgreSQL82Dialect\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Mappings\DB2Dialect\" />
-    <Folder Include="Mappings\Default\" />
-    <Folder Include="Mappings\MsSql2008Dialect\" />
+    <Content Include="Mappings\Default\Event\Event.hbm.xml" />
+    <Content Include="Mappings\Default\Event\EventRegistration.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

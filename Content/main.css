@@ -52,3 +52,13 @@ label.bx-disabled {
     opacity: 0.6;
     pointer-events: none; /* workaround for checkboxes being disabled, but still send to model */
 }
+
+
+.t-numerictextbox .t-input {
+    border-width: 2px;
+    height: 30px;
+}
+
+table {
+    white-space: nowrap;
+}

@@ -18,12 +18,23 @@
             controller="Event" action="EventManager"
             extends="./menubarRoot" />
 
-    <Export tag="menubar" id="BMMenu_EMM" order="13"
-            title="Event Manager" description="EMM desc" icon=""
+    <Export tag="menubar" id="eventRegistration" order="12"
+            title="Event Registration" description="Register for events" icon=""
+            controller="EventRegistration" action="EventRegistration"
+            extends="./menubarRoot/EMMMenu" />
+
+    <Export tag="menubar" id="eventManger" order="13"
+            title="Event Manager" description="Manage events" icon=""
             controller="Event" action="EventManager"
             extends="./menubarRoot/EMMMenu" />
-    
-	<!-- Settings Example-->
+  
+    <Export tag="settings" id="mangeEvents" order="20"
+            title="Manage Events" description="Manage events" icon=""
+            controller="Event" action="EventManager"
+            extends="./settingsRoot" />
+
+
+    <!-- Settings Example-->
     <!--<Export tag="settings" id="manageMetadata" order="1"
             title="Manage Metadata Structure" description="Edit or Importa new Metadata Structure" icon=""
             controller="ManageMetadataStructure" action="Index" argument=""

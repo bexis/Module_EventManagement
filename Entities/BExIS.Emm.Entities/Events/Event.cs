@@ -23,8 +23,6 @@ namespace BExIS.Emm.Entities.Event
 
         public virtual bool EditAllowed { get; set; }
 
-        public virtual string LogInName { get; set; }
-
         public virtual string LogInPassword { get; set; }
 
 

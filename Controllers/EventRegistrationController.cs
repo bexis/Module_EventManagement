@@ -18,12 +18,14 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Routing;
 using System.Xml;
 using System.Xml.Linq;
 using Telerik.Web.Mvc;
 using Vaiona.Utils.Cfg;
 using Vaiona.Web.Extensions;
 using Vaiona.Web.Mvc.Models;
+using Vaiona.Web.Mvc.Modularity;
 
 namespace BExIS.Modules.EMM.UI.Controllers
 {
@@ -35,6 +37,14 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             List<EventRegistrationModel> model = GetAvailableEvents();
             return View("AvailableEventsList", model);
+        }
+
+        public ActionResult EventRegistrationPatial()
+        {
+            ViewBag.Title = PresentationModel.GetViewTitleForTenant("Manage Event Registrations", this.Session.GetTenant());
+
+            List<EventRegistrationModel> model = GetAvailableEvents();
+            return PartialView("AvailableEventsList", model);
         }
 
         #region Register to Event
@@ -97,11 +107,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
             EventManager eManager = new EventManager();
             Event e = eManager.EventRepo.Get(model.EventId);
 
-            if (e.LogInName != model.LogInName)
-                ModelState.AddModelError("username", "The user name is wrong.");
-
             if (e.LogInPassword != model.LogInPassword)
-                ModelState.AddModelError("passwort", "The passwort name is wrong.");
+                ModelState.AddModelError("passwort", "The event passwort is wrong.");
 
             if (ModelState.IsValid)
             {
@@ -119,6 +126,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     taskManager.AddToBus(CreateTaskmanager.METADATA_XML, XDocument.Load(new XmlNodeReader(reg.Data)));
                 }
 
+                taskManager.AddToBus(CreateTaskmanager.SAVE_WITH_ERRORS, false);
+
                 Session["CreateDatasetTaskmanager"] = taskManager;
 
                 setAdditionalFunctions();
@@ -134,8 +143,24 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         }
 
-        public ActionResult Save()
+        public ActionResult LoadMetadataForm()
         {
+
+            var result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Copy" }, { "controllerName", "CreateDataset" }, { "area", "DCM" }, { "type", "copy" } });
+            result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Reset" }, { "controllerName", "Form" }, { "area", "Form" }, { "type", "reset" } });
+            result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Cancel" }, { "controllerName", "Form" }, { "area", "DCM" }, { "type", "cancel" } });
+            result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Save" }, { "controllerName", "EventRegistration" }, { "area", "EMM" }, { "type", "submit" } });
+
+            var view = this.Render("DCM", "Form", "StartMetadataEditor", new RouteValueDictionary()
+            {
+            });
+
+    
+            return Content(view.ToHtmlString(), "text/html");
+    }
+
+    public ActionResult Save()
+    {
             EventRegistrationManager erManager = new EventRegistrationManager();
             EventManager eManager = new EventManager();
             SubjectManager subManager = new SubjectManager();
@@ -183,8 +208,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
             //    pManager.CreateDataPermission(user.Id, 2, resource.Id, rightType);
             //}
 
-
-            return RedirectToAction("EventRegistration");
+            // return replace by parialview succesfully registrated-  send mail
+            return RedirectToAction("EventRegistrationPatial");
         }
 
         #endregion
@@ -205,7 +230,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             string path = excelWriter.CreateFile(eventName);
 
-            excelWriter.AddDataTableToExcel(GetEventResults(long.Parse(eventId)), path);
+            //excelWriter.AddDataTableToExcel(GetEventResults(long.Parse(eventId)), path);
 
             return File(path, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         }

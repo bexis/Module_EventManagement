@@ -41,13 +41,8 @@ namespace BExIS.Web.Shell.Areas.EMM.Models
 
         public long EventId { get; set; }
 
-
-        [Display(Name = "Login to event")]
-        public string LogInName { get; set; }
-
-
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Event password")]
         public string LogInPassword { get; set; }
 
         public bool Edit { get; set; }
