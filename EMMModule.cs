@@ -1,4 +1,5 @@
 ﻿//using BExIS.Modules.Lui.UI.Helper;
+using BExIS.Modules.EMM.UI.Helpers;
 using System;
 using Vaiona.Logging;
 using Vaiona.Web.Mvc.Modularity;
@@ -24,7 +25,8 @@ namespace BExIS.Modules.EMM.UI
             try
             {
                 base.Install();
-                //EMMSeedDataGenerator.CreateFeatures();
+                EMMSeedDataGenerator eMMSeedDataGenerator = new EMMSeedDataGenerator();
+                eMMSeedDataGenerator.GenerateSeedData();
             }
             catch (Exception e)
             {
