@@ -30,9 +30,9 @@
 
                     columns.Bound(r => r.Id).Width(90);
                     columns.Bound(r => r.Name);
-                    columns.Bound(r => r.ParticipantsLimitation);
-                    columns.Bound(r => r.StartDate);
-                    columns.Bound(r => r.Deadline);
+                    columns.Bound(r => r.ParticipantsLimitation) ;
+                    columns.Bound(r => r.StartDate).Format("{0: dd-MM-yyyy}");
+                    columns.Bound(r => r.Deadline).Format("{0: dd-MM-yyyy}"); ;
                     columns.Bound(r => r.EditAllowed);
                     columns.Template(
                         @<text>

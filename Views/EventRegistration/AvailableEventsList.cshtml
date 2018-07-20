@@ -5,10 +5,10 @@
 
 @section Information
 {
-    With this interface you are able to manage (e.g. register, edit or delete) event registrations. Here are all available event are listed. You need a passwort to get access to a event. This passwort is usually send to via mail by the project administration.
-    <p>
+   Here you find a list of all events currently available for registration. You can register for an event, view and change (only if allowed) your registration. To register you need a passwort, which is usually send via email by the project administration.
+   <!-- <p>
         <a href="/RBM/Help/Index/#_Toc434570750" class="bx-informationLink" title="go to help" target="_blank">More</a>
-    </p>
+    </p>-->
 }
 
 @{
@@ -25,29 +25,27 @@
                 @<text>
                     @if (item.AlreadyRegistered == false)
                                 {
-                        <div onclick="onClickRegister(@item.Event.Id)" class="bx bx-grid-function bx-sign-in" title="Register for event"></div>
+                        <div onclick="onClickRegister(@item.Event.Id)" class="bx bx-grid-function fa-sign-in" title="Register for event"></div>
                                 }
-                                else
+                                <!--else
                                 {
-                        <div class="bx bx-grid-function bx-sign-in bx-disabled" disabled="disabled" title="Register for event"></div>
+                        <div class="bx bx-grid-function fa-sign-in bx-disabled" disabled="disabled" title="Register for event"></div>
+                                }-->
+                   
+                    @if (item.EditAllowed && item.AlreadyRegistered == true)
+                                {
+                        <div onclick="onClickEdit(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function bx-edit" title="Edit registration"></div>
+                                }
+                     else if (item.AlreadyRegistered == true)
+                                {
+                        <div onclick="onClickView(@item.Event.Id)" class="bx bx-grid-function fa-eye" title="View registration"></div>
 
                                 }
-                    /**/
-                    @if (item.EditAllowed)
-                                {
-                        <div onclick="onClickEdit(@item.Event.Id)" class="bx bx-grid-function bx-edit" title="Edit event"></div>
-                                }
-                                else
-                                {
-                        <div class="bx bx-grid-function bx-edit bx-disabled" disabled="disabled" title="Edit event"></div>
-
-                                }
-                    /**/
                 </text>
-                    ).Width(90);
-                        columns.Bound(r => r.Event.Name);
-                        columns.Bound(r => r.Event.Deadline);
-                        columns.Template(
+                    ).Width(40);
+            columns.Bound(r => r.Event.Name);
+            columns.Bound(r => r.Event.Deadline).Format("{0: dd-MM-yyyy}").Width(200); 
+            columns.Template(
                         @<text>
                             @item.NumberOfRegistration/@item.Event.ParticipantsLimitation
                         </text>
@@ -93,21 +91,31 @@
 
     function onClickRegister(id)
     {
-        $.get('@Url.Action("LogInToEvent", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', { id: id }, function (data) {
+        $.get('@Url.Action("LogInToEvent", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', {id: id }, function (data) {
             $('#Content_Creation').html(data);
             var window = $('#Window_LogInToEvent').data('tWindow');
             window.center().open();
         });
     }
 
-    function onClickEdit(id)
+    function onClickEdit(id, ref_id = null)
     {
-        $.get('@Url.Action("LogInToEvent", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', { id: id }, function (data) {
+        $.get('@Url.Action("LogInToEvent", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', { id: id, ref_id: ref_id}, function (data) {
             $('#Content_Creation').html(data);
             var window = $('#Window_LogInToEvent').data('tWindow');
             window.center().open();
         });
     }
+
+    function onClickView(id)
+    {
+        $.get('@Url.Action("LogInToEvent", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', { id: id, view_only: "true"}, function (data) {
+            $('#Content_Creation').html(data);
+            var window = $('#Window_LogInToEvent').data('tWindow');
+            window.center().open();
+        });
+    }
+
 
     function Window_LogInToEvent_OnClose() {
 
@@ -118,7 +126,7 @@
         if (data.success) {
             $('#Window_LogInToEvent').data('tWindow').close();
 
-            window.location.href = "../../EMM/EventRegistration/LoadMetadataForm";
+            window.location.href = "/EMM/EventRegistration/LoadMetadataForm";
 
         }
         else {

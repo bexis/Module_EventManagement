@@ -21,6 +21,10 @@ namespace BExIS.Web.Shell.Areas.EMM.Models
 
         public bool AlreadyRegistered { get; set; }
 
+        public string AlreadyRegisteredRefId { get; set; }
+
+        public string Message { get; set; }
+
         public EventRegistrationModel()
         {
             Event = new EventModel();
@@ -46,16 +50,20 @@ namespace BExIS.Web.Shell.Areas.EMM.Models
         public string LogInPassword { get; set; }
 
         public bool Edit { get; set; }
+        public bool ViewOnly { get; set; }
 
+        public string RefId { get; set; }
 
         public LogInToEventModel()
         {
 
         }
 
-        public LogInToEventModel(long id)
+        public LogInToEventModel(long id, bool view_only = false, string ref_id = null)
         {
             EventId = id;
+            ViewOnly = view_only;
+            RefId = ref_id;
         }
 
     }

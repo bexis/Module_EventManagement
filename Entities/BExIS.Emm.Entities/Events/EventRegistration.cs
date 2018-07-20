@@ -17,6 +17,8 @@ namespace BExIS.Emm.Entities.Event
 
         public virtual bool Deleted { get; set; }
 
+        public virtual string Token { get; set; }
+
 
         #endregion
 

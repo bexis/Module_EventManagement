@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -31,32 +33,33 @@ namespace BExIS.Modules.EMM.UI.Controllers
 {
     public class EventRegistrationController : Controller
     {
-        public ActionResult EventRegistration()
+        public ActionResult EventRegistration(string ref_id = "")
         {
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Manage Event Registrations", this.Session.GetTenant());
 
-            List<EventRegistrationModel> model = GetAvailableEvents();
+            List<EventRegistrationModel> model = GetAvailableEvents(ref_id);
             return View("AvailableEventsList", model);
         }
 
-        public ActionResult EventRegistrationPatial()
+        public ActionResult EventRegistrationPatial(string message)
         {
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Manage Event Registrations", this.Session.GetTenant());
 
             List<EventRegistrationModel> model = GetAvailableEvents();
+            ViewBag.Message = message;
             return PartialView("AvailableEventsList", model);
         }
 
         #region Register to Event
 
         [GridAction]
-        public ActionResult AvailableEvents()
+        public ActionResult AvailableEvents(string ref_id)
         {
-            List<EventRegistrationModel> model = GetAvailableEvents();
+            List<EventRegistrationModel> model = GetAvailableEvents(ref_id);
             return View("AvailableEventsList", new GridModel<EventRegistrationModel> { Data = model });
         }
 
-        private List<EventRegistrationModel> GetAvailableEvents()
+        private List<EventRegistrationModel> GetAvailableEvents(string ref_id = null)
         {
             EventManager eManger = new EventManager();
             List<Event> allEvents = eManger.GetAllEvents().ToList();
@@ -70,33 +73,56 @@ namespace BExIS.Modules.EMM.UI.Controllers
             foreach (Event e in allEvents)
             {
                 DateTime today = DateTime.Now;
-                if (today >= e.StartDate && today < e.Deadline)
+                if (today >= e.StartDate)
                 {
                     EventRegistrationModel model = new EventRegistrationModel(e);
-                    //check if user already registered
-                    EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
-                    if (reg != null)
-                        model.AlreadyRegistered = true;
-
-                    availableEvents.Add(model);
+                    //check if user already registered (if logged in)
+                    if (user != null)
+                    { 
+                        EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+                        if (reg != null)
+                            model.AlreadyRegistered = true;
+                    }
+                    else if (ref_id != null)
+                    {
+                        EventRegistration reg = erManager.GetRegistrationByRefId(e.Id, ref_id);
+                        if (reg != null)
+                            model.AlreadyRegistered = true;
+                            model.AlreadyRegisteredRefId = ref_id;
+                    }
+                    
+                    
+           
+                    // Show event if either registered or deadline is over
+                    if (today <= e.Deadline || model.AlreadyRegistered == true)
+                        availableEvents.Add(model);
                 }
             }
 
             return availableEvents;
         }
 
-        public ActionResult LogInToEvent(string id)
+        public ActionResult LogInToEvent(string id, string view_only = "false", string ref_id = null)
         {
-            LogInToEventModel model = new LogInToEventModel(long.Parse(id));
+            LogInToEventModel model = new LogInToEventModel(long.Parse(id), bool.Parse(view_only), ref_id);
 
             //check if it is an edit
             SubjectManager subManager = new SubjectManager();
             EventRegistrationManager erManager = new EventRegistrationManager();
             User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
-            EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, long.Parse(id));
-            if (reg != null)
+            if (user != null)
             {
-                model.Edit = true;
+                EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, long.Parse(id));
+                if (reg != null)
+                {
+                    model.Edit = true;
+                }
+            }
+            else if (ref_id != null)
+            {
+                EventRegistration reg = erManager.GetRegistrationByRefId(long.Parse(id), ref_id);
+                if (reg != null)
+                    model.Edit = true;
             }
 
             return PartialView("_logInToEvent", model);
@@ -121,12 +147,26 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     EventRegistrationManager erManager = new EventRegistrationManager();
                     SubjectManager subManager = new SubjectManager();
                     User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
-                    EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+                    if (user != null)
+                    {
+                        EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+                        taskManager.AddToBus(CreateTaskmanager.METADATA_XML, XDocument.Load(new XmlNodeReader(reg.Data)));
+                    }
+                    else if (model.RefId != null)
+                    {
+                        EventRegistration reg = erManager.GetRegistrationByRefId(e.Id, model.RefId);
+                        taskManager.AddToBus(CreateTaskmanager.METADATA_XML, XDocument.Load(new XmlNodeReader(reg.Data)));
+                    }
 
-                    taskManager.AddToBus(CreateTaskmanager.METADATA_XML, XDocument.Load(new XmlNodeReader(reg.Data)));
                 }
 
                 taskManager.AddToBus(CreateTaskmanager.SAVE_WITH_ERRORS, false);
+                if (model.ViewOnly == true)
+                {
+                    taskManager.AddToBus(CreateTaskmanager.LOCKED, true);
+                }
+
+                taskManager.AddToBus(CreateTaskmanager.NO_IMPORT_ACTION, true);
 
                 Session["CreateDatasetTaskmanager"] = taskManager;
 
@@ -146,21 +186,19 @@ namespace BExIS.Modules.EMM.UI.Controllers
         public ActionResult LoadMetadataForm()
         {
 
-            var result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Copy" }, { "controllerName", "CreateDataset" }, { "area", "DCM" }, { "type", "copy" } });
-            result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Reset" }, { "controllerName", "Form" }, { "area", "Form" }, { "type", "reset" } });
-            result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Cancel" }, { "controllerName", "Form" }, { "area", "DCM" }, { "type", "cancel" } });
-            result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Save" }, { "controllerName", "EventRegistration" }, { "area", "EMM" }, { "type", "submit" } });
+            //var result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Copy" }, { "controllerName", "CreateDataset" }, { "area", "DCM" }, { "type", "copy" } });
+            //result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Reset" }, { "controllerName", "Form" }, { "area", "Form" }, { "type", "reset" } });
+            //result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Cancel" }, { "controllerName", "Form" }, { "area", "DCM" }, { "type", "cancel" } });
+            //result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Save" }, { "controllerName", "EventRegistration" }, { "area", "EMM" }, { "type", "submit" } });
 
-            var view = this.Render("DCM", "Form", "StartMetadataEditor", new RouteValueDictionary()
-            {
-            });
+            var view = this.Render("DCM", "Form", "StartMetadataEditor", new RouteValueDictionary()   
+            {});
 
-    
             return Content(view.ToHtmlString(), "text/html");
     }
 
-    public ActionResult Save()
-    {
+        public ActionResult Save()
+        {
             EventRegistrationManager erManager = new EventRegistrationManager();
             EventManager eManager = new EventManager();
             SubjectManager subManager = new SubjectManager();
@@ -191,25 +229,51 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
 
             User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
-            EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
-            if (reg != null)
+            if (user != null)
             {
-                reg.Data = XmlMetadataWriter.ToXmlDocument(data);
-                erManager.UpdateEventRegistration(reg);
+                EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+                if (reg != null)
+                {
+                    reg.Data = XmlMetadataWriter.ToXmlDocument(data);
+                    erManager.UpdateEventRegistration(reg);
+                }
             }
             else
-                erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false);
+            {
+                string guid = System.Guid.NewGuid().ToString();
 
-            ////Set permissions on event registration
-            //PermissionManager pManager = new PermissionManager();
+                XmlNodeList elemList = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("Email");
+                string email = elemList[0].InnerXml;
+            
 
-            //foreach (RightType rightType in Enum.GetValues(typeof(RightType)).Cast<RightType>())
-            //{
-            //    pManager.CreateDataPermission(user.Id, 2, resource.Id, rightType);
-            //}
+                StringBuilder hash = new StringBuilder();
+                MD5CryptoServiceProvider md5provider = new MD5CryptoServiceProvider();
+                byte[] bytes = md5provider.ComputeHash(new UTF8Encoding().GetBytes("abd_" + email));
 
-            // return replace by parialview succesfully registrated-  send mail
-            return RedirectToAction("EventRegistrationPatial");
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    hash.Append(bytes[i].ToString("x2"));
+                }
+                string token = hash.ToString();
+
+
+                erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, token);
+
+
+
+
+                ////Set permissions on event registration
+                //PermissionManager pManager = new PermissionManager();
+
+                //foreach (RightType rightType in Enum.GetValues(typeof(RightType)).Cast<RightType>())
+                //{
+                //    pManager.CreateDataPermission(user.Id, 2, resource.Id, rightType);
+                //}
+
+                // return replace by parialview succesfully registrated-  send mail
+            }
+                return RedirectToAction("EventRegistrationPatial", new { message = message });
+            
         }
 
         #endregion
@@ -223,17 +287,17 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return View("EventRegistrationResults", new DataTable());
         }
 
-        public ActionResult ExportToExcel(string eventName, string eventId)
-        {
-            eventName = "eventName";
-            ExcelWriter excelWriter = new ExcelWriter();
+       // public ActionResult ExportToExcel(string eventName, string eventId)
+       // {
+       //     eventName = "eventName";
+      //      ExcelWriter excelWriter = new ExcelWriter();
 
-            string path = excelWriter.CreateFile(eventName);
+           // string path = excelWriter.CreateFile(eventName);
 
             //excelWriter.AddDataTableToExcel(GetEventResults(long.Parse(eventId)), path);
 
-            return File(path, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        }
+           // return File(path, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+      //  }
 
         public ActionResult FillTree()
         {
@@ -386,4 +450,5 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         #endregion
     }
+
 }

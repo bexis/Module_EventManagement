@@ -28,6 +28,10 @@
       <column name="Deleted" />
     </property>
 
+    <property name="Token" type="String">
+      <column name="Token" />
+    </property>
+
     <!-- Mapping Entity Associations -->
 
     <many-to-one name="Person" class="BExIS.Security.Entities.Subjects.User" column="Person"/>

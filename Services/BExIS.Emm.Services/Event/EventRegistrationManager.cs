@@ -32,14 +32,14 @@ namespace BExIS.Emm.Services.Event
         /// <summary>
         /// Creates an EventRegistration <seealso cref="EventRegistration"/> and persists the entity in the database.
         /// </summary>
-        public E.EventRegistration CreateEventRegistration(XmlDocument data, E.Event e, User user, bool deleted)
+        public E.EventRegistration CreateEventRegistration(XmlDocument data, E.Event e, User user, bool deleted, string token)
         {
             E.EventRegistration eventRegistration = new E.EventRegistration();
             eventRegistration.Data = data;
             eventRegistration.Deleted = deleted;
             eventRegistration.Event = e;
             eventRegistration.Person = user;
-
+            eventRegistration.Token= token;
 
             using (IUnitOfWork uow = this.GetUnitOfWork())
             {
@@ -92,6 +92,12 @@ namespace BExIS.Emm.Services.Event
         {
             return EventRegistrationRepo.Query(a => a.Event.Id == eventId && a.Person.Id == userId).FirstOrDefault();
         }
+
+        public E.EventRegistration GetRegistrationByRefId(long eventId, string ref_id)
+        {
+            return EventRegistrationRepo.Query(a => a.Event.Id == eventId && a.Token == ref_id).FirstOrDefault();
+        }
+
 
         public int GetNumerOfRegistrationsByEvent(long id)
         {
