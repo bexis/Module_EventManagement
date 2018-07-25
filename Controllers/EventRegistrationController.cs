@@ -9,10 +9,12 @@ using BExIS.Security.Entities.Objects;
 using BExIS.Security.Entities.Subjects;
 using BExIS.Security.Services.Authorization;
 using BExIS.Security.Services.Subjects;
+using BExIS.Security.Services.Utilities;
 using BExIS.Web.Shell.Areas.EMM.Models;
 using BExIS.Xml.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -41,11 +43,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return View("AvailableEventsList", model);
         }
 
-        public ActionResult EventRegistrationPatial(string message)
+        public ActionResult EventRegistrationPatial(string message, string ref_id = "")
         {
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Manage Event Registrations", this.Session.GetTenant());
 
-            List<EventRegistrationModel> model = GetAvailableEvents();
+            List<EventRegistrationModel> model = GetAvailableEvents(ref_id);
             ViewBag.Message = message;
             return PartialView("AvailableEventsList", model);
         }
@@ -85,15 +87,14 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     }
                     else if (ref_id != null)
                     {
-                        EventRegistration reg = erManager.GetRegistrationByRefId(e.Id, ref_id);
+                        EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, e.Id);
                         if (reg != null)
                             model.AlreadyRegistered = true;
                             model.AlreadyRegisteredRefId = ref_id;
                     }
-                    
-                    
+
            
-                    // Show event if either registered or deadline is over
+                    // Show event if either registered or deadline is not over
                     if (today <= e.Deadline || model.AlreadyRegistered == true)
                         availableEvents.Add(model);
                 }
@@ -120,7 +121,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
             else if (ref_id != null)
             {
-                EventRegistration reg = erManager.GetRegistrationByRefId(long.Parse(id), ref_id);
+                EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, long.Parse(id));
                 if (reg != null)
                     model.Edit = true;
             }
@@ -154,7 +155,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     }
                     else if (model.RefId != null)
                     {
-                        EventRegistration reg = erManager.GetRegistrationByRefId(e.Id, model.RefId);
+                        EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(model.RefId, e.Id);
                         taskManager.AddToBus(CreateTaskmanager.METADATA_XML, XDocument.Load(new XmlNodeReader(reg.Data)));
                     }
 
@@ -185,17 +186,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         public ActionResult LoadMetadataForm()
         {
-
-            //var result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Copy" }, { "controllerName", "CreateDataset" }, { "area", "DCM" }, { "type", "copy" } });
-            //result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Reset" }, { "controllerName", "Form" }, { "area", "Form" }, { "type", "reset" } });
-            //result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Cancel" }, { "controllerName", "Form" }, { "area", "DCM" }, { "type", "cancel" } });
-            //result = this.Run("DCM", "Form", "SetAdditionalFunctions", new RouteValueDictionary() { { "actionName", "Save" }, { "controllerName", "EventRegistration" }, { "area", "EMM" }, { "type", "submit" } });
-
             var view = this.Render("DCM", "Form", "StartMetadataEditor", new RouteValueDictionary()   
             {});
 
             return Content(view.ToHtmlString(), "text/html");
-    }
+        }
 
         public ActionResult Save()
         {
@@ -217,50 +212,83 @@ namespace BExIS.Modules.EMM.UI.Controllers
             if (eventId != 0)
                 e = eManager.EventRepo.Get(eventId);
 
-            string message = "";
-            //check Participants Limitation
-            if (e.ParticipantsLimitation != 0)
-            {
-                int countRegs = erManager.GetNumerOfRegistrationsByEvent(e.Id);
-                if (countRegs > e.ParticipantsLimitation)
-                {
-                    message = "Number of participants has been reached. You are now on the waiting list.";
-                }
-            }
+            // get email adress from XML && get ref_id based on email adress
+            string email = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("Email")[0].InnerText;
+            string ref_id = GetRefIdFromEmail(email);
 
+            string notificationType = "";
+            string message = "";
+
+            // Check for logged in user
             User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
-            if (user != null)
+
+            // Check if event registration already exists - update registration
+            EventRegistration reg = CheckEventRegistration(user, ref_id, e.Id, erManager);
+
+            // Update event registration
+            if (reg != null )
             {
-                EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
-                if (reg != null)
+                if (e.EditAllowed != true)
                 {
-                    reg.Data = XmlMetadataWriter.ToXmlDocument(data);
-                    erManager.UpdateEventRegistration(reg);
+                    SendEmailNotification("resend", email, ref_id, data, e, user);
+                    return RedirectToAction("EventRegistrationPatial", new { message ="Update of your previous registration is not allowed. You registration details are send to your Email adress again." , message_type = "error"}); 
                 }
+
+                reg.Data = XmlMetadataWriter.ToXmlDocument(data);
+                erManager.UpdateEventRegistration(reg);
+
+                SendEmailNotification("updated", email, ref_id, data, e, user);
+                message = "Registration details sucessfully updated.";
+
             }
+            // New event registration
             else
             {
-                string guid = System.Guid.NewGuid().ToString();
 
-                XmlNodeList elemList = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("Email");
-                string email = elemList[0].InnerXml;
-            
-
-                StringBuilder hash = new StringBuilder();
-                MD5CryptoServiceProvider md5provider = new MD5CryptoServiceProvider();
-                byte[] bytes = md5provider.ComputeHash(new UTF8Encoding().GetBytes("abd_" + email));
-
-                for (int i = 0; i < bytes.Length; i++)
+                //check Participants Limitation
+                if (e.ParticipantsLimitation != 0)
                 {
-                    hash.Append(bytes[i].ToString("x2"));
+                    int countRegs = erManager.GetNumerOfRegistrationsByEvent(e.Id);
+                    if (countRegs > e.ParticipantsLimitation)
+                    {
+                        message = "Number of participants has been reached. You are now on the waiting list.";
+                        notificationType = "succesfully_registered_waiting_list";
+                    }
+                    else
+                    {
+                        message = "You registered sucessfully.";
+                        notificationType = "succesfully_registered";
+                    }
                 }
-                string token = hash.ToString();
+                else
+                {
+                    message = "You registered sucessfully.";
+                    notificationType = "succesfully_registered";
+                }
 
+                // Add hint to message text
+                string change = "";
+                if (e.EditAllowed == true)
+                {
+                   change = "and change";
+                }
+                else
+                {
+                    change = "(edit is not allowed - in urgent cases please contact ...)"; // todo fill with mail adress
+                }
+                if (user != null)
+                {
+                    message = message + " To view "+ change+" your registration log in or follow the link send via email.";
+                }
+                else
+                {
+                    message =  message + " To view " + change + " your registration follow the link send via email.";
+                }
 
-                erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, token);
-
-
-
+                // Save registration and send notification
+                erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id);
+                SendEmailNotification(notificationType, email, ref_id, data, e, user);
+                
 
                 ////Set permissions on event registration
                 //PermissionManager pManager = new PermissionManager();
@@ -270,10 +298,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 //    pManager.CreateDataPermission(user.Id, 2, resource.Id, rightType);
                 //}
 
-                // return replace by parialview succesfully registrated-  send mail
             }
-                return RedirectToAction("EventRegistrationPatial", new { message = message });
-            
+            return RedirectToAction("EventRegistrationPatial", new { message = message, ref_id = ref_id}); 
         }
 
         #endregion
@@ -358,6 +384,18 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return results;
         }
 
+        private DataTable GetEventRegistration(long eventId, XDocument data)
+        {
+            DataTable results = new DataTable();
+
+            EventRegistrationManager erManager = new EventRegistrationManager();
+
+            results = CreateDataTableColums(results, XElement.Load(new XmlNodeReader(XmlMetadataWriter.ToXmlDocument(data))));
+            results.Rows.Add(AddDataRow(XElement.Load(new XmlNodeReader(XmlMetadataWriter.ToXmlDocument(data))), results));
+         
+            return results;
+        }
+
         private DataTable CreateDataTableColums(DataTable dataTable, XElement x)
         {
             DataTable dt = dataTable;
@@ -413,6 +451,97 @@ namespace BExIS.Modules.EMM.UI.Controllers
         #endregion
 
         #region Helper
+
+        private string GetRefIdFromEmail(string email)
+        {
+            StringBuilder hash = new StringBuilder();
+            MD5CryptoServiceProvider md5provider = new MD5CryptoServiceProvider();
+            byte[] bytes = md5provider.ComputeHash(new UTF8Encoding().GetBytes("abd_" + email));
+
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                hash.Append(bytes[i].ToString("x2"));
+            }
+            string ref_id = hash.ToString();
+
+            return ref_id;
+        }
+
+        private EventRegistration CheckEventRegistration(User user, string ref_id, long event_id, EventRegistrationManager erManager)
+        {
+            EventRegistration reg_ref_id = erManager.GetRegistrationByRefIdAndEvent(ref_id, event_id);
+            if (user != null)
+            {
+                EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, event_id);
+                return reg; // user is logged in
+            }
+            else if (reg_ref_id != null)
+            {
+                return reg_ref_id; // provided ref_id fits to event
+            }
+            else
+            {
+                return null; 
+            }
+        }
+
+        private void SendEmailNotification(string notificationType, string email, string ref_id, XDocument data, Event e, User user)
+        {
+            // todo: add not allowed / log in info to mail
+            string first_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("FirstName")[0].InnerText;
+            string last_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("LastNameTEST")[0].InnerText;
+            string url = Request.Url.GetLeftPart(UriPartial.Authority);
+
+            string mail_message = "";
+            string subject = "";
+
+            switch (notificationType)
+            {
+                case "succesfully_registered":
+                    subject = "Registration confirmation for " + e.Name;
+                    mail_message = "You registered to " + e.Name + ".\n";
+                    break;
+                case "succesfully_registered_waiting_list":
+                    subject = "Registration confirmation for " + e.Name + " - wating list";
+                    mail_message = "You registered to " + e.Name + ", but you are currently on the waiting list. \n";
+                    break;
+                case "updated":
+                    subject = "Registration update confirmation for " + e.Name;
+                    mail_message = "You updated your registration for " + e.Name + ".\n";
+                    break;
+                case "resend":
+                    subject = "Resend of registration confirmation for " + e.Name;
+                    mail_message = "Your registration for " + e.Name + ".\n";
+                    break;
+            }
+
+            string details = "";
+            DataTable res = GetEventRegistration(e.Id, data);
+            int row_count = res.Columns.Count;
+            for (int i = 0; i < row_count; i++)
+            {
+                details = details + res.Columns[i].ToString().Split('/')[res.Columns[i].ToString().Split('/').Length - 2] + ":  " + res.Rows[0][i] + "\n";
+            }
+
+
+            string body = "Dear " + first_name + " " + last_name + ", " + "\n\n" +
+                 mail_message +
+                 "\nYour registration details are:\n\n" + 
+                 details + "\n\n" +
+                 "To view or change your registration follow this link: " + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "\n\n" +
+                 "Sincerely yours, \n" +
+                 "BExIS Team";
+
+            var es = new EmailService();
+            es.Send(
+                subject,
+                body,
+                new List<string> { email }, // to
+                new List<string> { "franzi82@gmx.de" }, // CC todo replace
+                new List<string> { "franzi82@gmx.de" }, // BCC todo replace
+                new List<string> { "franzi82@gmx.de" }  // reply to todo replace
+                );
+        }
 
         private void setAdditionalFunctions()
         {

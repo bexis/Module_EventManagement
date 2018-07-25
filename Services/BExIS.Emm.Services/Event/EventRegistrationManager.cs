@@ -93,7 +93,7 @@ namespace BExIS.Emm.Services.Event
             return EventRegistrationRepo.Query(a => a.Event.Id == eventId && a.Person.Id == userId).FirstOrDefault();
         }
 
-        public E.EventRegistration GetRegistrationByRefId(long eventId, string ref_id)
+        public E.EventRegistration GetRegistrationByRefIdAndEvent(string ref_id, long eventId)
         {
             return EventRegistrationRepo.Query(a => a.Event.Id == eventId && a.Token == ref_id).FirstOrDefault();
         }
