@@ -17,6 +17,8 @@
     pagerStyles |= GridPagerStyles.Numeric;
 }
 
+<span style="color:green">@ViewBag.Message</span>
+
 @(Html.Telerik().Grid(Model)
             .Name("Events")
             .Columns(columns =>
@@ -38,7 +40,7 @@
                                 }
                      else if (item.AlreadyRegistered == true)
                                 {
-                        <div onclick="onClickView(@item.Event.Id)" class="bx bx-grid-function fa-eye" title="View registration"></div>
+                        <div onclick="onClickView(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function fa-eye" title="View registration"></div>
 
                                 }
                 </text>
@@ -107,9 +109,9 @@
         });
     }
 
-    function onClickView(id)
+    function onClickView(id, ref_id = null)
     {
-        $.get('@Url.Action("LogInToEvent", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', { id: id, view_only: "true"}, function (data) {
+        $.get('@Url.Action("LogInToEvent", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', { id: id, view_only: "true", ref_id: ref_id}, function (data) {
             $('#Content_Creation').html(data);
             var window = $('#Window_LogInToEvent').data('tWindow');
             window.center().open();
