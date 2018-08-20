@@ -93,7 +93,7 @@
                                 .Filterable()
                                 .Sortable(sortable => sortable
                                     .OrderBy(orderby => orderby
-                                        .Add(r => r.Id).Descending()))
+                                        .Add(r => r.Deadline).Descending()))
 )
 
 <script type="text/javascript">

@@ -499,19 +499,19 @@ namespace BExIS.Modules.EMM.UI.Controllers
             {
                 case "succesfully_registered":
                     subject = "Registration confirmation for " + e.Name;
-                    mail_message = "You registered to " + e.Name + ".\n";
+                    mail_message = "you registered to " + e.Name + ".\n";
                     break;
                 case "succesfully_registered_waiting_list":
                     subject = "Registration confirmation for " + e.Name + " - wating list";
-                    mail_message = "You registered to " + e.Name + ", but you are currently on the waiting list. \n";
+                    mail_message = "you registered to " + e.Name + ", but you are currently on the waiting list. \n";
                     break;
                 case "updated":
                     subject = "Registration update confirmation for " + e.Name;
-                    mail_message = "You updated your registration for " + e.Name + ".\n";
+                    mail_message = "you updated your registration for " + e.Name + ".\n";
                     break;
                 case "resend":
                     subject = "Resend of registration confirmation for " + e.Name;
-                    mail_message = "Your registration for " + e.Name + ".\n";
+                    mail_message = "your registration for " + e.Name + ".\n";
                     break;
             }
 
@@ -531,15 +531,28 @@ namespace BExIS.Modules.EMM.UI.Controllers
                  "To view or change your registration follow this link: " + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "\n\n" +
                  "Sincerely yours, \n" +
                  "BExIS Team";
-
+     
             var es = new EmailService();
+
+
+            // If no explicit Reply to mail is set use the SystemEmail
+            string replyTo = "";
+            if (String.IsNullOrEmpty(e.EmailReply))
+            {
+                replyTo = ConfigurationManager.AppSettings["SystemEmail"];
+            }
+            else
+            {
+                replyTo = e.EmailReply;
+            }
+
             es.Send(
-                subject,
+                ConfigurationManager.AppSettings["ApplicationName"] + ": " + subject,
                 body,
                 new List<string> { email }, // to
-                new List<string> { "franzi82@gmx.de" }, // CC todo replace
-                new List<string> { "franzi82@gmx.de" }, // BCC todo replace
-                new List<string> { "franzi82@gmx.de" }  // reply to todo replace
+                new List<string> { e.EmailCC }, // CC 
+                new List<string> { ConfigurationManager.AppSettings["SystemEmail"] , e.EmailBCC}, // Allways send BCC to SystemEmail + additional set 
+                new List<string> { replyTo }  
                 );
         }
 

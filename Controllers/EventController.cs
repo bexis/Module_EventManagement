@@ -106,7 +106,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 MetadataStructure ms = mManager.Repo.Get(model.MetadataStructureId);
                 EventManager eManager = new EventManager();
                 if (model.Id == 0)
-                    eManager.CreateEvent(model.Name, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.EditAllowed, model.LogInPassword, ms);
+                    eManager.CreateEvent(model.Name, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.EditAllowed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, ms);
                 else
                 {
                     Event e = eManager.GetEventById(model.Id);
@@ -116,6 +116,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     e.ParticipantsLimitation = model.ParticipantsLimitation;
                     e.EditAllowed = model.EditAllowed;
                     e.LogInPassword = model.LogInPassword;
+                    e.LogInPassword = model.LogInPassword;
+                    e.EmailCC = model.EmailCC;
+                    e.EmailBCC = model.EmailBCC;
+                    e.EmailReply = model.EmailReply;
                     e.MetadataStructure = ms;
 
                     eManager.UpdateEvent(e);

@@ -33,7 +33,7 @@ namespace BExIS.Emm.Services.Event
         /// <summary>
         /// Creates an EventRegistration <seealso cref="EventRegistration"/> and persists the entity in the database.
         /// </summary>
-        public E.Event CreateEvent(string name, DateTime startDate, DateTime deadline, int participantsLimitation, bool editAllowed, string logInPassword, MetadataStructure metadataStructure)
+        public E.Event CreateEvent(string name, DateTime startDate, DateTime deadline, int participantsLimitation, bool editAllowed, string logInPassword, string emailBCC, string emailCC, string emailReply, MetadataStructure metadataStructure)
         {
             E.Event newEvent = new E.Event();
             newEvent.Name = name;
@@ -43,6 +43,9 @@ namespace BExIS.Emm.Services.Event
             newEvent.ParticipantsLimitation = participantsLimitation;
             newEvent.EditAllowed = editAllowed;
             newEvent.LogInPassword = logInPassword;
+            newEvent.EmailBCC = emailBCC;
+            newEvent.EmailCC = emailCC;
+            newEvent.EmailReply = emailReply;
 
             using (IUnitOfWork uow = this.GetUnitOfWork())
             {

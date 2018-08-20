@@ -25,7 +25,11 @@ namespace BExIS.Emm.Entities.Event
 
         public virtual string LogInPassword { get; set; }
 
+        public virtual string EmailBCC { get; set; }
 
+        public virtual string EmailCC { get; set; }
+
+        public virtual string EmailReply { get; set; }
         #endregion
 
         #region Associations

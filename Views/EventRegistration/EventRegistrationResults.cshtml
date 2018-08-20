@@ -11,29 +11,30 @@
         <a href="/RBM/Help/Index/#_Toc434570750" class="bx-informationLink" title="go to help" target="_blank">More</a>
     </p>
 }
+ 
 
 @(Html.Telerik().Grid(Model)
             .Name("EventRegistrationResults")
-            .Pageable()
+            .Sortable()
            .Columns(columns =>
-           {
-               foreach (DataColumn dc in Model.Columns)
-               {
-                   string title;
+            {
+                foreach (DataColumn dc in Model.Columns)
+                {
+                    string title;
 
-                   if (dc.Caption == "")
-                   {
-                       title = dc.ColumnName;
-                   }
-                   else
-                   {
-                       title = dc.Caption;
-                   }
+                    if (dc.Caption == "")
+                    {
+                        title = dc.ColumnName;
+                    }
+                    else
+                    {
+                        title = dc.Caption;
+                    }
 
-                   columns.Bound(dc.DataType, dc.ColumnName)
-                             .Title(title);
-               }
-           }
+                    columns.Bound(dc.DataType, dc.ColumnName)
+                              .Title(title).Width(dc.ColumnName.Length * 3); // forced fixed column width to enable horizontal scrolling
+                }
+            }
 
         )
 )

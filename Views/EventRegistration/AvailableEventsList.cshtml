@@ -34,7 +34,7 @@
                         <div class="bx bx-grid-function fa-sign-in bx-disabled" disabled="disabled" title="Register for event"></div>
                                 }-->
                    
-                    @if (item.EditAllowed && item.AlreadyRegistered == true)
+                    @if (item.EditAllowed && item.AlreadyRegistered == true && item.Event.Deadline >= DateTime.Now)
                                 {
                         <div onclick="onClickEdit(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function bx-edit" title="Edit registration"></div>
                                 }

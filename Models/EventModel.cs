@@ -35,6 +35,16 @@ namespace BExIS.Web.Shell.Areas.EMM.Models
         [DisplayName("Event password")]
         public string LogInPassword { get; set; }
 
+        [DisplayName("BCC email addresses (split by ,)")]
+        public string EmailBCC { get; set; }
+
+        [DisplayName("CC email addresses (split by ,)")]
+        public string EmailCC { get; set; }
+
+        [DisplayName("Reply to mail address")]
+        public string EmailReply { get; set; }
+
+
         public bool InUse { get; set; }
 
         public bool DeleteAccess { get; set; }
@@ -73,6 +83,11 @@ namespace BExIS.Web.Shell.Areas.EMM.Models
 
             EditAllowed = eEvent.EditAllowed;
             LogInPassword = eEvent.LogInPassword;
+
+            EmailBCC = eEvent.EmailBCC;
+            EmailCC = eEvent.EmailCC;
+            EmailReply = eEvent.EmailReply;
+
 
             DeleteAccess = true;
             EditAccess = true;
