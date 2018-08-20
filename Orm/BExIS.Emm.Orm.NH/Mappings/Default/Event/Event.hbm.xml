@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="BExIS.Emm.Entities" namespace="BExIS.Emm.Entities.Event">
-  <class xmlns="urn:nhibernate-mapping-2.2" name="Event" table="Events">
+  <class xmlns="urn:nhibernate-mapping-2.2" name="Event" table="emm_events">
 
     <!-- Mapping BaseEntity properties -->
 
@@ -74,6 +74,18 @@
 
     <property name="LogInPassword" type="string">
       <column name="LogInPassword" />
+    </property>
+
+    <property name="EmailBCC" type="string">
+      <column name="EmailBCC" />
+    </property>
+
+    <property name="EmailCC" type="string">
+      <column name="EmailCC" />
+    </property>
+
+    <property name="EmailReply" type="string">
+      <column name="EmailReply" />
     </property>
 
     <!-- Mapping Entity Associations -->

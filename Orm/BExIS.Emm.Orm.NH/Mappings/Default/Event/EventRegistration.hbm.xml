@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="BExIS.Emm.Entities" namespace="BExIS.Emm.Entities.Event">
-  <class xmlns="urn:nhibernate-mapping-2.2" name="EventRegistration" table="EventRegistrations">
+  <class xmlns="urn:nhibernate-mapping-2.2" name="EventRegistration" table="emm_EventRegistrations">
 
     <!-- Mapping BaseEntity properties -->
 
