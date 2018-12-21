@@ -547,7 +547,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
 
             es.Send(
-                ConfigurationManager.AppSettings["ApplicationName"] + ": " + subject,
+                subject,
                 body,
                 new List<string> { email }, // to
                 new List<string> { e.EmailCC }, // CC 
