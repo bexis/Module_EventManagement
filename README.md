@@ -4,8 +4,8 @@ Customizable module to manage event registrations (e.g. workshops, meetings).
 
 1. [Features](#Features)
 2. [How to use / Workflow](#how_to)
-    2.1 [Event creation](#event_creation)
-    2.2 [Event registration](#event_reg)
+    1. [Event creation](#event_creation)
+    2. [Event registration](#event_reg)
 3. [Installtion](#install)
 
 ## Features<a name="features"></a>
