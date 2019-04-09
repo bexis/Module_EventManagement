@@ -4,8 +4,9 @@ Customizable module to manage event registrations (e.g. workshops, meetings).
 
 1. [Features](#Features)
 2. [How to use / Workflow](#how_to)
-3. [Event creation](#event_creation)
-4. [Installtion](#install)
+    2.1 [Event creation](#event_creation)
+    2.2 [Event registration](#event_reg)
+3. [Installtion](#install)
 
 ## Features<a name="features"></a>
 - registration form is fully flexible
@@ -18,10 +19,7 @@ Customizable module to manage event registrations (e.g. workshops, meetings).
 
 ## How to use / Workflow<a name="how_to"></a>
 
-
-
-
-## Event creation<a name="event_creation"></a>
+### Event creation<a name="event_creation"></a>
 1. Create XSD for event 
    - *FirstName* and *LastName* are required fields (will be used for salutation in emails)
 2. Upload the XSD (Admin->Manage Metadate Structure) and select "Event" as Class
@@ -34,6 +32,9 @@ Customizable module to manage event registrations (e.g. workshops, meetings).
    - *Event password* the password which is requried to register for the event
    - *CC/BCC email addresses (split by ,)* list of email adresses which should recieve registration information
    - *Reply to mail address* mail adress for the reply  
+   
+### Event registration<a name="event_reg"></a>
+
 
 ## Installtion <a name="install"></a>
 This module requires seed data.
