@@ -11,6 +11,7 @@ Customizable module to manage event registrations (e.g. workshops, meetings).
 - registration form is fully flexible
 - no user account in BExIS needed for registration
 - deadline for registration
+- participants limitation / waiting list
 - update registration before the deadline by participants 
 - notification and overview for event organizer
 
@@ -21,4 +22,5 @@ Customizable module to manage event registrations (e.g. workshops, meetings).
 
 ## Configuration<a name="configuration"></a>
 1. Create XSD for event and upload it
+  - *FirstName* and *LastName* are required
 2. Create event and select 
