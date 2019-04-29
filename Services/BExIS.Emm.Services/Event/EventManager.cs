@@ -33,7 +33,7 @@ namespace BExIS.Emm.Services.Event
         /// <summary>
         /// Creates an EventRegistration <seealso cref="EventRegistration"/> and persists the entity in the database.
         /// </summary>
-        public E.Event CreateEvent(string name, DateTime startDate, DateTime deadline, int participantsLimitation, bool editAllowed, string logInPassword, string emailBCC, string emailCC, string emailReply, MetadataStructure metadataStructure)
+        public E.Event CreateEvent(string name, DateTime startDate, DateTime deadline, int participantsLimitation, bool editAllowed, string logInPassword, string emailBCC, string emailCC, string emailReply, MetadataStructure metadataStructure, string javaScriptPath)
         {
             E.Event newEvent = new E.Event();
             newEvent.Name = name;
@@ -46,6 +46,7 @@ namespace BExIS.Emm.Services.Event
             newEvent.EmailBCC = emailBCC;
             newEvent.EmailCC = emailCC;
             newEvent.EmailReply = emailReply;
+            newEvent.JavaScriptPath = javaScriptPath;
 
             using (IUnitOfWork uow = this.GetUnitOfWork())
             {
@@ -100,6 +101,11 @@ namespace BExIS.Emm.Services.Event
         }
 
         public List<EntityStoreItem> GetEntities()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetTitleById(long id)
         {
             throw new NotImplementedException();
         }

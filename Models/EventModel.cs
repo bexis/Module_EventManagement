@@ -44,6 +44,8 @@ namespace BExIS.Web.Shell.Areas.EMM.Models
         [DisplayName("Reply to mail address")]
         public string EmailReply { get; set; }
 
+        [DisplayName("JavaScript file")]
+        public string JavaScriptPath { get; set; }
 
         public bool InUse { get; set; }
 
@@ -87,6 +89,8 @@ namespace BExIS.Web.Shell.Areas.EMM.Models
             EmailBCC = eEvent.EmailBCC;
             EmailCC = eEvent.EmailCC;
             EmailReply = eEvent.EmailReply;
+
+            JavaScriptPath = eEvent.JavaScriptPath;
 
 
             DeleteAccess = true;

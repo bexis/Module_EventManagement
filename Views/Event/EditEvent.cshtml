@@ -5,11 +5,17 @@
 @model EventModel
 <link href="@Url.Content("~/Areas/EMM/Content/main.css")" rel="stylesheet" type="text/css" />
 
+@{
+    var fileName = Model.JavaScriptPath.Split('/')[Model.JavaScriptPath.Split('/').Length-1];
+   
+}
 
-@Html.ValidationSummary(true)
-@using (Html.BeginForm("Save", "Event", FormMethod.Post, new { enctype = "multipart/form-data" }))
+  @Html.ValidationSummary(true)
+  @using(Html.BeginForm("Save", "Event", FormMethod.Post, new
+  {
+      enctype = "multipart/form-data" }))
 {
-    @Html.HiddenFor(m => m.Id)
+@Html.HiddenFor(m => m.Id)
 <table class="bx-table-form" style="width: 500px;">
     <tr>
         <td>
@@ -62,10 +68,10 @@
         </td>
         <td>
             @(Html.Telerik().IntegerTextBoxFor(m => m.ParticipantsLimitation)
-                                                                                                                    .MinValue(1)
-                                                                                                                    .MaxValue(Int32.MaxValue)
-                                                                                                                    .Value(Model.ParticipantsLimitation)
-                                                                                                                    .HtmlAttributes(new { tabindex = "2", style = "border-width: 2px; height: 30px;" })
+                                                                                                                                                    .MinValue(1)
+                                                                                                                                                    .MaxValue(Int32.MaxValue)
+                                                                                                                                                    .Value(Model.ParticipantsLimitation)
+                                                                                                                                                    .HtmlAttributes(new { tabindex = "2", style = "border-width: 2px; height: 30px;" })
             )
         </td>
     </tr>
@@ -92,6 +98,15 @@
         <td>
             @Html.DropDownListFor(m => m.MetadataStructureId, new SelectList(Model.MetadataStructureList, "Id", "Name"),new { @class= "bx-dropdown",
        style = "-webkit-appearance: menulist; height: 30px;"})
+        </td> <!--temporty style to fix removed arrow-->
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.JavaScriptPath)
+        </td>
+        <td>
+            @fileName
+            <input value="JavaScriptPath" name="file" type="file" accept=".js"></input>
         </td> <!--temporty style to fix removed arrow-->
     </tr>
     <tr>
@@ -124,10 +139,10 @@
 
 </table>
 
-    <div class="bx-footer right">
-        <br />
-        <button name="save" type="submit" class="t-button action" title="Save">Save</button>
-        @Html.ActionLink("Cancel", "EventManager", "Event", new { area = "RBM", @class = "t-button action", @title = "Cancel", @tabindex = "5" })
-    </div><br />
+<div class="bx-footer right">
+    <br />
+    <button name="save" type="submit" class="t-button action" title="Save">Save</button>
+    @Html.ActionLink("Cancel", "EventManager", "Event", new { area = "RBM", @class = "t-button action", @title = "Cancel", @tabindex = "5" })
+</div><br />
 
 }
