@@ -104,6 +104,11 @@ namespace BExIS.Emm.Services.Event
             throw new NotImplementedException();
         }
 
+        public string GetTitleById(long id)
+        {
+            throw new NotImplementedException();
+        }
+
 
         #endregion
     }
