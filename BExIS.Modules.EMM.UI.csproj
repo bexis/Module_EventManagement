@@ -220,7 +220,6 @@
     <ProjectReference Include="Services\BExIS.Emm.Services\BExIS.Emm.Services.csproj">
       <Project>{0a9199f6-3cd0-4eee-9ebd-5d4ae7916c9d}</Project>
       <Name>BExIS.Emm.Services</Name>
-      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

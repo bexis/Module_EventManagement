@@ -14,7 +14,7 @@
     <!--add proper menu items-->
 	
     <Export tag="menubar" id="EMMMenu" order="13"
-            title="Event Tool" description="EMM desc" icon=""
+            title="Events" description="EMM desc" icon=""
             controller="Event" action="EventManager"
             extends="./menubarRoot" />
 
@@ -23,10 +23,10 @@
             controller="EventRegistration" action="EventRegistration"
             extends="./menubarRoot/EMMMenu" />
 
-    <Export tag="menubar" id="eventManger" order="13"
+    <!--<Export tag="menubar" id="eventManger" order="13"
             title="Event Manager" description="Manage events" icon=""
             controller="Event" action="EventManager"
-            extends="./menubarRoot/EMMMenu" />
+            extends="./menubarRoot/EMMMenu" />-->
   
     <Export tag="settings" id="mangeEvents" order="20"
             title="Manage Events" description="Manage events" icon=""
