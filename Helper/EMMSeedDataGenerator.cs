@@ -33,7 +33,7 @@ namespace BExIS.Modules.EMM.UI.Helpers
             {
 
 
-                #region create entities
+                #region create Entities
 
                 // Entities
                 Entity entity = entityManager.Entities.Where(e => e.Name.ToUpperInvariant() == "Event".ToUpperInvariant()).FirstOrDefault();
@@ -49,88 +49,36 @@ namespace BExIS.Modules.EMM.UI.Helpers
 
                     entityManager.Create(entity);
                 }
-
-
-
                 #endregion
 
                 #region SECURITY
-                //workflows = größere sachen, vielen operation
-                //operations = einzelne actions
 
-                //1.controller-> 1.Operation
+                OperationManager operationManager = new OperationManager();
+                FeatureManager featureManager = new FeatureManager();
 
+                try
+                {
+                    Feature rootEventManagementFeature = featureManager.FeatureRepository.Get().FirstOrDefault(f => f.Name.Equals("Event Management"));
+                    if (rootEventManagementFeature == null) rootEventManagementFeature = featureManager.Create("Event Management", "Event Management");
 
+                    Feature eventRegistrationFeature = featureManager.FeatureRepository.Get().FirstOrDefault(f => f.Name.Equals("Event Registration"));
+                    if (eventRegistrationFeature == null) eventRegistrationFeature = featureManager.Create("Event Registration", "Event Registration", rootEventManagementFeature);
 
+                    Feature eventAdministrationFeature = featureManager.FeatureRepository.Get().FirstOrDefault(f => f.Name.Equals("Event Administration"));
+                    if (eventAdministrationFeature == null) eventAdministrationFeature = featureManager.Create("Event Administration", "Event Administration", rootEventManagementFeature);
 
-                //Feature DataCollectionFeature = featureManager.FeatureRepository.Get().FirstOrDefault(f => f.Name.Equals("Data Collection"));
-                //if (DataCollectionFeature == null) DataCollectionFeature = featureManager.Create("Data Collection", "Data Collection");
-
-                //Feature DatasetCreationFeature = featureManager.FeatureRepository.Get().FirstOrDefault(f => f.Name.Equals("Data Creation"));
-                //if (DatasetCreationFeature == null) DatasetCreationFeature = featureManager.Create("Data Creation", "Data Creation", DataCollectionFeature);
-
-                //Feature DatasetUploadFeature = featureManager.FeatureRepository.Get().FirstOrDefault(f => f.Name.Equals("Dataset Upload"));
-                //if (DatasetUploadFeature == null) DatasetUploadFeature = featureManager.Create("Dataset Upload", "Dataset Upload", DataCollectionFeature);
-
-                //Feature MetadataManagementFeature = featureManager.FeatureRepository.Get().FirstOrDefault(f => f.Name.Equals("Metadata Management"));
-                //if (MetadataManagementFeature == null) MetadataManagementFeature = featureManager.Create("Metadata Management", "Metadata Management", DataCollectionFeature);
-
-
-                //#region Help Workflow
-
-                //operationManager.Create("DCM", "Help", "*");
-
-                //#endregion
-
-                //#region Create Dataset Workflow
-
-                //operationManager.Create("DCM", "CreateDataset", "*", DatasetCreationFeature);
-                //operationManager.Create("DCM", "Form", "*");
-
-                //#endregion
-
-                //#region Update Dataset Workflow
-
-                //operationManager.Create("DCM", "Push", "*", DatasetUploadFeature);
-                //operationManager.Create("DCM", "Submit", "*", DatasetUploadFeature);
-                //operationManager.Create("DCM", "SubmitDefinePrimaryKey", "*", DatasetUploadFeature);
-                //operationManager.Create("DCM", "SubmitGetFileInformation", "*", DatasetUploadFeature);
-                //operationManager.Create("DCM", "SubmitSelectAFile", "*", DatasetUploadFeature);
-                //operationManager.Create("DCM", "SubmitSpecifyDataset", "*", DatasetUploadFeature);
-                //operationManager.Create("DCM", "SubmitSummary", "*", DatasetUploadFeature);
-                //operationManager.Create("DCM", "SubmitValidation", "*", DatasetUploadFeature);
-
-                //#endregion
-
-                //#region Easy Upload
-
-                //operationManager.Create("DCM", "EasyUpload", "*", DatasetUploadFeature);
-                //operationManager.Create("DCM", "EasyUploadSelectAFile", "*", DatasetUploadFeature);
-                //operationManager.Create("DCM", "EasyUploadSelectAreas", "*", DatasetUploadFeature);
-                //operationManager.Create("DCM", "EasyUploadSheetDataStructure", "*", DatasetUploadFeature);
-                //operationManager.Create("DCM", "EasyUploadSheetSelectMetaData", "*", DatasetUploadFeature);
-                //operationManager.Create("DCM", "EasyUploadSummary", "*", DatasetUploadFeature);
-                //operationManager.Create("DCM", "EasyUploadVerification", "*", DatasetUploadFeature);
-
-                //#endregion
-
-                //#region Metadata Managment Workflow
-
-                //operationManager.Create("DCM", "ImportMetadataStructure", "*", MetadataManagementFeature);
-                //operationManager.Create("DCM", "ImportMetadataStructureReadSource", "*", MetadataManagementFeature);
-                //operationManager.Create("DCM", "ImportMetadataStructureSelectAFile", "*", MetadataManagementFeature);
-                //operationManager.Create("DCM", "ImportMetadataStructureSetParameters", "*", MetadataManagementFeature);
-                //operationManager.Create("DCM", "ImportMetadataStructureSummary", "*", MetadataManagementFeature);
-                //operationManager.Create("DCM", "ManageMetadataStructure", "*", MetadataManagementFeature);
-                //operationManager.Create("DCM", "SubmitSpecifyDataset", "*", MetadataManagementFeature);
-
-                //#endregion
-
-                //#region public available
-
-                //operationManager.Create("DCM", "Form", "*");
-
-                //#endregion
+                    operationManager.Create("EMM", "EventRegistration", "*", eventRegistrationFeature);
+                    operationManager.Create("EMM", "Event", "*", eventAdministrationFeature);
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    featureManager.Dispose();
+                    operationManager.Dispose();
+                }
 
                 #endregion
 
