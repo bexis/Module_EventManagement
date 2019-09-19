@@ -10,6 +10,7 @@ using Vaiona.Model;
 using Vaiona.Web.Extensions;
 using BExIS.Web.Shell.Areas.EMM.Models;
 using BExIS.Emm.Services.Event;
+using BExIS.IO;
 using System.IO;
 using System.Xml;
 using BExIS.Emm.Entities.Event;
@@ -17,6 +18,8 @@ using System.Text;
 using BExIS.Dlm.Services.MetadataStructure;
 using BExIS.Dlm.Entities.MetadataStructure;
 using BExIS.Xml.Helpers;
+using Vaiona.Utils.Cfg;
+using System;
 
 namespace BExIS.Modules.EMM.UI.Controllers
 {
@@ -77,7 +80,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return RedirectToAction("EventManager");
         }
 
-        public ActionResult Save(EventModel model)
+        [HttpPost]
+        public ActionResult Save(EventModel model, HttpPostedFileBase file)
         {
             XmlDocument schema = new XmlDocument();
             string schemaFileName = "";
@@ -93,20 +97,24 @@ namespace BExIS.Modules.EMM.UI.Controllers
             if (model.StartDate > model.Deadline)
                 ModelState.AddModelError("StartDate", "Start date needs to be before deadline.");
 
+                //check if schema file is uploaded
+                //if (attachments ==null &&model.Id == 0)
+                //    ModelState.AddModelError("Schema", "Schema is required.");
 
-            //check if schema file is uploaded
-            //if (attachments ==null &&model.Id == 0)
-            //    ModelState.AddModelError("Schema", "Schema is required.");
+                /** Event Validation End -------------------------------- **/
 
-            /** Event Validation End -------------------------------- **/
-
-            if (ModelState.IsValid)
+                if (ModelState.IsValid)
             {
                 MetadataStructureManager mManager = new MetadataStructureManager();
                 MetadataStructure ms = mManager.Repo.Get(model.MetadataStructureId);
                 EventManager eManager = new EventManager();
                 if (model.Id == 0)
-                    eManager.CreateEvent(model.Name, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.EditAllowed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, ms);
+                {
+                    Event newEvent = eManager.CreateEvent(model.Name, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.EditAllowed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, ms, null);
+
+                    newEvent = SaveFile(file, newEvent, eManager);
+                    eManager.UpdateEvent(newEvent);
+                }
                 else
                 {
                     Event e = eManager.GetEventById(model.Id);
@@ -122,6 +130,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     e.EmailReply = model.EmailReply;
                     e.MetadataStructure = ms;
 
+                    e = SaveFile(file, e, eManager);
                     eManager.UpdateEvent(e);
                 }
 
@@ -148,6 +157,41 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         #region helpers
 
+        private Event SaveFile(HttpPostedFileBase file, Event e, EventManager eManager)
+        {
+            BExIS.IO.FileHelper.CreateDicrectoriesIfNotExist(Server.MapPath("~/Areas/FMT/Scripts/Uploaded/" + e.Id + "/"));
+
+            if (System.IO.File.Exists(Server.MapPath("~" + e.JavaScriptPath)) && file != null && file.ContentLength > 0)
+            {
+                var deletedFilePath = Path.Combine(AppConfiguration.DataPath, "EMM\\Deleted JS Files");
+                BExIS.IO.FileHelper.CreateDicrectoriesIfNotExist(deletedFilePath);
+
+                string filePath = Server.MapPath("~" + e.JavaScriptPath);
+                var des = deletedFilePath + "\\" + Path.GetFileName(filePath);
+
+                // Check if file already exists in the "Deleted Files" folder and rename the file if yes.
+                if (System.IO.File.Exists(des))
+                {
+                    des = deletedFilePath + "\\" + new Random().Next(1, 1000) + "_" + Path.GetFileName(filePath);
+                }
+
+                System.IO.File.Move(filePath, des);
+            }
+
+            if (file != null && file.ContentLength > 0)
+            {
+                try
+                {
+                    string path_save = Path.Combine(Server.MapPath("~/Areas/FMT/Scripts/Uploaded/" + e.Id + "/"), Path.GetFileName(file.FileName));
+
+                    file.SaveAs(path_save);
+                    e.JavaScriptPath = Path.Combine("/Areas/FMT/Scripts/Uploaded/" + e.Id + "/", Path.GetFileName(file.FileName));
+                }
+                catch { }
+            }
+
+            return e;
+        }
 
         public List<ListItem> GetMetadataStructureList()
         {

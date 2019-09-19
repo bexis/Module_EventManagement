@@ -30,6 +30,8 @@ namespace BExIS.Emm.Entities.Event
         public virtual string EmailCC { get; set; }
 
         public virtual string EmailReply { get; set; }
+
+        public virtual string JavaScriptPath { get; set; }
         #endregion
 
         #region Associations

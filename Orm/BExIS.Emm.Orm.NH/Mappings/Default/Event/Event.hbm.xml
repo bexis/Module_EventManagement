@@ -88,6 +88,10 @@
       <column name="EmailReply" />
     </property>
 
+    <property name="JavaScriptPath" type="string">
+      <column name="JavaScriptPath" />
+    </property>
+
     <!-- Mapping Entity Associations -->
 
     <many-to-one name="MetadataStructure" class="BExIS.Dlm.Entities.MetadataStructure.MetadataStructure" not-null="true"  column="MetadataStructure"/>
