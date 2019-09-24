@@ -6,7 +6,10 @@
 <link href="@Url.Content("~/Areas/EMM/Content/main.css")" rel="stylesheet" type="text/css" />
 
 @{
-    var fileName = Model.JavaScriptPath.Split('/')[Model.JavaScriptPath.Split('/').Length-1];
+    string fileName = "";
+    if (Model.JavaScriptPath != null){
+        fileName = Model.JavaScriptPath.Split('/')[Model.JavaScriptPath.Split('/').Length - 1];
+    }
    
 }
 
