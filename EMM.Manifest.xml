@@ -23,6 +23,11 @@
             controller="EventRegistration" action="EventRegistration"
             extends="./menubarRoot/EMMMenu" />
 
+    <Export tag="menubar" id="eventRegistration" order="13"
+            title="Show Reservations" description="show reservations for events" icon=""
+            controller="EventRegistration" action="Show"
+            extends="./menubarRoot/EMMMenu" />
+
     <!--<Export tag="menubar" id="eventManger" order="13"
             title="Event Manager" description="Manage events" icon=""
             controller="Event" action="EventManager"
