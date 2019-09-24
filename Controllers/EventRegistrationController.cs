@@ -489,7 +489,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
         {
             // todo: add not allowed / log in info to mail
             string first_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("FirstName")[0].InnerText;
-            string last_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("LastNameTEST")[0].InnerText;
+            string last_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("LastName")[0].InnerText;
             string url = Request.Url.GetLeftPart(UriPartial.Authority);
 
             string mail_message = "";
