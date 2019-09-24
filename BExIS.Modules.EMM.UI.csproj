@@ -149,7 +149,6 @@
     <Content Include="Content\main.css" />
     <Content Include="EMM.Manifest.xml" />
     <Content Include="packages.config" />
-    <Content Include="Scripts\lui.js" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="web.config" />
@@ -161,6 +160,7 @@
     <Content Include="Views\EventRegistration\FormEventRegistration.cshtml" />
     <Content Include="Views\EventRegistration\_logInToEvent.cshtml" />
     <Content Include="Views\EventRegistration\_selectEvent.cshtml" />
+    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -169,7 +169,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Properties\PublishProfiles\" />
+    <Folder Include="Scripts\" />
     <Folder Include="Views\fonts\" />
   </ItemGroup>
   <ItemGroup>
