@@ -109,6 +109,21 @@ namespace BExIS.Emm.Services.Event
         {
             throw new NotImplementedException();
         }
+        
+         public bool HasVersions()
+        {
+            throw new NotImplementedException();
+        }
+
+        public int CountVersions(long id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<EntityStoreItem> GetVersionsById(long id)
+        {
+            throw new NotImplementedException();
+        }
 
 
         #endregion
