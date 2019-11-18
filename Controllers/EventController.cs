@@ -159,33 +159,33 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         private Event SaveFile(HttpPostedFileBase file, Event e, EventManager eManager)
         {
-            BExIS.IO.FileHelper.CreateDicrectoriesIfNotExist(Server.MapPath("~/Areas/FMT/Scripts/Uploaded/" + e.Id + "/"));
+            string filename = "ext.js";
+            string path = Path.Combine(AppConfiguration.DataPath, "MetadataStructures", e.MetadataStructure.Id.ToString(), filename);
 
-            if (System.IO.File.Exists(Server.MapPath("~" + e.JavaScriptPath)) && file != null && file.ContentLength > 0)
+
+
+            if (System.IO.File.Exists(path) && file != null && file.ContentLength > 0)
             {
                 var deletedFilePath = Path.Combine(AppConfiguration.DataPath, "EMM\\Deleted JS Files");
                 BExIS.IO.FileHelper.CreateDicrectoriesIfNotExist(deletedFilePath);
 
-                string filePath = Server.MapPath("~" + e.JavaScriptPath);
-                var des = deletedFilePath + "\\" + Path.GetFileName(filePath);
+                var des = deletedFilePath + "\\" + Path.GetFileName(path);
 
                 // Check if file already exists in the "Deleted Files" folder and rename the file if yes.
                 if (System.IO.File.Exists(des))
                 {
-                    des = deletedFilePath + "\\" + new Random().Next(1, 1000) + "_" + Path.GetFileName(filePath);
+                    des = deletedFilePath + "\\" + new Random().Next(1, 1000) + "_" + Path.GetFileName(path);
                 }
 
-                System.IO.File.Move(filePath, des);
+                System.IO.File.Move(path, des);
             }
 
             if (file != null && file.ContentLength > 0)
             {
                 try
                 {
-                    string path_save = Path.Combine(Server.MapPath("~/Areas/FMT/Scripts/Uploaded/" + e.Id + "/"), Path.GetFileName(file.FileName));
-
-                    file.SaveAs(path_save);
-                    e.JavaScriptPath = Path.Combine("/Areas/FMT/Scripts/Uploaded/" + e.Id + "/", Path.GetFileName(file.FileName));
+                    file.SaveAs(path);
+                    e.JavaScriptPath = path;
                 }
                 catch { }
             }
