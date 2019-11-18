@@ -37,7 +37,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
     {
         public ActionResult EventRegistration(string ref_id = "")
         {
-            ViewBag.Title = PresentationModel.GetViewTitleForTenant("Manage Event Registrations", this.Session.GetTenant());
+            ViewBag.Title = PresentationModel.GetViewTitleForTenant("Event Registrations", this.Session.GetTenant());
 
             List<EventRegistrationModel> model = GetAvailableEvents(ref_id);
             return View("AvailableEventsList", model);
@@ -45,7 +45,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         public ActionResult EventRegistrationPatial(string message, string ref_id = "")
         {
-            ViewBag.Title = PresentationModel.GetViewTitleForTenant("Manage Event Registrations", this.Session.GetTenant());
+            ViewBag.Title = PresentationModel.GetViewTitleForTenant("Event Registrations", this.Session.GetTenant());
 
             List<EventRegistrationModel> model = GetAvailableEvents(ref_id);
             ViewBag.Message = message;
@@ -168,6 +168,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 }
 
                 taskManager.AddToBus(CreateTaskmanager.NO_IMPORT_ACTION, true);
+                taskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_TITLE, "Event registration");
+                taskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_DESCRIPTION, "<p><b>help</b></p>");
+
 
                 Session["CreateDatasetTaskmanager"] = taskManager;
 
