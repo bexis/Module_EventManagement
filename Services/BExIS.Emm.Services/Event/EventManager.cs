@@ -1,25 +1,46 @@
 ﻿using BExIS.Dlm.Entities.MetadataStructure;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using Vaiona.Persistence.Api;
-using Vaiona.Entities;
 using E = BExIS.Emm.Entities.Event;
-using BExIS.Security.Services.Objects;
+
 
 namespace BExIS.Emm.Services.Event
 {
-    public class EventManager: IEntityStore
+    public class EventManager: IDisposable
     {
+        private IUnitOfWork guow = null;
         public EventManager()
         {
-            IUnitOfWork uow = this.GetUnitOfWork();
-            this.EventRepo = uow.GetReadOnlyRepository<E.Event>();
+            IUnitOfWork guow = this.GetUnitOfWork();
+            this.EventRepo = guow.GetReadOnlyRepository<E.Event>();
         }
+
+        private bool isDisposed = false;
+        ~EventManager()
+        {
+            Dispose(true);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!isDisposed)
+            {
+                if (disposing)
+                {
+                    if (guow != null)
+                        guow.Dispose();
+                    isDisposed = true;
+                }
+            }
+        }
+
 
         #region Data Readers
 
@@ -28,6 +49,24 @@ namespace BExIS.Emm.Services.Event
         #endregion
 
         #region Methods
+
+        public IQueryable<E.Event> GetAllEvents()
+        {
+            using (IUnitOfWork uow = this.GetUnitOfWork())
+            {
+                IRepository<E.Event> repo = uow.GetRepository<E.Event>();
+                return repo.Query();
+            }
+        }
+
+        public E.Event GetEventById(long id)
+        {
+            using (IUnitOfWork uow = this.GetUnitOfWork())
+            {
+                IRepository<E.Event> repo = uow.GetRepository<E.Event>();
+                return repo.Query(u => u.Id == id).FirstOrDefault();
+            }
+        }
 
 
         /// <summary>
@@ -90,41 +129,7 @@ namespace BExIS.Emm.Services.Event
 
         }
 
-        public IQueryable<E.Event> GetAllEvents()
-        {
-            return EventRepo.Query();
-        }
-
-        public E.Event GetEventById(long id)
-        {
-            return EventRepo.Query(u => u.Id == id).FirstOrDefault();
-        }
-
-        public List<EntityStoreItem> GetEntities()
-        {
-            throw new NotImplementedException();
-        }
-
-        public string GetTitleById(long id)
-        {
-            throw new NotImplementedException();
-        }
-        
-         public bool HasVersions()
-        {
-            throw new NotImplementedException();
-        }
-
-        public int CountVersions(long id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<EntityStoreItem> GetVersionsById(long id)
-        {
-            throw new NotImplementedException();
-        }
-
+ 
 
         #endregion
     }

@@ -25,7 +25,7 @@
 
     <Export tag="menubar" id="eventRegistration" order="13"
             title="Show Reservations" description="show reservations for events" icon=""
-            controller="EventRegistration" action="Show"
+            controller="EventRegistrationResult" action="Show"
             extends="./menubarRoot/EMMMenu" />
 
     <!--<Export tag="menubar" id="eventManger" order="13"

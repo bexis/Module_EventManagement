@@ -19,6 +19,7 @@ using Vaiona.Persistence.Api;
 using Vaiona.Utils.Cfg;
 using Vaiona.Web.Mvc.Modularity;
 
+
 namespace BExIS.Modules.EMM.UI.Helpers
 {
     public class EMMSeedDataGenerator : IModuleSeedDataGenerator
@@ -43,7 +44,7 @@ namespace BExIS.Modules.EMM.UI.Helpers
                     entity = new Entity();
                     entity.Name = "Event";
                     entity.EntityType = typeof(Event);
-                    entity.EntityStoreType = typeof(EventManager);
+                    entity.EntityStoreType = typeof(EventStore);
                     entity.UseMetadata = true;
                     entity.Securable = true;
 
@@ -67,8 +68,12 @@ namespace BExIS.Modules.EMM.UI.Helpers
                     Feature eventAdministrationFeature = featureManager.FeatureRepository.Get().FirstOrDefault(f => f.Name.Equals("Event Administration"));
                     if (eventAdministrationFeature == null) eventAdministrationFeature = featureManager.Create("Event Administration", "Event Administration", rootEventManagementFeature);
 
+                    Feature eventRegistrationResultFeature = featureManager.FeatureRepository.Get().FirstOrDefault(f => f.Name.Equals("Event Registration Result"));
+                    if (eventRegistrationResultFeature == null) eventRegistrationResultFeature = featureManager.Create("Event Registration Result", "Event Registration Result", rootEventManagementFeature);
+
                     operationManager.Create("EMM", "EventRegistration", "*", eventRegistrationFeature);
                     operationManager.Create("EMM", "Event", "*", eventAdministrationFeature);
+                    operationManager.Create("EMM", "EventRegistrationResult", "*", eventRegistrationResultFeature);
                 }
                 catch (Exception ex)
                 {

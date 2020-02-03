@@ -28,15 +28,19 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         public ActionResult EventManager()
         {
+
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Manage Events", this.Session.GetTenant());
-            EventManager eManger = new EventManager();
 
-            List<EventModel> model = new List<EventModel>();
-            List<Event> data = eManger.GetAllEvents().ToList();
+            using (EventManager eManger = new EventManager())
+            {
 
-            data.ToList().ForEach(r => model.Add(new EventModel(r)));
+                List<EventModel> model = new List<EventModel>();
+                List<Event> data = eManger.GetAllEvents().ToList();
 
-            return View("EventManager", model);
+                data.ToList().ForEach(r => model.Add(new EventModel(r)));
+
+                return View("EventManager", model);
+            }
         }
 
         [GridAction]

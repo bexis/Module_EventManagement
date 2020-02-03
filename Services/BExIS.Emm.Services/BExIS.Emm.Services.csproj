@@ -49,6 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Event\Store.cs" />
     <Compile Include="Event\EventManager.cs" />
     <Compile Include="Event\EventRegistrationManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
