@@ -160,7 +160,7 @@
     <Content Include="Views\Event\EditEvent.cshtml" />
     <Content Include="Views\Event\EventManager.cshtml" />
     <Content Include="Views\EventRegistration\AvailableEventsList.cshtml" />
-    <Content Include="Views\EventRegistration\EventRegistrationResults.cshtml" />
+    <Content Include="Views\EventRegistrationResult\EventRegistrationResults.cshtml" />
     <Content Include="Views\EventRegistration\FormEventRegistration.cshtml" />
     <Content Include="Views\EventRegistration\_logInToEvent.cshtml" />
     <Content Include="Views\EventRegistration\_selectEvent.cshtml" />
