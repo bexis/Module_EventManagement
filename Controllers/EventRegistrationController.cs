@@ -502,19 +502,19 @@ namespace BExIS.Modules.EMM.UI.Controllers
             {
                 case "succesfully_registered":
                     subject = "Registration confirmation for " + e.Name;
-                    mail_message = "you registered to " + e.Name + ".\n";
+                    mail_message = "you registered to " + e.Name + "<br/>";
                     break;
                 case "succesfully_registered_waiting_list":
                     subject = "Registration confirmation for " + e.Name + " - wating list";
-                    mail_message = "you registered to " + e.Name + ", but you are currently on the waiting list. \n";
+                    mail_message = "you registered to " + e.Name + ", but you are currently on the waiting list. <br/>";
                     break;
                 case "updated":
                     subject = "Registration update confirmation for " + e.Name;
-                    mail_message = "you updated your registration for " + e.Name + ".\n";
+                    mail_message = "you updated your registration for " + e.Name + "<br/>";
                     break;
                 case "resend":
                     subject = "Resend of registration confirmation for " + e.Name;
-                    mail_message = "your registration for " + e.Name + ".\n";
+                    mail_message = "your registration for " + e.Name + "<br/>";
                     break;
             }
 
@@ -523,16 +523,16 @@ namespace BExIS.Modules.EMM.UI.Controllers
             int row_count = res.Columns.Count;
             for (int i = 0; i < row_count; i++)
             {
-                details = details + res.Columns[i].ToString().Split('/')[res.Columns[i].ToString().Split('/').Length - 2] + ":  " + res.Rows[0][i] + "\n";
+                details = details + res.Columns[i].ToString().Split('/')[res.Columns[i].ToString().Split('/').Length - 2] + ":  " + res.Rows[0][i] + "<br/>";
             }
 
 
-            string body = "Dear " + first_name + " " + last_name + ", " + "\n\n" +
+            string body = "Dear " + first_name + " " + last_name + ", " + "<br/><br/>" +
                  mail_message +
-                 "\nYour registration details are:\n\n" + 
-                 details + "\n\n" +
-                 "To view or change your registration follow this link: " + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "\n\n" +
-                 "Sincerely yours, \n" +
+                 "<br/> Your registration details are: <br/><br/>" + 
+                 details + "<br/><br/>" +
+                 "To view or change your registration follow this link: " + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "<br/><br/>" +
+                 "Sincerely yours, <br/>" +
                  "BExIS Team";
      
             var es = new EmailService();
