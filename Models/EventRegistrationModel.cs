@@ -7,7 +7,7 @@ using System.Linq;
 using System.Web;
 using System.Xml;
 
-namespace BExIS.Web.Shell.Areas.EMM.Models
+namespace BExIS.Modules.EMM.UI.Models
 {
     public class EventRegistrationModel
     {

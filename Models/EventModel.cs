@@ -6,7 +6,7 @@ using System.Web;
 using System.Xml;
 using System.ComponentModel;
 
-namespace BExIS.Web.Shell.Areas.EMM.Models
+namespace BExIS.Modules.EMM.UI.Models
 {
     public class EventModel
     {

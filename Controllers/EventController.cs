@@ -8,7 +8,6 @@ using BExIS.Security.Entities.Objects;
 using Vaiona.Web.Mvc.Models;
 using Vaiona.Model;
 using Vaiona.Web.Extensions;
-using BExIS.Web.Shell.Areas.EMM.Models;
 using BExIS.Emm.Services.Event;
 using BExIS.IO;
 using System.IO;
@@ -20,6 +19,7 @@ using BExIS.Dlm.Entities.MetadataStructure;
 using BExIS.Xml.Helpers;
 using Vaiona.Utils.Cfg;
 using System;
+using BExIS.Modules.EMM.UI.Models;
 
 namespace BExIS.Modules.EMM.UI.Controllers
 {
