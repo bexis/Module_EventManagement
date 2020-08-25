@@ -9,6 +9,9 @@ using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
 using BExIS.IO.Transform.Validation.Exceptions;
 using BExIS.Modules.Dcm.UI.Controllers;
+using BExIS.Modules.Dcm.UI.Helpers;
+using BExIS.Modules.Dcm.UI.Models.CreateDataset;
+using BExIS.Modules.Dcm.UI.Models.Metadata;
 using BExIS.Modules.EMM.UI.Helpers;
 using BExIS.Modules.EMM.UI.Models;
 using BExIS.Security.Entities.Subjects;
@@ -69,44 +72,46 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         private List<EventRegistrationModel> GetAvailableEvents(string ref_id = null)
         {
-            EventManager eManger = new EventManager();
-            List<Event> allEvents = eManger.GetAllEvents().ToList();
-
-            List<EventRegistrationModel> availableEvents = new List<EventRegistrationModel>();
-
-            SubjectManager subManager = new SubjectManager();
-            EventRegistrationManager erManager = new EventRegistrationManager();
-            User user = subManager.Subjects.Where(a=>a.Name== HttpContext.User.Identity.Name).FirstOrDefault() as User;
-
-            foreach (Event e in allEvents)
+            using (EventManager eManger = new EventManager())
+            using (SubjectManager subManager = new SubjectManager())
             {
-                DateTime today = DateTime.Now;
-                if (today >= e.StartDate)
+                List<Event> allEvents = eManger.GetAllEvents().ToList();
+
+                List<EventRegistrationModel> availableEvents = new List<EventRegistrationModel>();
+
+                EventRegistrationManager erManager = new EventRegistrationManager();
+                User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+
+                foreach (Event e in allEvents)
                 {
-                    EventRegistrationModel model = new EventRegistrationModel(e);
-                    //check if user already registered (if logged in)
-                    if (user != null)
-                    { 
-                        EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
-                        if (reg != null)
-                            model.AlreadyRegistered = true;
-                    }
-                    else if (ref_id != null)
+                    DateTime today = DateTime.Now;
+                    if (today >= e.StartDate)
                     {
-                        EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, e.Id);
-                        if (reg != null)
-                            model.AlreadyRegistered = true;
+                        EventRegistrationModel model = new EventRegistrationModel(e);
+                        //check if user already registered (if logged in)
+                        if (user != null)
+                        {
+                            EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+                            if (reg != null)
+                                model.AlreadyRegistered = true;
+                        }
+                        else if (ref_id != null)
+                        {
+                            EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, e.Id);
+                            if (reg != null)
+                                model.AlreadyRegistered = true;
                             model.AlreadyRegisteredRefId = ref_id;
+                        }
+
+
+                        // Show event if either registered or deadline is not over
+                        if (today <= e.Deadline || model.AlreadyRegistered == true)
+                            availableEvents.Add(model);
                     }
-
-           
-                    // Show event if either registered or deadline is not over
-                    if (today <= e.Deadline || model.AlreadyRegistered == true)
-                        availableEvents.Add(model);
                 }
-            }
 
-            return availableEvents;
+                return availableEvents;
+            }
         }
 
         public ActionResult LogInToEvent(string id, string view_only = "false", string ref_id = null)
@@ -114,22 +119,24 @@ namespace BExIS.Modules.EMM.UI.Controllers
             LogInToEventModel model = new LogInToEventModel(long.Parse(id), bool.Parse(view_only), ref_id);
 
             //check if it is an edit
-            SubjectManager subManager = new SubjectManager();
-            EventRegistrationManager erManager = new EventRegistrationManager();
-            User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
-            if (user != null)
+            using (SubjectManager subManager = new SubjectManager())
             {
-                EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, long.Parse(id));
-                if (reg != null)
+                EventRegistrationManager erManager = new EventRegistrationManager();
+                User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+                if (user != null)
                 {
-                    model.Edit = true;
+                    EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, long.Parse(id));
+                    if (reg != null)
+                    {
+                        model.Edit = true;
+                    }
                 }
-            }
-            else if (ref_id != null)
-            {
-                EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, long.Parse(id));
-                if (reg != null)
-                    model.Edit = true;
+                else if (ref_id != null)
+                {
+                    EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, long.Parse(id));
+                    if (reg != null)
+                        model.Edit = true;
+                }
             }
 
             return PartialView("_logInToEvent", model);
@@ -142,61 +149,67 @@ namespace BExIS.Modules.EMM.UI.Controllers
         public ActionResult LoadForm(LogInToEventModel model)
 
         {
-            EventManager eManager = new EventManager();
-            Event e = eManager.EventRepo.Get(model.EventId);
-
-            if (e.LogInPassword != model.LogInPassword)
-                ModelState.AddModelError("passwort", "The event passwort is wrong.");
-
-            if (ModelState.IsValid)
+            using (EventManager eManager = new EventManager())
             {
-                //CreateTaskmanager taskManager = new CreateTaskmanager();
-                if (TaskManager == null)
-                    TaskManager = new CreateTaskmanager();
+                Event e = eManager.EventRepo.Get(model.EventId);
 
-                TaskManager.AddToBus(CreateTaskmanager.METADATASTRUCTURE_ID, e.MetadataStructure.Id);
-                TaskManager.AddToBus(CreateTaskmanager.ENTITY_ID, e.Id);
+                if (e.LogInPassword != model.LogInPassword)
+                    ModelState.AddModelError("passwort", "The event passwort is wrong.");
 
-                if (model.Edit)
+                if (ModelState.IsValid)
                 {
-                    EventRegistrationManager erManager = new EventRegistrationManager();
-                    SubjectManager subManager = new SubjectManager();
-                    User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
-                    if (user != null)
+                    //CreateTaskmanager taskManager = new CreateTaskmanager();
+                    if (TaskManager == null)
+                        TaskManager = new CreateTaskmanager();
+
+                    TaskManager.AddToBus(CreateTaskmanager.METADATASTRUCTURE_ID, e.MetadataStructure.Id);
+                    TaskManager.AddToBus(CreateTaskmanager.ENTITY_ID, e.Id);
+
+                    if (model.Edit)
                     {
-                        EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
-                        TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, XDocument.Load(new XmlNodeReader(reg.Data)));
-                    }
-                    else if (model.RefId != null)
-                    {
-                        EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(model.RefId, e.Id);
-                        TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, XDocument.Load(new XmlNodeReader(reg.Data)));
+                        EventRegistrationManager erManager = new EventRegistrationManager();
+                        using (SubjectManager subManager = new SubjectManager())
+                        {
+                            User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+                            if (user != null)
+                            {
+                                EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+#pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht
+                                TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, XDocument.Load(new XmlNodeReader(reg.Data)));
+                            }
+                            else if (model.RefId != null)
+                            {
+                                EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(model.RefId, e.Id);
+                                TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, XDocument.Load(new XmlNodeReader(reg.Data)));
+#pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht
+                            }
+                        }
+
                     }
 
+                    TaskManager.AddToBus(CreateTaskmanager.SAVE_WITH_ERRORS, false);
+                    if (model.ViewOnly == true)
+                    {
+                        TaskManager.AddToBus(CreateTaskmanager.LOCKED, true);
+                    }
+
+                    TaskManager.AddToBus(CreateTaskmanager.NO_IMPORT_ACTION, true);
+                    TaskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_TITLE, "Event registration");
+                    TaskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_DESCRIPTION, "<p><b>help</b></p>");
+
+
+                    Session["EventRegistrationTaskmanager"] = TaskManager;
+
+                    setAdditionalFunctions();
+                    return Json(new { success = true, edit = model.Edit });
+
+
+                    //return RedirectToAction("StartMetadataEditor", "Form", new { area = "DCM" });
                 }
-
-                TaskManager.AddToBus(CreateTaskmanager.SAVE_WITH_ERRORS, false);
-                if (model.ViewOnly == true)
+                else
                 {
-                    TaskManager.AddToBus(CreateTaskmanager.LOCKED, true);
+                    return PartialView("_logInToEvent", model);
                 }
-
-                TaskManager.AddToBus(CreateTaskmanager.NO_IMPORT_ACTION, true);
-                TaskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_TITLE, "Event registration");
-                TaskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_DESCRIPTION, "<p><b>help</b></p>");
-
-
-                Session["EventRegistrationTaskmanager"] = TaskManager;
-
-                setAdditionalFunctions();
-                return Json(new { success = true, edit = model.Edit });
-
-
-                //return RedirectToAction("StartMetadataEditor", "Form", new { area = "DCM" });
-            }
-            else
-            {
-                return PartialView("_logInToEvent", model);
             }
 
         }
@@ -399,111 +412,113 @@ namespace BExIS.Modules.EMM.UI.Controllers
         public ActionResult Save()
         {
             EventRegistrationManager erManager = new EventRegistrationManager();
-            EventManager eManager = new EventManager();
-            SubjectManager subManager = new SubjectManager();
-
-            CreateTaskmanager taskManager = (CreateTaskmanager)Session["EventRegistrationTaskmanager"];
-
-            XDocument data = new XDocument();
-            if (taskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_XML))
-                data = (XDocument)taskManager.Bus[CreateTaskmanager.METADATA_XML];
-
-            long eventId = 0;
-            if (taskManager.Bus.ContainsKey(CreateTaskmanager.ENTITY_ID))
-                eventId = (long)taskManager.Bus[CreateTaskmanager.ENTITY_ID];
-
-            Event e = new Event();
-            if (eventId != 0)
-                e = eManager.EventRepo.Get(eventId);
-
-            // get email adress from XML && get ref_id based on email adress
-            string email = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("Email")[0].InnerText;
-            string ref_id = GetRefIdFromEmail(email);
-
-            string notificationType = "";
-            string message = "";
-
-            // Check for logged in user
-            User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
-
-            // Check if event registration already exists - update registration
-            EventRegistration reg = CheckEventRegistration(user, ref_id, e.Id, erManager);
-
-            // Update event registration
-            if (reg != null )
-            {
-                if (e.EditAllowed != true)
-                {
-                    SendEmailNotification("resend", email, ref_id, data, e, user);
-                    return RedirectToAction("EventRegistrationPatial", new { message ="Update of your previous registration is not allowed. You registration details are send to your Email adress again." , message_type = "error"}); 
-                }
-
-                reg.Data = XmlMetadataWriter.ToXmlDocument(data);
-                erManager.UpdateEventRegistration(reg);
-
-                SendEmailNotification("updated", email, ref_id, data, e, user);
-                message = "Registration details sucessfully updated.";
-
-            }
-            // New event registration
-            else
+            using (EventManager eManager = new EventManager())
+            using (SubjectManager subManager = new SubjectManager())
             {
 
-                //check Participants Limitation
-                if (e.ParticipantsLimitation != 0)
+                CreateTaskmanager taskManager = (CreateTaskmanager)Session["EventRegistrationTaskmanager"];
+
+                XDocument data = new XDocument();
+                if (taskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_XML))
+                    data = (XDocument)taskManager.Bus[CreateTaskmanager.METADATA_XML];
+
+                long eventId = 0;
+                if (taskManager.Bus.ContainsKey(CreateTaskmanager.ENTITY_ID))
+                    eventId = (long)taskManager.Bus[CreateTaskmanager.ENTITY_ID];
+
+                Event e = new Event();
+                if (eventId != 0)
+                    e = eManager.EventRepo.Get(eventId);
+
+                // get email adress from XML && get ref_id based on email adress
+                string email = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("Email")[0].InnerText;
+                string ref_id = GetRefIdFromEmail(email);
+
+                string notificationType = "";
+                string message = "";
+
+                // Check for logged in user
+                User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+
+                // Check if event registration already exists - update registration
+                EventRegistration reg = CheckEventRegistration(user, ref_id, e.Id, erManager);
+
+                // Update event registration
+                if (reg != null)
                 {
-                    int countRegs = erManager.GetNumerOfRegistrationsByEvent(e.Id);
-                    if (countRegs > e.ParticipantsLimitation)
+                    if (e.EditAllowed != true)
                     {
-                        message = "Number of participants has been reached. You are now on the waiting list.";
-                        notificationType = "succesfully_registered_waiting_list";
+                        SendEmailNotification("resend", email, ref_id, data, e, user);
+                        return RedirectToAction("EventRegistrationPatial", new { message = "Update of your previous registration is not allowed. You registration details are send to your Email adress again.", message_type = "error" });
+                    }
+
+                    reg.Data = XmlMetadataWriter.ToXmlDocument(data);
+                    erManager.UpdateEventRegistration(reg);
+
+                    SendEmailNotification("updated", email, ref_id, data, e, user);
+                    message = "Registration details sucessfully updated.";
+
+                }
+                // New event registration
+                else
+                {
+
+                    //check Participants Limitation
+                    if (e.ParticipantsLimitation != 0)
+                    {
+                        int countRegs = erManager.GetNumerOfRegistrationsByEvent(e.Id);
+                        if (countRegs > e.ParticipantsLimitation)
+                        {
+                            message = "Number of participants has been reached. You are now on the waiting list.";
+                            notificationType = "succesfully_registered_waiting_list";
+                        }
+                        else
+                        {
+                            message = "You registered sucessfully.";
+                            notificationType = "succesfully_registered";
+                        }
                     }
                     else
                     {
                         message = "You registered sucessfully.";
                         notificationType = "succesfully_registered";
                     }
-                }
-                else
-                {
-                    message = "You registered sucessfully.";
-                    notificationType = "succesfully_registered";
-                }
 
-                // Add hint to message text
-                string change = "";
-                if (e.EditAllowed == true)
-                {
-                   change = "and change";
-                }
-                else
-                {
-                    change = "(edit is not allowed - in urgent cases please contact ...)"; // todo fill with mail adress
-                }
-                if (user != null)
-                {
-                    message = message + " To view "+ change+" your registration log in or follow the link send via email.";
-                }
-                else
-                {
-                    message =  message + " To view " + change + " your registration follow the link send via email.";
-                }
+                    // Add hint to message text
+                    string change = "";
+                    if (e.EditAllowed == true)
+                    {
+                        change = "and change";
+                    }
+                    else
+                    {
+                        change = "(edit is not allowed - in urgent cases please contact ...)"; // todo fill with mail adress
+                    }
+                    if (user != null)
+                    {
+                        message = message + " To view " + change + " your registration log in or follow the link send via email.";
+                    }
+                    else
+                    {
+                        message = message + " To view " + change + " your registration follow the link send via email.";
+                    }
 
-                // Save registration and send notification
-                erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id);
-                SendEmailNotification(notificationType, email, ref_id, data, e, user);
-                
+                    // Save registration and send notification
+                    erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id);
+                    SendEmailNotification(notificationType, email, ref_id, data, e, user);
 
-                ////Set permissions on event registration
-                //PermissionManager pManager = new PermissionManager();
 
-                //foreach (RightType rightType in Enum.GetValues(typeof(RightType)).Cast<RightType>())
-                //{
-                //    pManager.CreateDataPermission(user.Id, 2, resource.Id, rightType);
-                //}
+                    ////Set permissions on event registration
+                    //PermissionManager pManager = new PermissionManager();
 
-            }
-            return RedirectToAction("EventRegistrationPatial", "EventRegistrationResult", new { message = message, ref_id = ref_id}); 
+                    //foreach (RightType rightType in Enum.GetValues(typeof(RightType)).Cast<RightType>())
+                    //{
+                    //    pManager.CreateDataPermission(user.Id, 2, resource.Id, rightType);
+                    //}
+
+                }
+                return RedirectToAction("EventRegistrationPatial", "EventRegistrationResult", new { message = message, ref_id = ref_id });
+            }        
         }
 
         #endregion
@@ -739,30 +754,32 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         public ActionResult FillTree()
         {
-            EventManager eManager = new EventManager();
-            List<Event> events = eManager.GetAllEvents().ToList();
-            List<EventRegistrationFilterModel> model = new List<EventRegistrationFilterModel>();
-
-            EventRegistrationFilterModel closed = new EventRegistrationFilterModel();
-            closed.Status = "closed";
-            closed.EventFilterItems = new List<EventFilterItem>();
-
-            EventRegistrationFilterModel open = new EventRegistrationFilterModel();
-            open.Status = "open";
-            open.EventFilterItems = new List<EventFilterItem>();
-
-            foreach (Event e in events)
+            using (EventManager eManager = new EventManager())
             {
-                if (e.Deadline < DateTime.Now)
-                    closed.EventFilterItems.Add(new EventFilterItem(e));
-                else
-                    open.EventFilterItems.Add(new EventFilterItem(e));
+                List<Event> events = eManager.GetAllEvents().ToList();
+                List<EventRegistrationFilterModel> model = new List<EventRegistrationFilterModel>();
+
+                EventRegistrationFilterModel closed = new EventRegistrationFilterModel();
+                closed.Status = "closed";
+                closed.EventFilterItems = new List<EventFilterItem>();
+
+                EventRegistrationFilterModel open = new EventRegistrationFilterModel();
+                open.Status = "open";
+                open.EventFilterItems = new List<EventFilterItem>();
+
+                foreach (Event e in events)
+                {
+                    if (e.Deadline < DateTime.Now)
+                        closed.EventFilterItems.Add(new EventFilterItem(e));
+                    else
+                        open.EventFilterItems.Add(new EventFilterItem(e));
+                }
+
+                model.Add(open);
+                model.Add(closed);
+
+                return PartialView("_selectEvent", model);
             }
-
-            model.Add(open);
-            model.Add(closed);
-
-            return PartialView("_selectEvent", model);
         }
 
         public ActionResult OnSelectTreeViewItem(long id)
@@ -786,11 +803,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
             List<EventRegistration> eventRegistrations = erManager.GetAllRegistrationsByEvent(eventId);
 
             if (eventRegistrations.Count != 0)
+#pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht
                 results = CreateDataTableColums(results, XElement.Load(new XmlNodeReader(eventRegistrations[0].Data)));
 
             foreach (EventRegistration er in eventRegistrations)
             {
                 results.Rows.Add(AddDataRow(XElement.Load(new XmlNodeReader(er.Data)), results));
+#pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht
             }
 
             return results;
@@ -802,9 +821,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             EventRegistrationManager erManager = new EventRegistrationManager();
 
+#pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht
             results = CreateDataTableColums(results, XElement.Load(new XmlNodeReader(XmlMetadataWriter.ToXmlDocument(data))));
             results.Rows.Add(AddDataRow(XElement.Load(new XmlNodeReader(XmlMetadataWriter.ToXmlDocument(data))), results));
-         
+#pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht
+            
             return results;
         }
 
@@ -867,12 +888,14 @@ namespace BExIS.Modules.EMM.UI.Controllers
         private string GetRefIdFromEmail(string email)
         {
             StringBuilder hash = new StringBuilder();
-            MD5CryptoServiceProvider md5provider = new MD5CryptoServiceProvider();
-            byte[] bytes = md5provider.ComputeHash(new UTF8Encoding().GetBytes("abd_" + email));
-
-            for (int i = 0; i < bytes.Length; i++)
+            using (MD5CryptoServiceProvider md5provider = new MD5CryptoServiceProvider())
             {
-                hash.Append(bytes[i].ToString("x2"));
+                byte[] bytes = md5provider.ComputeHash(new UTF8Encoding().GetBytes("abd_" + email));
+
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    hash.Append(bytes[i].ToString("x2"));
+                }
             }
             string ref_id = hash.ToString();
 
@@ -1325,8 +1348,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
             var metadataPackageId = stepModelHelper.UsageId;
             var metadataStructureId = Convert.ToInt64(TaskManager.Bus[CreateTaskmanager.METADATASTRUCTURE_ID]);
 
-            var mdsManager = new MetadataStructureManager();
-            var mdpManager = new MetadataPackageManager();
             var mpu = (MetadataPackageUsage)loadUsage(stepModelHelper.UsageId, stepModelHelper.UsageType);
             var model = new MetadataPackageModel();
 

@@ -89,5 +89,10 @@ namespace BExIS.Emm.Services.Event
                 return eManger.EventRepo.Query().Count();
             }
         }
+
+        public bool Exist(long id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

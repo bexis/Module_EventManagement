@@ -46,14 +46,15 @@ namespace BExIS.Modules.EMM.UI.Controllers
         [GridAction]
         public ActionResult AllEvents()
         {
-            EventManager eManger = new EventManager();
+            using (EventManager eManger = new EventManager())
+            {
+                List<EventModel> model = new List<EventModel>();
+                List<Event> data = eManger.GetAllEvents().ToList();
 
-            List<EventModel> model = new List<EventModel>();
-            List<Event> data = eManger.GetAllEvents().ToList();
+                data.ToList().ForEach(r => model.Add(new EventModel(r)));
 
-            data.ToList().ForEach(r => model.Add(new EventModel(r)));
-
-            return View("EventManager", new GridModel<EventModel> { Data = model });
+                return View("EventManager", new GridModel<EventModel> { Data = model });
+            }
 
         }
 
@@ -68,18 +69,22 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         public ActionResult Edit(long id)
         {
-            EventManager eManger = new EventManager();
-            EventModel model = new EventModel(eManger.GetEventById(id));
-            model.MetadataStructureList = GetMetadataStructureList();
-            model.EditMode = true;
+            using (EventManager eManger = new EventManager())
+            {
+                EventModel model = new EventModel(eManger.GetEventById(id));
+                model.MetadataStructureList = GetMetadataStructureList();
+                model.EditMode = true;
 
-            return View("EditEvent", model);
+                return View("EditEvent", model);
+            }
         }
 
         public ActionResult Delete(long id)
         {
-            EventManager eManger = new EventManager();
-            eManger.DeleteEvent(eManger.GetEventById(id));
+            using (EventManager eManger = new EventManager())
+            {
+                eManger.DeleteEvent(eManger.GetEventById(id));
+            }
 
             return RedirectToAction("EventManager");
         }
@@ -101,44 +106,47 @@ namespace BExIS.Modules.EMM.UI.Controllers
             if (model.StartDate > model.Deadline)
                 ModelState.AddModelError("StartDate", "Start date needs to be before deadline.");
 
-                //check if schema file is uploaded
-                //if (attachments ==null &&model.Id == 0)
-                //    ModelState.AddModelError("Schema", "Schema is required.");
+            //check if schema file is uploaded
+            //if (attachments ==null &&model.Id == 0)
+            //    ModelState.AddModelError("Schema", "Schema is required.");
 
-                /** Event Validation End -------------------------------- **/
+            /** Event Validation End -------------------------------- **/
 
-                if (ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                MetadataStructureManager mManager = new MetadataStructureManager();
-                MetadataStructure ms = mManager.Repo.Get(model.MetadataStructureId);
-                EventManager eManager = new EventManager();
-                if (model.Id == 0)
+                using (MetadataStructureManager mManager = new MetadataStructureManager())
+                using (EventManager eManager = new EventManager())
                 {
-                    Event newEvent = eManager.CreateEvent(model.Name, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.EditAllowed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, ms, null);
+                    MetadataStructure ms = mManager.Repo.Get(model.MetadataStructureId);
 
-                    newEvent = SaveFile(file, newEvent, eManager);
-                    eManager.UpdateEvent(newEvent);
+                    if (model.Id == 0)
+                    {
+                        Event newEvent = eManager.CreateEvent(model.Name, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.EditAllowed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, ms, null);
+
+                        newEvent = SaveFile(file, newEvent, eManager);
+                        eManager.UpdateEvent(newEvent);
+                    }
+                    else
+                    {
+                        Event e = eManager.GetEventById(model.Id);
+                        e.Name = model.Name;
+                        e.StartDate = model.StartDate;
+                        e.Deadline = model.Deadline;
+                        e.ParticipantsLimitation = model.ParticipantsLimitation;
+                        e.EditAllowed = model.EditAllowed;
+                        e.LogInPassword = model.LogInPassword;
+                        e.LogInPassword = model.LogInPassword;
+                        e.EmailCC = model.EmailCC;
+                        e.EmailBCC = model.EmailBCC;
+                        e.EmailReply = model.EmailReply;
+                        e.MetadataStructure = ms;
+
+                        e = SaveFile(file, e, eManager);
+                        eManager.UpdateEvent(e);
+                    }
+
+                    return View("EventManager");
                 }
-                else
-                {
-                    Event e = eManager.GetEventById(model.Id);
-                    e.Name = model.Name;
-                    e.StartDate = model.StartDate;
-                    e.Deadline = model.Deadline;
-                    e.ParticipantsLimitation = model.ParticipantsLimitation;
-                    e.EditAllowed = model.EditAllowed;
-                    e.LogInPassword = model.LogInPassword;
-                    e.LogInPassword = model.LogInPassword;
-                    e.EmailCC = model.EmailCC;
-                    e.EmailBCC = model.EmailBCC;
-                    e.EmailReply = model.EmailReply;
-                    e.MetadataStructure = ms;
-
-                    e = SaveFile(file, e, eManager);
-                    eManager.UpdateEvent(e);
-                }
-
-                return View("EventManager");
             }
             else
                 model.MetadataStructureList = GetMetadataStructureList();

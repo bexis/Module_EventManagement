@@ -25,8 +25,10 @@ namespace BExIS.Modules.EMM.UI
             try
             {
                 base.Install();
-                EMMSeedDataGenerator eMMSeedDataGenerator = new EMMSeedDataGenerator();
-                eMMSeedDataGenerator.GenerateSeedData();
+                using (EMMSeedDataGenerator eMMSeedDataGenerator = new EMMSeedDataGenerator())
+                {
+                    eMMSeedDataGenerator.GenerateSeedData();
+                }
             }
             catch (Exception e)
             {
