@@ -140,6 +140,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
         #region Load Registration Form
 
         public ActionResult LoadForm(LogInToEventModel model)
+
         {
             EventManager eManager = new EventManager();
             Event e = eManager.EventRepo.Get(model.EventId);
@@ -208,7 +209,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
         //    return Content(view.ToHtmlString(), "text/html");
         //}
 
-        public ActionResult LoadMetadataForm()
+        public ActionResult LoadMetadataForm(bool fromEditMode = true)
         {
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Register to Event", this.Session.GetTenant());
 
@@ -218,6 +219,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             if (TaskManager != null)
             {
+                //FromCreateOrEditMode
+                TaskManager.AddToBus(CreateTaskmanager.EDIT_MODE, fromEditMode);
+                Model.FromEditMode = (bool)TaskManager.Bus[CreateTaskmanager.EDIT_MODE];
+
                 //load empty metadata xml if needed
                 if (!TaskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_XML))
                 {
