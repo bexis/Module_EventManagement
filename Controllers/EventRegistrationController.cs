@@ -2,16 +2,11 @@
 using BExIS.Dcm.Wizard;
 using BExIS.Dlm.Entities.Common;
 using BExIS.Dlm.Entities.MetadataStructure;
-using BExIS.Dlm.Services;
 using BExIS.Dlm.Services.MetadataStructure;
 using BExIS.Dlm.Services.TypeSystem;
 using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
 using BExIS.IO.Transform.Validation.Exceptions;
-using BExIS.Modules.Dcm.UI.Controllers;
-using BExIS.Modules.Dcm.UI.Helpers;
-using BExIS.Modules.Dcm.UI.Models.CreateDataset;
-using BExIS.Modules.Dcm.UI.Models.Metadata;
 using BExIS.Modules.EMM.UI.Helpers;
 using BExIS.Modules.EMM.UI.Models;
 using BExIS.Security.Entities.Subjects;
@@ -171,17 +166,21 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         using (SubjectManager subManager = new SubjectManager())
                         {
                             User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+
                             if (user != null)
                             {
                                 EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
-#pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht
-                                TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, XDocument.Load(new XmlNodeReader(reg.Data)));
+
+                                XmlNodeReader xmlNodeReader = new XmlNodeReader(reg.Data);
+                                TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, reg.Data);
+                                xmlNodeReader.Dispose();
                             }
                             else if (model.RefId != null)
                             {
                                 EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(model.RefId, e.Id);
-                                TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, XDocument.Load(new XmlNodeReader(reg.Data)));
-#pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht
+                                XmlNodeReader xmlNodeReader = new XmlNodeReader(reg.Data);
+                                TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, reg.Data);
+                                xmlNodeReader.Dispose();
                             }
                         }
 
@@ -1316,7 +1315,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
         {
             try
             {
-                if (TaskManager == null) TaskManager = (CreateTaskmanager)Session["CreateDatasetTaskmanager"];
+                if (TaskManager == null) TaskManager = (CreateTaskmanager)Session["EventRegistrationTaskmanager"];
 
                 if (TaskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_XML))
                 {
