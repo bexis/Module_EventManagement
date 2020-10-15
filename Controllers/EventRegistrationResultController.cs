@@ -374,7 +374,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return View("EventRegistrationResults", GetEventResults(id));
         }
 
-
         #endregion
 
         #region Xml to DataTable
