@@ -54,7 +54,7 @@
 
     $(window).load(function () {
 
-        $.get('@Url.Action("FillTree", "EventRegistration")', function (data) {
+        $.get('@Url.Action("FillTree", "EventRegistrationResult")', function (data) {
 
             $('#Content_Events').html(data);
         });
