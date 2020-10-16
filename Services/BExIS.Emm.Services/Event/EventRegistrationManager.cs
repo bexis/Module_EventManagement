@@ -12,12 +12,38 @@ using System.Xml.Linq;
 
 namespace BExIS.Emm.Services.Event
 {
-    public class EventRegistrationManager
+    public class EventRegistrationManager : IDisposable
     {
+        private IUnitOfWork uow = null;
         public EventRegistrationManager()
         {
             IUnitOfWork uow = this.GetUnitOfWork();
             this.EventRegistrationRepo = uow.GetReadOnlyRepository<E.EventRegistration>();
+        }
+
+
+        private bool isDisposed = false;
+        ~EventRegistrationManager()
+        {
+            Dispose(true);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!isDisposed)
+            {
+                if (disposing)
+                {
+                    if (uow != null)
+                        uow.Dispose();
+                    isDisposed = true;
+                }
+            }
         }
 
         #region Data Readers

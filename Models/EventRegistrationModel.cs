@@ -35,8 +35,10 @@ namespace BExIS.Modules.EMM.UI.Models
             Event = new EventModel(e);
             EditAllowed = e.EditAllowed;
 
-            EventRegistrationManager erManger = new EventRegistrationManager();
-            NumberOfRegistration = erManger.GetAllRegistrationsByEvent(e.Id).Count();
+            using (EventRegistrationManager erManger = new EventRegistrationManager())
+            {
+                NumberOfRegistration = erManger.GetAllRegistrationsByEvent(e.Id).Count();
+            }
         }
     }
 

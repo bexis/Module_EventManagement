@@ -152,8 +152,17 @@
     <Compile Include="Controllers\EventRegistrationController.cs" />
     <Compile Include="EMMModule.cs" />
     <Compile Include="Helper\EMMSeedDataGenerator.cs" />
+    <Compile Include="Helper\FormHelper.cs" />
+    <Compile Include="Models\AbstractMetadataStepModel.cs" />
+    <Compile Include="Models\AbstractStepModel.cs" />
     <Compile Include="Models\EventModel.cs" />
     <Compile Include="Models\EventRegistrationModel.cs" />
+    <Compile Include="Models\MetadataAttributeModel.cs" />
+    <Compile Include="Models\MetadataCompoundAttributeModel.cs" />
+    <Compile Include="Models\MetadataEditorModel.cs" />
+    <Compile Include="Models\MetadataInstanceModel.cs" />
+    <Compile Include="Models\MetadataPackageModel.cs" />
+    <Compile Include="Models\StepModelHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -171,7 +180,7 @@
     <Content Include="Views\EventRegistrationResult\EventRegistrationResults.cshtml" />
     <Content Include="Views\EventRegistration\FormEventRegistration.cshtml" />
     <Content Include="Views\EventRegistration\_logInToEvent.cshtml" />
-    <Content Include="Views\EventRegistration\_selectEvent.cshtml" />
+    <Content Include="Views\EventRegistrationResult\_selectEvent.cshtml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <Content Include="Views\EventRegistration\MetadataEditor.cshtml" />
     <Content Include="Views\EventRegistration\_metadataAttributeView.cshtml" />

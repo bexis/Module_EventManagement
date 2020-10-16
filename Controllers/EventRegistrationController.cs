@@ -74,34 +74,37 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 List<EventRegistrationModel> availableEvents = new List<EventRegistrationModel>();
 
-                EventRegistrationManager erManager = new EventRegistrationManager();
-                User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
-
-                foreach (Event e in allEvents)
+                using (EventRegistrationManager erManager = new EventRegistrationManager())
                 {
-                    DateTime today = DateTime.Now;
-                    if (today >= e.StartDate)
+                    User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+
+                    foreach (Event e in allEvents)
                     {
-                        EventRegistrationModel model = new EventRegistrationModel(e);
-                        //check if user already registered (if logged in)
-                        if (user != null)
+                        DateTime today = DateTime.Now;
+                        if (today >= e.StartDate)
                         {
-                            EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
-                            if (reg != null)
-                                model.AlreadyRegistered = true;
-                        }
-                        else if (ref_id != null)
-                        {
-                            EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, e.Id);
-                            if (reg != null)
-                                model.AlreadyRegistered = true;
-                            model.AlreadyRegisteredRefId = ref_id;
-                        }
+                            EventRegistrationModel model = new EventRegistrationModel(e);
+                            //check if user already registered (if logged in)
+                            if (user != null)
+                            {
+                                EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+                                if (reg != null)
+                                    model.AlreadyRegistered = true;
+                            }
+                            else if (ref_id != null)
+                            {
+                                EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, e.Id);
+                                if (reg != null)
+                                    model.AlreadyRegistered = true;
+                                model.AlreadyRegisteredRefId = ref_id;
+                            }
 
 
-                        // Show event if either registered or deadline is not over
-                        if (today <= e.Deadline || model.AlreadyRegistered == true)
-                            availableEvents.Add(model);
+
+                            // Show event if either registered or deadline is not over
+                            if (today <= e.Deadline || model.AlreadyRegistered == true)
+                                availableEvents.Add(model);
+                        }
                     }
                 }
 
@@ -116,21 +119,23 @@ namespace BExIS.Modules.EMM.UI.Controllers
             //check if it is an edit
             using (SubjectManager subManager = new SubjectManager())
             {
-                EventRegistrationManager erManager = new EventRegistrationManager();
-                User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
-                if (user != null)
+                using (EventRegistrationManager erManager = new EventRegistrationManager())
                 {
-                    EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, long.Parse(id));
-                    if (reg != null)
+                    User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+                    if (user != null)
                     {
-                        model.Edit = true;
+                        EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, long.Parse(id));
+                        if (reg != null)
+                        {
+                            model.Edit = true;
+                        }
                     }
-                }
-                else if (ref_id != null)
-                {
-                    EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, long.Parse(id));
-                    if (reg != null)
-                        model.Edit = true;
+                    else if (ref_id != null)
+                    {
+                        EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, long.Parse(id));
+                        if (reg != null)
+                            model.Edit = true;
+                    }
                 }
             }
 
@@ -162,7 +167,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                     if (model.Edit)
                     {
-                        EventRegistrationManager erManager = new EventRegistrationManager();
+                        using (EventRegistrationManager erManager = new EventRegistrationManager())
                         using (SubjectManager subManager = new SubjectManager())
                         {
                             User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
@@ -410,8 +415,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         public ActionResult Save()
         {
-            EventRegistrationManager erManager = new EventRegistrationManager();
             using (EventManager eManager = new EventManager())
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
             using (SubjectManager subManager = new SubjectManager())
             {
 
@@ -516,7 +521,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     //}
 
                 }
-                return RedirectToAction("EventRegistrationPatial", "EventRegistrationResult", new { message = message, ref_id = ref_id });
+
+                return RedirectToAction("EventRegistration", "EventRegistration", new { message = message, ref_id = ref_id });
             }        
         }
 
@@ -798,17 +804,24 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             DataTable results = new DataTable();
 
-            EventRegistrationManager erManager = new EventRegistrationManager();
-            List<EventRegistration> eventRegistrations = erManager.GetAllRegistrationsByEvent(eventId);
-
-            if (eventRegistrations.Count != 0)
-#pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht
-                results = CreateDataTableColums(results, XElement.Load(new XmlNodeReader(eventRegistrations[0].Data)));
-
-            foreach (EventRegistration er in eventRegistrations)
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
             {
-                results.Rows.Add(AddDataRow(XElement.Load(new XmlNodeReader(er.Data)), results));
-#pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht
+                List<EventRegistration> eventRegistrations = erManager.GetAllRegistrationsByEvent(eventId);
+
+                if (eventRegistrations.Count != 0)
+                {
+                    XmlNodeReader xmlNodeReader = new XmlNodeReader(eventRegistrations[0].Data);
+                    results = CreateDataTableColums(results, XElement.Load(xmlNodeReader));
+                    xmlNodeReader.Dispose();
+                }
+
+                foreach (EventRegistration er in eventRegistrations)
+                {
+                    XmlNodeReader xmlNodeReader = new XmlNodeReader(er.Data);
+                    results.Rows.Add(AddDataRow(XElement.Load(xmlNodeReader), results));
+                    xmlNodeReader.Dispose();
+
+                }
             }
 
             return results;
@@ -818,12 +831,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
         {
             DataTable results = new DataTable();
 
-            EventRegistrationManager erManager = new EventRegistrationManager();
-
-#pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht
-            results = CreateDataTableColums(results, XElement.Load(new XmlNodeReader(XmlMetadataWriter.ToXmlDocument(data))));
-            results.Rows.Add(AddDataRow(XElement.Load(new XmlNodeReader(XmlMetadataWriter.ToXmlDocument(data))), results));
-#pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
+            {
+                XmlNodeReader xmlNodeReader = new XmlNodeReader(XmlMetadataWriter.ToXmlDocument(data));
+                results = CreateDataTableColums(results, XElement.Load(xmlNodeReader));
+                results.Rows.Add(AddDataRow(XElement.Load(xmlNodeReader), results));
+                xmlNodeReader.Dispose();
+            }
             
             return results;
         }
