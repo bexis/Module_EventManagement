@@ -509,7 +509,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                     // Save registration and send notification
                     erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id);
-                    SendEmailNotification(notificationType, email, ref_id, data, e, user);
+
+                    //SendEmailNotification(notificationType, email, ref_id, data, e, user);
 
 
                     ////Set permissions on event registration
@@ -522,7 +523,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 }
 
-                return RedirectToAction("EventRegistration", "EventRegistration", new { message = message, ref_id = ref_id });
+                return Json(new { result = "redirect", url = Url.Action("EventRegistration", "EventRegistration", new { area = "EMM", ref_id = ref_id }) }, JsonRequestBehavior.AllowGet);
             }        
         }
 
