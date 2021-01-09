@@ -510,7 +510,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     // Save registration and send notification
                     erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id);
 
-                    //SendEmailNotification(notificationType, email, ref_id, data, e, user);
+                    SendEmailNotification(notificationType, email, ref_id, data, e, user);
 
 
                     ////Set permissions on event registration
@@ -831,16 +831,18 @@ namespace BExIS.Modules.EMM.UI.Controllers
         private DataTable GetEventRegistration(long eventId, XDocument data)
         {
             DataTable results = new DataTable();
-
             using (EventRegistrationManager erManager = new EventRegistrationManager())
+
             {
-                XmlNodeReader xmlNodeReader = new XmlNodeReader(XmlMetadataWriter.ToXmlDocument(data));
-                results = CreateDataTableColums(results, XElement.Load(xmlNodeReader));
-                results.Rows.Add(AddDataRow(XElement.Load(xmlNodeReader), results));
-                xmlNodeReader.Dispose();
+
+#pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht	    
+                results = CreateDataTableColums(results, XElement.Load(new XmlNodeReader(XmlMetadataWriter.ToXmlDocument(data))));
+                results.Rows.Add(AddDataRow(XElement.Load(new XmlNodeReader(XmlMetadataWriter.ToXmlDocument(data))), results));
+#pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht	             
+
+
+                return results;
             }
-            
-            return results;
         }
 
         private DataTable CreateDataTableColums(DataTable dataTable, XElement x)
