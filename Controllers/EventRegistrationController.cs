@@ -114,6 +114,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         public ActionResult LogInToEvent(string id, string view_only = "false", string ref_id = null)
         {
+            Session["DefaultEventInformation"] = null;
             LogInToEventModel model = new LogInToEventModel(long.Parse(id), bool.Parse(view_only), ref_id);
 
             //check if it is an edit
@@ -158,6 +159,18 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 if (ModelState.IsValid)
                 {
+                    //add default value to session
+                    DefaultEventInformation defaultEventInformation = new DefaultEventInformation();
+                    defaultEventInformation.EventName = e.Name;
+                    if(!String.IsNullOrEmpty(e.EventDate))
+                        defaultEventInformation.Date = e.EventDate;
+                    if (!String.IsNullOrEmpty(e.EventLanguage))
+                        defaultEventInformation.Language = e.EventLanguage;
+                    if (!String.IsNullOrEmpty(e.ImportantInformation))
+                        defaultEventInformation.ImportantInformation = e.ImportantInformation;
+
+                    Session["DefaultEventInformation"] = defaultEventInformation;
+
                     //CreateTaskmanager taskManager = new CreateTaskmanager();
                     if (TaskManager == null)
                         TaskManager = new CreateTaskmanager();
@@ -205,6 +218,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     Session["EventRegistrationTaskmanager"] = TaskManager;
 
                     setAdditionalFunctions();
+
                     return Json(new { success = true, edit = model.Edit });
 
 
@@ -240,11 +254,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 TaskManager.AddToBus(CreateTaskmanager.EDIT_MODE, fromEditMode);
                 Model.FromEditMode = (bool)TaskManager.Bus[CreateTaskmanager.EDIT_MODE];
 
-                //load empty metadata xml if needed
-                if (!TaskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_XML))
-                {
-                    CreateXml();
-                }
+            //load empty metadata xml if needed
+            if (!TaskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_XML))
+            {
+                        CreateXml();
+            }
 
                 var loaded = false;
                 //check if formsteps are loaded

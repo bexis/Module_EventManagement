@@ -32,6 +32,30 @@
     </tr>
     <tr>
         <td>
+            @Html.LabelFor(m => m.EventDate)
+        </td>
+        <td>
+            @Html.TextBoxFor(m => m.EventDate, new { @class = "bx-input", @tabindex = "2" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.ImportantInformation)
+        </td>
+        <td>
+            @Html.TextAreaFor(m => m.ImportantInformation, new { @class = "bx-textarea", @tabindex = "2" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.EventLanguage)
+        </td>
+        <td>
+            @Html.TextBoxFor(m => m.EventLanguage, new { @class = "bx-input", @tabindex = "2" })
+        </td>
+    </tr>
+    <tr>
+        <td>
             <b title="This field is required" style="color:red">*</b>
             @Html.LabelFor(m => m.StartDate)
         </td>
@@ -99,8 +123,11 @@
             @Html.LabelFor(m => m.MetadataStructureList)
         </td>
         <td>
-            @Html.DropDownListFor(m => m.MetadataStructureId, new SelectList(Model.MetadataStructureList, "Id", "Name"),new { @class= "bx-dropdown",
-       style = "-webkit-appearance: menulist; height: 30px;"})
+            @Html.DropDownListFor(m => m.MetadataStructureId, new SelectList(Model.MetadataStructureList, "Id", "Name"), new
+            {
+                @class = "bx-dropdown",
+       style = "-webkit-appearance: menulist; height: 30px;"
+            })
         </td> <!--temporty style to fix removed arrow-->
     </tr>
     <tr>

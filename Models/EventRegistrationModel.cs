@@ -42,6 +42,21 @@ namespace BExIS.Modules.EMM.UI.Models
         }
     }
 
+    public class DefaultEventInformation
+    {
+        //event default values
+        public string EventName { get; set; }
+        public string Date { get; set; }
+        public string Language { get; set; }
+        public string ImportantInformation { get; set; }
+
+        public DefaultEventInformation()
+        {
+
+        }
+
+    }
+
     public class LogInToEventModel
     {
 

@@ -55,9 +55,17 @@
     <property name="Name" type="string">
       <column name="Name" />
     </property>
+    
+    <property name="EventDate" type="string">
+      <column name="EventDate" />
+    </property>
+    
+    <property name="ImportantInformation" type="string">
+      <column name="ImportantInformation" />
+    </property>
 
-    <property name="StartDate" type="DateTime">
-      <column name="StartDate" />
+    <property name="EventLanguage" type="string">
+      <column name="EventLanguage" />
     </property>
 
     <property name="Deadline" type="DateTime">

@@ -28,6 +28,61 @@
     bool hasSimpleMapping = Model.PartySimpleMappingExist;
     bool hasComplexMapping = Model.PartyComplexMappingExist;
 
+    <script>
+            function OnChangeDefault(val) {
+
+                $.post("/EMM/EventRegistration/ValidateMetadataAttributeUsage",
+                {
+                    value: val,
+                    id: @Model.Id,
+                    parentid: @Model.Parent.Id,
+                    number: @Model.Number,
+                    parentModelNumber: @Model.ParentModelNumber,
+                    ParentStepId: @Model.ParentStepId
+                });
+        }
+    </script>
+
+    DefaultEventInformation defaultEventInformation = (DefaultEventInformation)Session["DefaultEventInformation"];
+
+    if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_name_1" && Model.Value == null)
+    {
+        Model.Value = defaultEventInformation.EventName;
+        Model.Locked = true;
+        <script>
+                OnChangeDefault("@Model.Value");
+        </script>
+    }
+
+    if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_date_1" && Model.Value == null)
+    {
+        Model.Value = defaultEventInformation.Date;
+        Model.Locked = true;
+        <script>
+                OnChangeDefault("@Model.Value");
+        </script>
+    }
+
+    if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_language_1" && Model.Value == null)
+    {
+        Model.Value = defaultEventInformation.Language;
+        Model.Locked = true;
+        <script>
+                OnChangeDefault("@Model.Value");
+        </script>
+    }
+
+    if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_importantInformation_1" && Model.Value == null)
+    {
+        Model.Value = defaultEventInformation.ImportantInformation;
+        Model.Locked = true;
+        <script>
+                OnChangeDefault("@Model.Value");
+        </script>
+    }
+
+
+
     // Add before every uppercase word empty space (e.g. LastNameTEST -> Last Name TEST)
     displayName = Regex.Replace(Model.DisplayName, "((?<=[a-z])[A-Z])", " $1");
 
@@ -177,8 +232,10 @@
                                 else
                                 {
                                     //Attention: leave the below code in one line to avoid a leading emtpy line
-                                    <div class="bx-metadataForm-textArea-display">@if (Model.Value != null)
-                                    {@Html.DisplayWithLinksFor(m => m.Value)}</div>
+                                    <div class="bx-metadataForm-textArea-display">
+                                        @if (Model.Value != null)
+                                        {@Html.DisplayWithLinksFor(m => m.Value)}
+                                    </div>
                                 }
                             }
 

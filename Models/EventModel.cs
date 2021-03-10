@@ -15,6 +15,15 @@ namespace BExIS.Modules.EMM.UI.Models
         [DisplayName("Event name")]
         public string Name { get; set; }
 
+        [DisplayName("Event time period and time")]
+        public string EventDate { get; set; }
+
+        [DisplayName("Important Information")]
+        public string ImportantInformation { get; set; }
+
+        [DisplayName("Event Language")]
+        public string EventLanguage { get; set; }
+
         public XmlDocument Schema { get; set; }
 
         public string SchemaFileName { get; set; }
@@ -74,6 +83,9 @@ namespace BExIS.Modules.EMM.UI.Models
         {
             Id = eEvent.Id;
             Name = eEvent.Name;
+            EventDate = eEvent.EventDate;
+            ImportantInformation = eEvent.ImportantInformation;
+            EventLanguage = eEvent.EventLanguage;
             StartDate = eEvent.StartDate;
             Deadline = eEvent.Deadline;
             ParticipantsLimitation = eEvent.ParticipantsLimitation;
