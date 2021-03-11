@@ -426,6 +426,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return new Dictionary<string, ActionInfo>();
         }
 
+        public ActionResult Cancel()
+        {
+            return Json(new { result = "redirect", url = Url.Action("EventRegistration", "EventRegistration", new { area = "EMM"}) }, JsonRequestBehavior.AllowGet);
+        }
 
         public ActionResult Save()
         {
@@ -1031,7 +1035,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
             submitAction.ControllerName = "EventRegistration";
             submitAction.AreaName = "EMM";
 
+            ActionInfo cancelAction = new ActionInfo();
+            cancelAction.ActionName = "Cancel";
+            cancelAction.ControllerName = "EventRegistration";
+            cancelAction.AreaName = "EMM";
+
             taskManager.Actions.Add(CreateTaskmanager.SUBMIT_ACTION, submitAction);
+            taskManager.Actions.Add(CreateTaskmanager.CANCEL_ACTION, cancelAction);
 
             Session["EventRegistrationTaskmanager"] = taskManager;
 

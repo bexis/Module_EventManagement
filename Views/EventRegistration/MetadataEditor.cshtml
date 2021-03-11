@@ -449,24 +449,12 @@
             $
                 .get('@Url.Action(@cancel.ActionName, @cancel.ControllerName, new RouteValueDictionary {{"area", @cancel.AreaName}})',
                     function(response) {
-                        $('#MetadataEditor').replaceWith(response);
-                        bindMinimap(true);
-                        $('html, body').animate({ scrollTop: 0 }, 'slow');
-                    });
-        } else {
-            return false;
-        }
-    }
-
-    function reset() {
-
-        if (confirm('Are you sure? All changes will be lost.')) {
-            $
-                .get('@Url.Action(@reset.ActionName, @reset.ControllerName, new RouteValueDictionary {{"area", @reset.AreaName}})',
-                    function(response) {
-                        $('#MetadataEditor').replaceWith(response);
-                        bindMinimap(true);
-                        $('html, body').animate({ scrollTop: 0 }, 'slow');
+                        if (response.result == 'error') {
+                            alert(response.message)
+                        }
+                        else if (response.result == 'redirect') {
+                            window.location = response.url;
+                        }
                     });
         } else {
             return false;
