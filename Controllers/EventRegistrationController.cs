@@ -972,7 +972,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     break;
                 case "succesfully_registered_waiting_list":
                     subject = "Registration confirmation for" + e.Name + " - Event fully booked";
-                    mail_message = "you registered to " + e.Name + "you are currently on a replacment place.";
+                    mail_message = "For registered to " + e.Name + "you are currently on a replacment place.";
                     break;
                 case "updated":
                     subject = "Registration update confirmation for " + e.Name;
