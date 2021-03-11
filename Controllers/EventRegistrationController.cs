@@ -489,7 +489,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     if (e.ParticipantsLimitation != 0)
                     {
                         int countRegs = erManager.GetNumerOfRegistrationsByEvent(e.Id);
-                        if (countRegs > e.ParticipantsLimitation)
+                        if (countRegs >= e.ParticipantsLimitation)
                         {
                             message = "Number of participants has been reached. You are now on the waiting list.";
                             notificationType = "succesfully_registered_waiting_list";
@@ -971,8 +971,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     mail_message = "you registered to " + e.Name + "<br/>";
                     break;
                 case "succesfully_registered_waiting_list":
-                    subject = "Registration confirmation for " + e.Name + " - wating list";
-                    mail_message = "you registered to " + e.Name + ", but you are currently on the waiting list. <br/>";
+                    subject = "Registration confirmation for" + e.Name + " - Event fully booked";
+                    mail_message = "you registered to " + e.Name + "you are currently on a replacment place.";
                     break;
                 case "updated":
                     subject = "Registration update confirmation for " + e.Name;
