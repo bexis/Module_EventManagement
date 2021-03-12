@@ -148,7 +148,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
         #region Load Registration Form
 
         public ActionResult LoadForm(LogInToEventModel model)
-
         {
             using (EventManager eManager = new EventManager())
             {
@@ -205,6 +204,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     }
 
                     TaskManager.AddToBus(CreateTaskmanager.SAVE_WITH_ERRORS, false);
+
                     if (model.ViewOnly == true)
                     {
                         TaskManager.AddToBus(CreateTaskmanager.LOCKED, true);
@@ -220,9 +220,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     setAdditionalFunctions();
 
                     return Json(new { success = true, edit = model.Edit });
-
-
-                    //return RedirectToAction("StartMetadataEditor", "Form", new { area = "DCM" });
                 }
                 else
                 {
@@ -274,6 +271,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     // generate all steps
                     // one step for each complex type  in the metadata structure
                     AdvanceTaskManager(metadataStrutureId);
+                }
+
+                if (TaskManager.Bus.ContainsKey(CreateTaskmanager.LOCKED))
+                {
+                    ViewData["Locked"] = (bool)TaskManager.Bus[CreateTaskmanager.LOCKED];
                 }
 
                 var stepInfoModelHelpers = new List<StepModelHelper>();
