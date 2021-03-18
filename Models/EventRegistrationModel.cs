@@ -3,6 +3,7 @@ using BExIS.Emm.Services.Event;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Xml;
@@ -89,8 +90,7 @@ namespace BExIS.Modules.EMM.UI.Models
     {
         public long EventId { get; set; }
         public XmlDocument Form { get; set; }
-
-
+        public DataTable Results { get; set; }
     }
 
     public class EventRegistrationFilterModel

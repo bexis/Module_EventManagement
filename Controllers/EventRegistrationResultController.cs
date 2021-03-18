@@ -1,35 +1,20 @@
-﻿using BExIS.Dcm.CreateDatasetWizard;
-using BExIS.Dcm.Wizard;
-using BExIS.Dlm.Entities.MetadataStructure;
-using BExIS.Dlm.Services.MetadataStructure;
-using BExIS.Emm.Entities.Event;
+﻿using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
 using BExIS.IO.Transform.Output;
 using BExIS.Modules.EMM.UI.Models;
-using BExIS.Security.Entities.Objects;
-using BExIS.Security.Entities.Subjects;
-using BExIS.Security.Services.Authorization;
-using BExIS.Security.Services.Subjects;
-using BExIS.Security.Services.Utilities;
 using BExIS.Xml.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Web;
 using System.Web.Mvc;
-using System.Web.Routing;
 using System.Xml;
 using System.Xml.Linq;
-using Telerik.Web.Mvc;
 using Vaiona.Utils.Cfg;
 using Vaiona.Web.Extensions;
 using Vaiona.Web.Mvc.Models;
-using Vaiona.Web.Mvc.Modularity;
 
 namespace BExIS.Modules.EMM.UI.Controllers
 {
@@ -41,21 +26,44 @@ namespace BExIS.Modules.EMM.UI.Controllers
         public ActionResult Show()
         {
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Show Event Results", this.Session.GetTenant());
-
-            return View("EventRegistrationResults", new DataTable());
+            EventRegistrationResultModel model = new EventRegistrationResultModel();
+            model.Results = new DataTable();
+            return View("EventRegistrationResults", model);
         }
 
-       // public ActionResult ExportToExcel(string eventName, string eventId)
-       // {
-       //     eventName = "eventName";
-      //      ExcelWriter excelWriter = new ExcelWriter();
+        //export as comma seperatred csv
+        public ActionResult Export(string id)
+        {
+            DataTable dataTable = GetEventResults(long.Parse(id));
 
-           // string path = excelWriter.CreateFile(eventName);
+            var lines = new List<string>();
+            string[] columnNames = dataTable.Columns
+                    .Cast<DataColumn>()
+                    .Select(column => column.ColumnName)
+                    .ToArray();
 
-            //excelWriter.AddDataTableToExcel(GetEventResults(long.Parse(eventId)), path);
+            var header = string.Join(",", columnNames.Select(name => $"\"{name}\""));
+            lines.Add(header);
 
-           // return File(path, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-      //  }
+            var valueLines = dataTable.AsEnumerable()
+                .Select(row => string.Join(",", row.ItemArray.Select(val => $"\"{val}\"")));
+
+            lines.AddRange(valueLines);
+
+            string eventName;
+
+            using (EventManager eventManager = new EventManager())
+            {
+                eventName = eventManager.GetEventById(long.Parse(id)).Name;
+            }
+
+            string dataPath = AppConfiguration.DataPath;
+            string storePath = Path.Combine(dataPath, "EMM", "Temp", eventName + ".csv");
+
+            System.IO.File.WriteAllLines(storePath, lines);
+
+            return File(storePath, MimeMapping.GetMimeMapping(eventName + ".csv"), Path.GetFileName(storePath));
+        }
 
         public ActionResult FillTree()
         {
@@ -89,7 +97,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         public ActionResult OnSelectTreeViewItem(long id)
         {
-            return View("EventRegistrationResults", GetEventResults(id));
+            EventRegistrationResultModel model = new EventRegistrationResultModel();
+            model.Results = GetEventResults(id);
+            model.EventId = id;
+
+            return View("EventRegistrationResults", model);
         }
 
         #endregion
@@ -98,9 +110,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         private DataTable GetEventResults(long eventId)
         {
-            //string path = AppConfiguration.GetModuleWorkspacePath("EMM");
-            //XDocument xDoc = XDocument.Load(Path.Combine(path, "workshopReg4.xml"));
-
             DataTable results = new DataTable();
 
             using (EventRegistrationManager erManager = new EventRegistrationManager())
@@ -114,13 +123,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     xmlNodeReader.Dispose();
                 }
 
-
                 foreach (EventRegistration er in eventRegistrations)
                 {
                     XmlNodeReader xmlNodeReader = new XmlNodeReader(er.Data);
                     results.Rows.Add(AddDataRow(XElement.Load(xmlNodeReader), results));
                     xmlNodeReader.Dispose();
-
                 }
             }
 
@@ -147,28 +154,14 @@ namespace BExIS.Modules.EMM.UI.Controllers
             // build your DataTable
             foreach (XElement xe in x.Descendants())
             {
-                //if (xe.Attribute("input") != null)
-                //{
-                //if (xe.Attribute("input").Value != "intern" && !xe.HasElements)
                 if (!xe.HasElements)
                 {
                     DataColumn dc = new DataColumn();
                     dc.Caption = xe.Name.ToString();
-                    dc.ColumnName = xe.GetAbsoluteXPath();
+                    dc.ColumnName = xe.Name.ToString();
 
                     dt.Columns.Add(dc); // add columns to your dt
                 }
-                // }
-
-                //if (!xe.HasElements)
-                //{
-                //    DataColumn dc = new DataColumn();
-                //    dc.Caption = xe.Name.ToString();
-                //    dc.ColumnName =xe.GetAbsoluteXPath();
-                //    dt.Columns.Add(dc); // add columns to your dt
-                //}
-
-
             }
 
             return dt;
@@ -176,18 +169,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         private DataRow AddDataRow(XElement x, DataTable dt)
         {
-            //var all = from p in x.Descendants(x.Name.ToString()) select p;
             DataRow dr = dt.NewRow();
             foreach (XElement xe in x.Descendants())
             {
-                //if (xe.Attribute("input") != null)
-                //{
                 if (!xe.HasElements)
                 {
-                    //dr[xe.Name.ToString()] = xe.Value; //add in the values
-                    dr[xe.GetAbsoluteXPath()] = xe.Value;
+                    dr[xe.Name.ToString()] = xe.Value; //add in the values
                 }
-                // }
             }
 
             return dr;

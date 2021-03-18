@@ -2,7 +2,7 @@
 @using System.Data
 @using BExIS.Modules.EMM.UI.Models;
 
-@model  DataTable
+@model EventRegistrationResultModel
 
 @section Information
 {
@@ -13,12 +13,12 @@
 }
  
 
-@(Html.Telerik().Grid(Model)
+@(Html.Telerik().Grid(Model.Results)
             .Name("EventRegistrationResults")
             .Sortable()
            .Columns(columns =>
             {
-                foreach (DataColumn dc in Model.Columns)
+                foreach (DataColumn dc in Model.Results.Columns)
                 {
                     string title;
 
@@ -39,7 +39,7 @@
         )
 )
 
-@Html.ActionLink("Export to excel", "ExportToExcel", "EventRegistration", new { @class = "bx-button function" })
+@Html.ActionLink("Export (csv)", "Export", "EventRegistrationResult", new { id = Model.EventId }, new { @class = "bx-button function" })
 
 
 @section LeftPane
