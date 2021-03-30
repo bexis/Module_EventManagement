@@ -18,10 +18,10 @@ namespace BExIS.Modules.EMM.UI.Models
         [DisplayName("Event time period and time")]
         public string EventDate { get; set; }
 
-        [DisplayName("Important Information")]
+        [DisplayName("Important information")]
         public string ImportantInformation { get; set; }
 
-        [DisplayName("Event Language")]
+        [DisplayName("Event language")]
         public string EventLanguage { get; set; }
 
         public XmlDocument Schema { get; set; }
@@ -62,7 +62,7 @@ namespace BExIS.Modules.EMM.UI.Models
 
         public bool EditAccess { get; set; }
 
-        [DisplayName("Registration Template")]
+        [DisplayName("Registration template")]
         public List<ListItem> MetadataStructureList { get; set; }
 
         public long MetadataStructureId { get; set; }
