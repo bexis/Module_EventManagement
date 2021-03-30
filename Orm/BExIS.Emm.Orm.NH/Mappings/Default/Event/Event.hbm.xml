@@ -67,6 +67,10 @@
     <property name="EventLanguage" type="string">
       <column name="EventLanguage" />
     </property>
+    
+     <property name="StartDate" type="DateTime">
+      <column name="StartDate" />
+    </property>
 
     <property name="Deadline" type="DateTime">
       <column name="Deadline" />
