@@ -17,6 +17,8 @@ namespace BExIS.Modules.EMM.UI.Models
         public bool SaveWithErrors { get; set; }
         public bool LatestVersion { get; set; }
         public string HeaderHelp { get; set; }
+        public bool Registered { get; set; }
+        public bool EditRegistration { get; set; }
 
         public List<StepModelHelper> StepModelHelpers { get; set; }
         public Dictionary<string, ActionInfo> Actions { get; set; }
@@ -37,6 +39,8 @@ namespace BExIS.Modules.EMM.UI.Models
             LatestVersion = false;
 
             Actions = new Dictionary<string, ActionInfo>();
+
+            Registered = false;
         }
     }
 }

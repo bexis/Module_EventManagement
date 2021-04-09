@@ -128,7 +128,7 @@
         if (data.success) {
             $('#Window_LogInToEvent').data('tWindow').close();
 
-            window.location.href = "/EMM/EventRegistration/LoadMetadataForm";
+            window.location.href = "/EMM/EventRegistration/LoadMetadataForm?edit=" + data.edit;
 
         }
         else {

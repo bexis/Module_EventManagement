@@ -254,26 +254,35 @@
 
     @if (!locked)
     {
-        <div class="bx-footer right">
+<div class="bx-footer right">
 
-            <!-- only from editmode you have the option to reset-->
-            @*<button id="validate" onclick="validate()" class="bx-button function" style="float: left;">Validate</button>*@
+    <!-- only from editmode you have the option to reset-->
+    @*<button id="validate" onclick="validate()" class="bx-button function" style="float: left;">Validate</button>*@
 
-            @*@if (@Model.FromEditMode)
-                {
-                    <button onclick="reset()" class="bx-button function" style="float: left;">Reset</button>
-                }*@
+    @*@if (@Model.FromEditMode)
+        {
+            <button onclick="reset()" class="bx-button function" style="float: left;">Reset</button>
+        }*@
 
-            @if (@submit.IsComplete())
-            {
-                <button id="save" onclick="submit()" class="bx-button action">Save</button>
-            }
+    @if (@submit.IsComplete())
+    {
+        if (Model.Registered)
+        {
+            <div id="view-warning" class="alert alert-danger bx-input-error" role="alert" style="width: 100%;">
+                You are already registered with this email for that event.
+            </div>
+        }
+        else
+        {
+            <button id="save" onclick="submit()" class="bx-button action">Save</button>
+        }
+    }
 
-            @if (@Model.FromEditMode)
-            {
-                <button id="cancel" onclick="cancel()" class="bx-button action">Cancel</button>
-            }
-        </div>
+    @if (@Model.FromEditMode)
+    {
+        <button id="cancel" onclick="cancel()" class="bx-button action">Cancel</button>
+    }
+</div>
     }
 
     <!--include additional JavaScript file at the bottum-->
@@ -473,7 +482,7 @@
         function submit() {
 
            
-        $.get('@Url.Action("Validate", "EventRegistration", new RouteValueDictionary {{"area", "EMM"}})',
+        $.get('@Url.Action("Validate", "EventRegistration", new RouteValueDictionary { { "area", "EMM" }, { "edit", @Model.EditRegistration } })',
             function(response) {
                 $('#MetadataEditor').replaceWith(response);
                 bindMinimap(true);

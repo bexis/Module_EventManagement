@@ -81,6 +81,10 @@
         </script>
     }
 
+    if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_name_1")
+    {
+        Model.Locked = true;
+    }
 
 
     // Add before every uppercase word empty space (e.g. LastNameTEST -> Last Name TEST)
@@ -111,7 +115,7 @@
     {
         autoCompleteType = "PartyCustomType";
     }
-}
+    }
 
 @if (Model.Number > 1)
 {

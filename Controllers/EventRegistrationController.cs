@@ -161,7 +161,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     //add default value to session
                     DefaultEventInformation defaultEventInformation = new DefaultEventInformation();
                     defaultEventInformation.EventName = e.Name;
-                    if(!String.IsNullOrEmpty(e.EventDate))
+                    if (!String.IsNullOrEmpty(e.EventDate))
                         defaultEventInformation.Date = e.EventDate;
                     if (!String.IsNullOrEmpty(e.EventLanguage))
                         defaultEventInformation.Language = e.EventLanguage;
@@ -237,11 +237,12 @@ namespace BExIS.Modules.EMM.UI.Controllers
         //    return Content(view.ToHtmlString(), "text/html");
         //}
 
-        public ActionResult LoadMetadataForm(bool fromEditMode = true)
+        public ActionResult LoadMetadataForm(string edit,bool fromEditMode = true)
         {
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Register to Event", this.Session.GetTenant());
 
             var Model = new MetadataEditorModel();
+            Model.EditRegistration = Convert.ToBoolean(edit);
 
             if (TaskManager == null) TaskManager = (CreateTaskmanager)Session["EventRegistrationTaskmanager"];
 
@@ -251,11 +252,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 TaskManager.AddToBus(CreateTaskmanager.EDIT_MODE, fromEditMode);
                 Model.FromEditMode = (bool)TaskManager.Bus[CreateTaskmanager.EDIT_MODE];
 
-            //load empty metadata xml if needed
-            if (!TaskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_XML))
-            {
-                        CreateXml();
-            }
+                //load empty metadata xml if needed
+                if (!TaskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_XML))
+                {
+                    CreateXml();
+                }
 
                 var loaded = false;
                 //check if formsteps are loaded
@@ -276,6 +277,12 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 if (TaskManager.Bus.ContainsKey(CreateTaskmanager.LOCKED))
                 {
                     ViewData["Locked"] = (bool)TaskManager.Bus[CreateTaskmanager.LOCKED];
+                }
+
+                //save with errors?
+                if (TaskManager.Bus.ContainsKey(CreateTaskmanager.SAVE_WITH_ERRORS))
+                {
+                    Model.SaveWithErrors = (bool)TaskManager.Bus[CreateTaskmanager.SAVE_WITH_ERRORS];
                 }
 
                 var stepInfoModelHelpers = new List<StepModelHelper>();
@@ -319,7 +326,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
             bool created = false,
             long entityId = -1,
             bool fromEditMode = false,
-            bool latestVersion = false
+            bool latestVersion = false,
+            bool registered = false
             )
         {
             ViewData["Locked"] = locked;
@@ -328,7 +336,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Create Dataset", this.Session.GetTenant());
             TaskManager = (CreateTaskmanager)Session["EventRegistrationTaskmanager"];
 
-            TaskManager?.AddToBus(CreateTaskmanager.SAVE_WITH_ERRORS, true);
+            TaskManager?.AddToBus(CreateTaskmanager.SAVE_WITH_ERRORS, false);
 
             var stepInfoModelHelpers = new List<StepModelHelper>();
 
@@ -351,6 +359,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
 
             var Model = new MetadataEditorModel();
+            Model.Registered = registered;
             Model.StepModelHelpers = stepInfoModelHelpers;
             Model.SaveWithErrors = Model.StepModelHelpers.Any(s => s.Model.ErrorList.Count() > 0);
 
@@ -430,7 +439,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         public ActionResult Cancel()
         {
-            return Json(new { result = "redirect", url = Url.Action("EventRegistration", "EventRegistration", new { area = "EMM"}) }, JsonRequestBehavior.AllowGet);
+            return Json(new { result = "redirect", url = Url.Action("EventRegistration", "EventRegistration", new { area = "EMM" }) }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Save()
@@ -439,12 +448,22 @@ namespace BExIS.Modules.EMM.UI.Controllers
             using (EventRegistrationManager erManager = new EventRegistrationManager())
             using (SubjectManager subManager = new SubjectManager())
             {
-
                 CreateTaskmanager taskManager = (CreateTaskmanager)Session["EventRegistrationTaskmanager"];
 
                 XDocument data = new XDocument();
                 if (taskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_XML))
+                {
+                    if(taskManager.Bus[CreateTaskmanager.METADATA_XML].GetType() == typeof (XmlDocument))
+                    {
+                        using (var nodeReader = new XmlNodeReader((XmlDocument)taskManager.Bus[CreateTaskmanager.METADATA_XML]))
+                        {
+                            nodeReader.MoveToContent();
+                            data = XDocument.Load(nodeReader);
+                        }
+                    }
+                    else
                     data = (XDocument)taskManager.Bus[CreateTaskmanager.METADATA_XML];
+                }
 
                 long eventId = 0;
                 if (taskManager.Bus.ContainsKey(CreateTaskmanager.ENTITY_ID))
@@ -486,7 +505,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 // New event registration
                 else
                 {
-
                     //check Participants Limitation
                     if (e.ParticipantsLimitation != 0)
                     {
@@ -532,36 +550,32 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                     SendEmailNotification(notificationType, email, ref_id, data, e, user);
 
-
-                    ////Set permissions on event registration
-                    //PermissionManager pManager = new PermissionManager();
-
-                    //foreach (RightType rightType in Enum.GetValues(typeof(RightType)).Cast<RightType>())
-                    //{
-                    //    pManager.CreateDataPermission(user.Id, 2, resource.Id, rightType);
-                    //}
-
                 }
 
                 return Json(new { result = "redirect", url = Url.Action("EventRegistration", "EventRegistration", new { area = "EMM", ref_id = ref_id }) }, JsonRequestBehavior.AllowGet);
-            }        
+            }
         }
 
         #endregion
 
         #region Validation
 
-        public ActionResult Validate()
+        public ActionResult Validate(string edit)
         {
             TaskManager = (CreateTaskmanager)Session["EventRegistrationTaskmanager"];
-
+            bool inEvent = false;
             if (TaskManager != null && TaskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_STEP_MODEL_HELPER))
             {
                 var stepInfoModelHelpers = (List<StepModelHelper>)TaskManager.Bus[CreateTaskmanager.METADATA_STEP_MODEL_HELPER];
+
+                //check if email allready used in this event, only if we are not in edit reg mode
+                if(!Convert.ToBoolean(edit))
+                    inEvent = UserAllreadyRegister();
+                    
                 ValidateModels(stepInfoModelHelpers.Where(s => s.Activated && s.IsParentActive()).ToList());
             }
 
-            return RedirectToAction("ReloadMetadataEditor", "EventRegistration");
+            return RedirectToAction("ReloadMetadataEditor", "EventRegistration", new { registered = inEvent });
         }
 
         //XX number of index des values nötig
@@ -766,17 +780,17 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return View("EventRegistrationResults", new DataTable());
         }
 
-       // public ActionResult ExportToExcel(string eventName, string eventId)
-       // {
-       //     eventName = "eventName";
-      //      ExcelWriter excelWriter = new ExcelWriter();
+        // public ActionResult ExportToExcel(string eventName, string eventId)
+        // {
+        //     eventName = "eventName";
+        //      ExcelWriter excelWriter = new ExcelWriter();
 
-           // string path = excelWriter.CreateFile(eventName);
+        // string path = excelWriter.CreateFile(eventName);
 
-            //excelWriter.AddDataTableToExcel(GetEventResults(long.Parse(eventId)), path);
+        //excelWriter.AddDataTableToExcel(GetEventResults(long.Parse(eventId)), path);
 
-           // return File(path, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-      //  }
+        // return File(path, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        //  }
 
         public ActionResult FillTree()
         {
@@ -920,6 +934,56 @@ namespace BExIS.Modules.EMM.UI.Controllers
         #endregion
 
         #region Helper
+
+        /// <summary>
+        /// Check if user allready register with the given email adress
+        /// </summary>
+        /// <returns>true or false</returns>
+        private bool UserAllreadyRegister()
+        {
+            CreateTaskmanager taskManager = (CreateTaskmanager)Session["EventRegistrationTaskmanager"];
+            //get event id id exsit
+            long eventId = 0;
+            if (taskManager.Bus.ContainsKey(CreateTaskmanager.ENTITY_ID))
+                eventId = (long)taskManager.Bus[CreateTaskmanager.ENTITY_ID];
+
+            if (eventId != 0)
+            {
+                //get xml data
+                XDocument data = new XDocument();
+                if (taskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_XML))
+                {
+                    //check if xml data is in XmLformat and convert to Xdoc ToDO: find a why without converting(DCM: XDoc EMM: XmlDoc)
+                    if (taskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_XML).GetType() == typeof(XmlDocument))
+                    {
+                        using (var nodeReader = new XmlNodeReader((XmlDocument)taskManager.Bus[CreateTaskmanager.METADATA_XML]))
+                        {
+                            nodeReader.MoveToContent();
+                            data = XDocument.Load(nodeReader);
+                        }
+                    }
+                    else
+                    data = (XDocument)taskManager.Bus[CreateTaskmanager.METADATA_XML];
+                }
+
+                //get email adress to check if it already exsits in thsi event
+                string email = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("Email")[0].InnerText;
+
+                using (var eventRegistrationManager = new EventRegistrationManager())
+                {
+                    //get all registrations from the selected event 
+                    var events = eventRegistrationManager.GetAllRegistrationsByEvent(eventId);
+                    foreach (var e in events)
+                    {
+                        //return true if we have a match
+                        if (email == e.Data.GetElementsByTagName("Email")[0].InnerText)
+                            return true;
+                    }
+                }
+            }
+
+            return false;
+        }
 
         private string GetRefIdFromEmail(string email)
         {
