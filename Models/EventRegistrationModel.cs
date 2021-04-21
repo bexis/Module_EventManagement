@@ -10,21 +10,28 @@ using System.Xml;
 
 namespace BExIS.Modules.EMM.UI.Models
 {
+
+    /// <summary>
+    /// The EventRegistrationModel represent all informatio ehich are needed to handel a event registration.
+    /// </summary>
+    /// <remarks></remarks>
     public class EventRegistrationModel
     {
         public EventModel Event { get; set; }
 
-        public string Participants { get; set; }
+        public string Participants { get; set; } //number of participants limitation
 
-        public int NumberOfRegistration { get; set; }
+        public int NumberOfRegistration { get; set; } //number of already registered participants
 
-        public bool EditAllowed { get; set; }
+        public bool EditAllowed { get; set; } // edit allowed by user
 
-        public bool AlreadyRegistered { get; set; }
+        public bool AlreadyRegistered { get; set; } //user already registered, this will find out via user email
 
-        public string AlreadyRegisteredRefId { get; set; }
+        public bool Deleted { get; set; } //is registration deleted by user
 
-        public string Message { get; set; }
+        public string AlreadyRegisteredRefId { get; set; } //Already registered RefId
+
+        public string Message { get; set; } //
 
         public EventRegistrationModel()
         {

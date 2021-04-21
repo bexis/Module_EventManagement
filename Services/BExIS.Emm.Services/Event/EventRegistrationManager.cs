@@ -102,7 +102,9 @@ namespace BExIS.Emm.Services.Event
             using (IUnitOfWork uow = this.GetUnitOfWork())
             {
                 IRepository<E.EventRegistration> repo = uow.GetRepository<E.EventRegistration>();
-                repo.Put(eventRegistration);
+                repo.Merge(eventRegistration);
+                var merged = repo.Get(eventRegistration.Id);
+                repo.Put(merged);
                 uow.Commit();
             }
             return eventRegistration;
@@ -114,9 +116,9 @@ namespace BExIS.Emm.Services.Event
             return EventRegistrationRepo.Query(a=>a.Event.Id == id).ToList();
         }
 
-        public E.EventRegistration GetRegistrationByUserAndEvent(long userId, long eventId)
+        public List<E.EventRegistration> GetRegistrationByUserAndEvent(long userId, long eventId)
         {
-            return EventRegistrationRepo.Query(a => a.Event.Id == eventId && a.Person.Id == userId).FirstOrDefault();
+            return EventRegistrationRepo.Query(a => a.Event.Id == eventId && a.Person.Id == userId).ToList();
         }
 
         public E.EventRegistration GetRegistrationByRefIdAndEvent(string ref_id, long eventId)

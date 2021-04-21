@@ -16,6 +16,8 @@
 @(Html.Telerik().Grid(Model.Results)
             .Name("EventRegistrationResults")
             .Sortable()
+            .ClientEvents(clientEvents => clientEvents
+            .OnDataBound("onDataBound"))
            .Columns(columns =>
             {
                 foreach (DataColumn dc in Model.Results.Columns)
@@ -51,6 +53,10 @@
 
 
 <script type="text/javascript">
+
+    function onDataBound() {
+        addTooltips();
+    }
 
     $(window).load(function () {
 

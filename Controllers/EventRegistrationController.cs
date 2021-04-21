@@ -87,15 +87,32 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             //check if user already registered (if logged in)
                             if (user != null)
                             {
-                                EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
-                                if (reg != null)
-                                    model.AlreadyRegistered = true;
+                                List<EventRegistration> regs = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+                                if (regs.Count > 0)
+                                {
+                                    //if there is any registration where deleted == false there is an activ registration for that user 
+                                    EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
+                                    if (reg != null)
+                                    {
+                                        model.AlreadyRegistered = true;
+                                        model.Deleted = reg.Deleted;
+                                    }
+                                    //else there are only one or more deleted registrations and the user is not registered
+                                    else
+                                    {
+                                        model.AlreadyRegistered = false;
+                                        model.Deleted = true;
+                                    }
+                                }
                             }
                             else if (ref_id != null)
                             {
                                 EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, e.Id);
                                 if (reg != null)
+                                {
                                     model.AlreadyRegistered = true;
+                                    model.Deleted = reg.Deleted;
+                                }
                                 model.AlreadyRegisteredRefId = ref_id;
                             }
 
@@ -125,17 +142,21 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
                     if (user != null)
                     {
-                        EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, long.Parse(id));
+                        List<EventRegistration> regs = erManager.GetRegistrationByUserAndEvent(user.Id, long.Parse(id));
+                        EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
                         if (reg != null)
-                        {
-                            model.Edit = true;
-                        }
+                                model.Edit = true;
+
                     }
                     else if (ref_id != null)
                     {
                         EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, long.Parse(id));
                         if (reg != null)
-                            model.Edit = true;
+                        {
+                            //only if there is a reg which is not deleted you get the edit mode
+                            if (reg.Deleted == false)
+                                model.Edit = true;
+                        }
                     }
                 }
             }
@@ -186,7 +207,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                             if (user != null)
                             {
-                                EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+                                List<EventRegistration> regs = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+                                EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
 
                                 XmlNodeReader xmlNodeReader = new XmlNodeReader(reg.Data);
                                 TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, reg.Data);
@@ -237,7 +259,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
         //    return Content(view.ToHtmlString(), "text/html");
         //}
 
-        public ActionResult LoadMetadataForm(string edit,bool fromEditMode = true)
+        public ActionResult LoadMetadataForm(string edit, bool fromEditMode = true)
         {
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Register to Event", this.Session.GetTenant());
 
@@ -442,6 +464,44 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return Json(new { result = "redirect", url = Url.Action("EventRegistration", "EventRegistration", new { area = "EMM" }) }, JsonRequestBehavior.AllowGet);
         }
 
+        /// <summary>
+        /// User deleted registration, this function set flag deleted in event registration = true
+        /// </summary>
+        /// <param name="id">event registration id</param>
+        /// <param name="ref_id">event registration ref id</param>
+        /// <returns></returns>
+        public ActionResult DeleteRegistration(string id, string ref_id = null)
+        {
+            using (SubjectManager subManager = new SubjectManager())
+            {
+                using (EventRegistrationManager erManager = new EventRegistrationManager())
+                {
+                    User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+                    if (user != null)
+                    {
+                        List<EventRegistration> regs = erManager.GetRegistrationByUserAndEvent(user.Id, long.Parse(id));
+                        EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
+
+                        if (reg != null)
+                        {
+                            reg.Deleted = true;
+                            erManager.UpdateEventRegistration(reg);
+                        }
+                    }
+                    else if (ref_id != null)
+                    {
+                        EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, long.Parse(id));
+                        if (reg != null)
+                        {
+                            reg.Deleted = true;
+                            erManager.UpdateEventRegistration(reg);
+                        }
+                    }
+                }
+            }
+            return Json(new { result = "redirect", url = Url.Action("EventRegistration", "EventRegistration", new { area = "EMM" }) }, JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult Save()
         {
             using (EventManager eManager = new EventManager())
@@ -453,7 +513,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 XDocument data = new XDocument();
                 if (taskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_XML))
                 {
-                    if(taskManager.Bus[CreateTaskmanager.METADATA_XML].GetType() == typeof (XmlDocument))
+                    if (taskManager.Bus[CreateTaskmanager.METADATA_XML].GetType() == typeof(XmlDocument))
                     {
                         using (var nodeReader = new XmlNodeReader((XmlDocument)taskManager.Bus[CreateTaskmanager.METADATA_XML]))
                         {
@@ -462,7 +522,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         }
                     }
                     else
-                    data = (XDocument)taskManager.Bus[CreateTaskmanager.METADATA_XML];
+                        data = (XDocument)taskManager.Bus[CreateTaskmanager.METADATA_XML];
                 }
 
                 long eventId = 0;
@@ -489,72 +549,88 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 // Update event registration
                 if (reg != null)
                 {
-                    if (e.EditAllowed != true)
+                    if (reg.Deleted == false)
                     {
-                        SendEmailNotification("resend", email, ref_id, data, e, user);
-                        return RedirectToAction("EventRegistrationPatial", new { message = "Update of your previous registration is not allowed. You registration details are send to your Email adress again.", message_type = "error" });
+                        if (e.EditAllowed != true)
+                        {
+                            SendEmailNotification("resend", email, ref_id, data, e, user);
+                            return RedirectToAction("EventRegistrationPatial", new { message = "Update of your previous registration is not allowed. You registration details are send to your Email adress again.", message_type = "error" });
+                        }
+
+                        reg.Data = XmlMetadataWriter.ToXmlDocument(data);
+                        erManager.UpdateEventRegistration(reg);
+
+                        SendEmailNotification("updated", email, ref_id, data, e, user);
+                        message = "Registration details sucessfully updated.";
                     }
-
-                    reg.Data = XmlMetadataWriter.ToXmlDocument(data);
-                    erManager.UpdateEventRegistration(reg);
-
-                    SendEmailNotification("updated", email, ref_id, data, e, user);
-                    message = "Registration details sucessfully updated.";
-
+                    else
+                        CreateNewEventRegistration(e, data, user, email, notificationType, ref_id, message);
                 }
                 // New event registration
                 else
+                    CreateNewEventRegistration(e, data, user, email, notificationType, ref_id, message);
+
+
+                return Json(new { result = "redirect", url = Url.Action("EventRegistration", "EventRegistration", new { area = "EMM", ref_id = ref_id }) }, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        /// <summary>
+        /// Create a new event registration
+        /// </summary>
+        /// <param name=""></param>
+        /// <returns></returns>
+        private void CreateNewEventRegistration(Event e, XDocument data, User user, string email, string notificationType, string ref_id, string message)
+        {
+            using (var erManager = new EventRegistrationManager())
+            { 
+                //check Participants Limitation
+                if (e.ParticipantsLimitation != 0)
                 {
-                    //check Participants Limitation
-                    if (e.ParticipantsLimitation != 0)
+                    int countRegs = erManager.GetNumerOfRegistrationsByEvent(e.Id);
+                    if (countRegs >= e.ParticipantsLimitation)
                     {
-                        int countRegs = erManager.GetNumerOfRegistrationsByEvent(e.Id);
-                        if (countRegs >= e.ParticipantsLimitation)
-                        {
-                            message = "Number of participants has been reached. You are now on the waiting list.";
-                            notificationType = "succesfully_registered_waiting_list";
-                        }
-                        else
-                        {
-                            message = "You registered sucessfully.";
-                            notificationType = "succesfully_registered";
-                        }
+                        message = "Number of participants has been reached. You are now on the waiting list.";
+                        notificationType = "succesfully_registered_waiting_list";
                     }
                     else
                     {
                         message = "You registered sucessfully.";
                         notificationType = "succesfully_registered";
                     }
-
-                    // Add hint to message text
-                    string change = "";
-                    if (e.EditAllowed == true)
-                    {
-                        change = "and change";
-                    }
-                    else
-                    {
-                        change = "(edit is not allowed - in urgent cases please contact ...)"; // todo fill with mail adress
-                    }
-                    if (user != null)
-                    {
-                        message = message + " To view " + change + " your registration log in or follow the link send via email.";
-                    }
-                    else
-                    {
-                        message = message + " To view " + change + " your registration follow the link send via email.";
-                    }
-
-                    // Save registration and send notification
-                    erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id);
-
-                    SendEmailNotification(notificationType, email, ref_id, data, e, user);
-
+                }
+                else
+                {
+                    message = "You registered sucessfully.";
+                    notificationType = "succesfully_registered";
                 }
 
-                return Json(new { result = "redirect", url = Url.Action("EventRegistration", "EventRegistration", new { area = "EMM", ref_id = ref_id }) }, JsonRequestBehavior.AllowGet);
+            // Add hint to message text
+            string change = "";
+            if (e.EditAllowed == true)
+            {
+                change = "and change";
             }
+            else
+            {
+                change = "(edit is not allowed - in urgent cases please contact ...)"; // todo fill with mail adress
+            }
+            if (user != null)
+            {
+                message = message + " To view " + change + " your registration log in or follow the link send via email.";
+            }
+            else
+            {
+                message = message + " To view " + change + " your registration follow the link send via email.";
+            }
+
+            // Save registration and send notification
+            erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id);
+
+            SendEmailNotification(notificationType, email, ref_id, data, e, user);
         }
+    }
+
 
         #endregion
 
@@ -972,11 +1048,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 using (var eventRegistrationManager = new EventRegistrationManager())
                 {
                     //get all registrations from the selected event 
-                    var events = eventRegistrationManager.GetAllRegistrationsByEvent(eventId);
-                    foreach (var e in events)
+                    var eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(eventId);
+                    foreach (var er in eventRegistrations)
                     {
-                        //return true if we have a match
-                        if (email == e.Data.GetElementsByTagName("Email")[0].InnerText)
+                        //return true if we have a match and the registration is not deleted. Id deleted == true registration with same email possible 
+                        if (email == er.Data.GetElementsByTagName("Email")[0].InnerText && er.Deleted == false)
                             return true;
                     }
                 }
@@ -1007,7 +1083,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
             EventRegistration reg_ref_id = erManager.GetRegistrationByRefIdAndEvent(ref_id, event_id);
             if (user != null)
             {
-                EventRegistration reg = erManager.GetRegistrationByUserAndEvent(user.Id, event_id);
+                List<EventRegistration> regs = erManager.GetRegistrationByUserAndEvent(user.Id, event_id);
+                EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
+
                 return reg; // user is logged in
             }
             else if (reg_ref_id != null)

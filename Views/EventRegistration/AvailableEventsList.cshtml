@@ -5,10 +5,10 @@
 
 @section Information
 {
-   Here you find a list of all events currently available for registration. You can register for an event, view and change (only if allowed) your registration. To register you need a passwort, which is usually send via email by the project administration.
-   <!-- <p>
-        <a href="/RBM/Help/Index/#_Toc434570750" class="bx-informationLink" title="go to help" target="_blank">More</a>
-    </p>-->
+    Here you find a list of all events currently available for registration. You can register for an event, view and change (only if allowed) your registration. To register you need a passwort, which is usually send via email by the project administration.
+    <!-- <p>
+         <a href="/RBM/Help/Index/#_Toc434570750" class="bx-informationLink" title="go to help" target="_blank">More</a>
+     </p>-->
 }
 
 @{
@@ -25,7 +25,7 @@
             {
                 columns.Template(
                 @<text>
-                    @if (item.AlreadyRegistered == false)
+                    @if (item.AlreadyRegistered == false || item.Deleted == true)
                                 {
                         <div onclick="onClickRegister(@item.Event.Id)" class="bx bx-grid-function fa-sign-in" style="cursor: pointer;" title="Register for event"> Register</div>
                                 }
@@ -33,20 +33,23 @@
                                 {
                         <div class="bx bx-grid-function fa-sign-in bx-disabled" disabled="disabled" title="Register for event"></div>
                                 }-->
-                   
-                    @if (item.EditAllowed && item.AlreadyRegistered == true && item.Event.Deadline >= DateTime.Now)
-                                {
-                        <div onclick="onClickEdit(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"> Edit registration</div>
-                                }
-                     else if (item.AlreadyRegistered == true)
-                                {
-                        <div onclick="onClickView(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function fa-eye" style="cursor: pointer;" title="View registration"> View registration</div>
 
-                                }
+                    @if (item.EditAllowed && item.AlreadyRegistered == true && item.Deleted == false && item.Event.Deadline >= DateTime.Now)
+                    {
+                        <div onclick="onClickEdit(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"> Edit registration</div> <br />
+                        <div onclick="onClickDelete(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"> Delete registration</div>
+
+                        }
+                    else if (item.AlreadyRegistered == true && item.Deleted == false)
+                    {
+                        <div onclick="onClickView(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function fa-eye" style="cursor: pointer;" title="View registration"> View registration</div>
+                        <div onclick="onClickDelete(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"> Delete registration</div>
+                    }
+                  
                 </text>
-                    ).Width(140);
+                    ).Width(270);
             columns.Bound(r => r.Event.Name);
-            columns.Bound(r => r.Event.Deadline).Format("{0: dd-MM-yyyy}").Width(200); 
+            columns.Bound(r => r.Event.Deadline).Format("{0: dd-MM-yyyy}").Width(200);
             columns.Template(
                         @<text>
                             @item.NumberOfRegistration/@item.Event.ParticipantsLimitation
@@ -65,7 +68,6 @@
                     //    .OrderBy(orderby => orderby
                     //        .Add(r => r.Id).Descending()))
 )
-
 @(Html.Telerik().Window()
         .Name("Window_LogInToEvent")
         .Title("Event registration")
@@ -118,6 +120,16 @@
         });
     }
 
+    function onClickDelete(id, ref_id = null)
+    {
+        var result = confirm('Are you sure you want to delete this reservation?');
+        if (result) {
+            $.get('@Url.Action("DeleteRegistration", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', { id: id, ref_id: ref_id }, function (data) {
+
+                window.location.href = "/EMM/EventRegistration/EventRegistration";
+            });
+        }
+    }
 
     function Window_LogInToEvent_OnClose() {
 
