@@ -106,6 +106,15 @@ namespace BExIS.Modules.EMM.UI.Controllers
             if (model.StartDate > model.Deadline)
                 ModelState.AddModelError("StartDate", "Start date needs to be before deadline.");
 
+            if (model.EventDate == null)
+                ModelState.AddModelError("EventDate", "Event time period is required.");
+
+            if (model.EventLanguage == null)
+                ModelState.AddModelError("EventLanguage", "Event language is required.");
+
+            if (model.ImportantInformation == null)
+                ModelState.AddModelError("ImportantInformation", "Important information is required.");
+
             //check if schema file is uploaded
             //if (attachments ==null &&model.Id == 0)
             //    ModelState.AddModelError("Schema", "Schema is required.");
