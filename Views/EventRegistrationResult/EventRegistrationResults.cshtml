@@ -11,7 +11,7 @@
         <a href="/RBM/Help/Index/#_Toc434570750" class="bx-informationLink" title="go to help" target="_blank">More</a>
     </p>
 }
- 
+
 
 @(Html.Telerik().Grid(Model.Results)
             .Name("EventRegistrationResults")
@@ -42,6 +42,8 @@
 )
 
 @Html.ActionLink("Export (csv)", "Export", "EventRegistrationResult", new { id = Model.EventId }, new { @class = "bx-button function" })
+<span class="bx-button function" id="" onclick="Delete(@Model.EventId)" title="Delete event">Delete</span>
+
 
 
 @section LeftPane
@@ -65,5 +67,14 @@
             $('#Content_Events').html(data);
         });
     })
+
+      function Delete(id) {
+        var result = confirm('Are you sure you want to delete this event with all reservations?');
+        if (result) {
+            $.get('@Url.Action("Delete", "EventRegistrationResult")', { id: id }, function (data) {
+                window.location.href = '../Show';
+            });
+        }
+    }
 
 </script>

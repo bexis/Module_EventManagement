@@ -21,7 +21,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
     public class EventRegistrationResultController : Controller
     {
 
-       #region Show Event Registration Results
+        #region Show Event Registration Results
 
         public ActionResult Show()
         {
@@ -31,7 +31,32 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return View("EventRegistrationResults", model);
         }
 
-        //export as comma seperatred csv
+        /// <summary>
+        /// delete event with all registrations
+        /// </summary>
+        /// <param name="id">event id</param>
+        /// <returns>csv file</returns>
+        public ActionResult Delete(string id)
+        {
+            long eventId = Convert.ToInt64(id);
+            using (var eventRegistrationManager = new EventRegistrationManager())
+            using (var eventManager = new EventManager())
+            { 
+                //delete first all registrations
+                List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(eventId);
+                eventRegistrations.ForEach(a => eventRegistrationManager.DeleteEventRegistration(a));
+
+                eventManager.DeleteEvent(eventManager.GetEventById(eventId));
+            }
+          
+            return RedirectToAction("Show");
+        }
+
+        /// <summary>
+        /// export as comma seperatred csv
+        /// </summary>
+        /// <param name="id">event id</param>
+        /// <returns>csv file</returns>
         public ActionResult Export(string id)
         {
             DataTable dataTable = GetEventResults(long.Parse(id));

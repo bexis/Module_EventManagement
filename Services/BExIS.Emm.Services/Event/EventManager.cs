@@ -101,7 +101,7 @@ namespace BExIS.Emm.Services.Event
         }
 
         /// <summary>
-        /// If the <paramref name="Activity"/> is not associated to any <see cref="Event"/>, the method deletes it from the database.
+        /// If the <paramref name="eEvent"/> is not associated to any <see cref="Event"/>, the method deletes it from the database.
         /// </summary>
         public bool DeleteEvent(E.Event eEvent)
         {
@@ -111,8 +111,8 @@ namespace BExIS.Emm.Services.Event
             using (IUnitOfWork uow = this.GetUnitOfWork())
             {
                 IRepository<E.Event> repo = uow.GetRepository<E.Event>();
-                eEvent = repo.Reload(eEvent);
-                repo.Delete(eEvent);
+                var latest = repo.Reload(eEvent);
+                repo.Delete(latest);
                 uow.Commit();
             }
 
