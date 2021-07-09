@@ -22,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using System.Xml;
 using System.Xml.Linq;
@@ -942,14 +943,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
         {
             DataTable results = new DataTable();
             using (EventRegistrationManager erManager = new EventRegistrationManager())
-
             {
 
-#pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht	    
-                results = CreateDataTableColums(results, XElement.Load(new XmlNodeReader(XmlMetadataWriter.ToXmlDocument(data))));
-                results.Rows.Add(AddDataRow(XElement.Load(new XmlNodeReader(XmlMetadataWriter.ToXmlDocument(data))), results));
-#pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht	             
-
+                results = CreateDataTableColums(results, XElement.Parse(data.ToString()));
+                results.Rows.Add(AddDataRow(XElement.Parse(data.ToString()), results));
 
                 return results;
             }
@@ -1112,7 +1109,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             {
                 case "succesfully_registered":
                     subject = "Registration confirmation for " + e.Name;
-                    mail_message = "you registered to " + e.Name + "<br/>";
+                    mail_message = " you have registered for " + e.Name + "<br/>";
                     break;
                 case "succesfully_registered_waiting_list":
                     subject = "Registration confirmation for" + e.Name + " - Event fully booked";
@@ -1129,17 +1126,34 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
 
             string details = "";
-            DataTable res = GetEventRegistration(e.Id, data);
-            int row_count = res.Columns.Count;
-            for (int i = 0; i < row_count; i++)
+
+            foreach (XElement xe in XElement.Parse(data.ToString()).Elements())
             {
-                details = details + res.Columns[i].ToString().Split('/')[res.Columns[i].ToString().Split('/').Length - 2] + ":  " + res.Rows[0][i] + "<br/>";
+                string displayNameRoot = "";
+                if (xe.HasElements)
+                {
+                    displayNameRoot = char.ToUpper(xe.Name.ToString()[0]) + xe.Name.ToString().Substring(1);
+                    displayNameRoot = Regex.Replace(displayNameRoot, "((?<=[a-z])[A-Z])", " $1");
+                    details = details + "<br/><b>" + displayNameRoot + "</b><br/><br/>";
+
+                    foreach(XElement x in xe.Elements())
+                    {
+                        foreach(XElement r in x.Elements())
+                        {
+                            string displayName = "";
+                            displayName = char.ToUpper(r.Name.ToString()[0]) + r.Name.ToString().Substring(1);
+                            displayName = Regex.Replace(displayName, "((?<=[a-z])[A-Z])", " $1");
+                            details = details + "<b>" + displayName + "</b>: " + r.Descendants().First().Value + "<br/>";
+
+                        }
+                    } 
+
+                }
             }
 
-
-            string body = "Dear " + first_name + " " + last_name + ", " + "<br/><br/>" +
+                string body = "Dear " + first_name + " " + last_name + ", " + "<br/><br/>" +
                  mail_message +
-                 "<br/> Your registration details are: <br/><br/>" + 
+                 "<br/> Your registration details are: <br/>" + 
                  details + "<br/><br/>" +
                  "To view or change your registration follow this link: " + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "<br/><br/>" +
                  "Sincerely yours, <br/>" +
