@@ -1126,7 +1126,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
 
             string details = "";
-
+            //read xml file and format email output
             foreach (XElement xe in XElement.Parse(data.ToString()).Elements())
             {
                 string displayNameRoot = "";
