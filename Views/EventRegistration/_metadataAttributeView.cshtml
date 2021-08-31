@@ -3,7 +3,6 @@
 @using BExIS.Utils.WebHelpers
 @using Telerik.Web.Mvc.UI
 @using System.Text.RegularExpressions
-
 @{
     string id = Model.Id + "_" + Model.Parent.Id + "_" + Model.Number + "_" + Model.ParentModelNumber + "_" + Model.NumberOfSourceInPackage + "_" + Model.ParentStepId;
     string idByXpath = ((string)ViewData["Xpath"]).Replace("//", "_").Replace('[', '_').Replace(']', '_') + Model.DisplayName + "_" + Model.NumberOfSourceInPackage;  // Replace special character by underscore
@@ -29,8 +28,8 @@
     bool hasComplexMapping = Model.PartyComplexMappingExist;
 
     <script>
-            function OnChangeDefault(val) {
-
+        function OnChangeDefault(val) {
+            console.log(val);
                 $.post("/EMM/EventRegistration/ValidateMetadataAttributeUsage",
                 {
                     value: val,
@@ -45,41 +44,85 @@
 
     DefaultEventInformation defaultEventInformation = (DefaultEventInformation)Session["DefaultEventInformation"];
 
-    if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_name_1" && Model.Value == null)
+    if (defaultEventInformation.Language == "English")
     {
-        Model.Value = defaultEventInformation.EventName;
-        Model.Locked = true;
-        <script>
+
+        if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_name_1" && Model.Value == null)
+        {
+            Model.Value = defaultEventInformation.EventName;
+            Model.Locked = true;
+            <script>
                 OnChangeDefault("@Model.Value");
-        </script>
+            </script>
+        }
+
+        if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_date_1" && Model.Value == null)
+        {
+            Model.Value = defaultEventInformation.Date;
+            Model.Locked = true;
+            <script>
+                OnChangeDefault("@Model.Value");
+            </script>
+        }
+
+        if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_language_1" && Model.Value == null)
+        {
+            Model.Value = defaultEventInformation.Language;
+            Model.Locked = true;
+            <script>
+                OnChangeDefault("@Model.Value");
+            </script>
+        }
+
+        if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_importantInformation_1" && Model.Value == null)
+        {
+            Model.Value = defaultEventInformation.ImportantInformation;
+            Model.Locked = true;
+            <script>
+                OnChangeDefault("@Model.Value");
+            </script>
+        }
+    }
+    else
+    {
+
+        if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_name_1" && Model.Value == null)
+        {
+            Model.Value = defaultEventInformation.EventName;
+            Model.Locked = true;
+            <script>
+                OnChangeDefault("@Model.Value");
+            </script>
+        }
+
+        if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_zeitraum_1" && Model.Value == null)
+        {
+            Model.Value = defaultEventInformation.Date;
+            Model.Locked = true;
+            <script>
+                OnChangeDefault("@Model.Value");
+            </script>
+        }
+
+        if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_sprache_1" && Model.Value == null)
+        {
+            Model.Value = defaultEventInformation.Language;
+            Model.Locked = true;
+            <script>
+                OnChangeDefault("@Model.Value");
+            </script>
+        }
+
+        if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_wichtigeInformationen_1" && Model.Value == null)
+        {
+            Model.Value = defaultEventInformation.ImportantInformation;
+            Model.Locked = true;
+            <script>
+                OnChangeDefault("@Model.Value");
+            </script>
+        }
     }
 
-    if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_date_1" && Model.Value == null)
-    {
-        Model.Value = defaultEventInformation.Date;
-        Model.Locked = true;
-        <script>
-                OnChangeDefault("@Model.Value");
-        </script>
-    }
-
-    if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_language_1" && Model.Value == null)
-    {
-        Model.Value = defaultEventInformation.Language;
-        Model.Locked = true;
-        <script>
-                OnChangeDefault("@Model.Value");
-        </script>
-    }
-
-    if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_importantInformation_1" && Model.Value == null)
-    {
-        Model.Value = defaultEventInformation.ImportantInformation;
-        Model.Locked = true;
-        <script>
-                OnChangeDefault("@Model.Value");
-        </script>
-    }
 
     if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_name_1" || idByXpath == "Metadata_eventInformation_1__eventInformationType_1_language_1" || idByXpath == "Metadata_eventInformation_1__eventInformationType_1_date_1" || idByXpath == "Metadata_eventInformation_1__eventInformationType_1_importantInformation_1")
     {
@@ -115,7 +158,7 @@
     {
         autoCompleteType = "PartyCustomType";
     }
-    }
+}
 
 @if (Model.Number > 1)
 {

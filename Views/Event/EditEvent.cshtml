@@ -53,10 +53,10 @@
     <tr>
         <td>
             <b title="This field is required" style="color:red">*</b>
-            @Html.LabelFor(m => m.EventLanguage)
+            @Html.LabelFor(m => m.SelectedEventLanguage)
         </td>
         <td>
-            @Html.TextBoxFor(m => m.EventLanguage, new { @class = "bx-input", @tabindex = "2" })
+            @Html.DropDownListFor(m => m.SelectedEventLanguage, new SelectList(Model.EventLanguages), "Select")
             <small>@Html.ValidationMessage("EventLanguage")</small>
 
         </td>

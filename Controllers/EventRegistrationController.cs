@@ -657,6 +657,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         //XX number of index des values nötig
         [HttpPost]
+        [ValidateInput(false)]
         public ActionResult ValidateMetadataAttributeUsage(string value, int id, int parentid, string parentname, int number, int parentModelNumber, int parentStepId)
         {
             //delete all white spaces from start and end
@@ -1098,8 +1099,19 @@ namespace BExIS.Modules.EMM.UI.Controllers
         private void SendEmailNotification(string notificationType, string email, string ref_id, XDocument data, Event e, User user)
         {
             // todo: add not allowed / log in info to mail
-            string first_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("FirstName")[0].InnerText;
-            string last_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("LastName")[0].InnerText;
+            string first_name = "";
+            string last_name = "";
+            if (e.EventLanguage == "English")
+            {
+                first_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("FirstName")[0].InnerText;
+                last_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("LastName")[0].InnerText;
+            }
+            else
+            {
+                first_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("Vorname")[0].InnerText;
+                last_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("Nachname")[0].InnerText;
+            }
+
             string url = Request.Url.GetLeftPart(UriPartial.Authority);
 
             string mail_message = "";

@@ -109,7 +109,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             if (model.EventDate == null)
                 ModelState.AddModelError("EventDate", "Event time period is required.");
 
-            if (model.EventLanguage == null)
+            if (model.SelectedEventLanguage == null)
                 ModelState.AddModelError("EventLanguage", "Event language is required.");
 
             if (model.ImportantInformation == null)
@@ -130,7 +130,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                     if (model.Id == 0)
                     {
-                        Event newEvent = eManager.CreateEvent(model.Name, model.EventDate, model.ImportantInformation, model.EventLanguage, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.EditAllowed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, ms, null);
+                        Event newEvent = eManager.CreateEvent(model.Name, model.EventDate, model.ImportantInformation, model.SelectedEventLanguage, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.EditAllowed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, ms, null);
 
                         newEvent = SaveFile(file, newEvent, eManager);
                         eManager.UpdateEvent(newEvent);
@@ -141,7 +141,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         e.Name = model.Name;
                         e.EventDate = model.EventDate;
                         e.ImportantInformation = model.ImportantInformation;
-                        e.EventLanguage = model.EventLanguage;
+                        e.EventLanguage = model.SelectedEventLanguage;
                         e.StartDate = model.StartDate;
                         e.Deadline = model.Deadline;
                         e.ParticipantsLimitation = model.ParticipantsLimitation;

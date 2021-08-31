@@ -22,7 +22,9 @@ namespace BExIS.Modules.EMM.UI.Models
         public string ImportantInformation { get; set; }
 
         [DisplayName("Event language")]
-        public string EventLanguage { get; set; }
+        public List<string> EventLanguages { get; set; }
+
+        public string SelectedEventLanguage { get; set; }
 
         public XmlDocument Schema { get; set; }
 
@@ -69,6 +71,7 @@ namespace BExIS.Modules.EMM.UI.Models
 
         public EventModel()
         {
+            EventLanguages = new List<string>() { "English", "Deutsch" };
             Deadline = new DateTime();
             StartDate = new DateTime();
             SchemaFileName = "";
@@ -77,6 +80,7 @@ namespace BExIS.Modules.EMM.UI.Models
             ParticipantsLimitation = 0;
             MetadataStructureList = new List<ListItem>();
             MetadataStructureId = 0;
+
         }
 
         public EventModel(Event eEvent)
@@ -85,7 +89,8 @@ namespace BExIS.Modules.EMM.UI.Models
             Name = eEvent.Name;
             EventDate = eEvent.EventDate;
             ImportantInformation = eEvent.ImportantInformation;
-            EventLanguage = eEvent.EventLanguage;
+            EventLanguages = new List<string>() { "English", "Deutsch" };
+            SelectedEventLanguage = eEvent.EventLanguage;
             StartDate = eEvent.StartDate;
             Deadline = eEvent.Deadline;
             ParticipantsLimitation = eEvent.ParticipantsLimitation;
