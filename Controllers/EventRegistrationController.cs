@@ -7,6 +7,7 @@ using BExIS.Dlm.Services.TypeSystem;
 using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
 using BExIS.IO.Transform.Validation.Exceptions;
+using BExIS.Modules.EMM.UI.Helper;
 using BExIS.Modules.EMM.UI.Helpers;
 using BExIS.Modules.EMM.UI.Models;
 using BExIS.Security.Entities.Subjects;
@@ -1099,19 +1100,12 @@ namespace BExIS.Modules.EMM.UI.Controllers
         private void SendEmailNotification(string notificationType, string email, string ref_id, XDocument data, Event e, User user)
         {
             // todo: add not allowed / log in info to mail
-            string first_name = "";
-            string last_name = "";
-            if (e.EventLanguage == "English")
-            {
-                first_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("FirstName")[0].InnerText;
-                last_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("LastName")[0].InnerText;
-            }
-            else
-            {
-                first_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("Vorname")[0].InnerText;
-                last_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("Nachname")[0].InnerText;
-            }
 
+           EmailStructure emailStructure = EmailHelper.ReadFile(e.EventLanguage);
+
+           string first_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName(emailStructure.lableFirstName)[0].InnerText;
+           string  last_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName(emailStructure.lableLastname)[0].InnerText;
+          
             string url = Request.Url.GetLeftPart(UriPartial.Authority);
 
             string mail_message = "";
@@ -1120,21 +1114,21 @@ namespace BExIS.Modules.EMM.UI.Controllers
             switch (notificationType)
             {
                 case "succesfully_registered":
-                    subject = "Registration confirmation for " + e.Name;
-                    mail_message = " you have registered for " + e.Name + "<br/>";
+                    subject = emailStructure.succesfullyRegisteredSubject + e.Name;
+                    mail_message = emailStructure.succesfullyRegisteredMessage + e.Name + "<br/>";
                     break;
                 case "succesfully_registered_waiting_list":
-                    subject = "Registration confirmation for" + e.Name + " - Event fully booked";
-                    mail_message = "For registered to " + e.Name + "you are currently on a replacment place.";
+                    subject = emailStructure.succesfullyRegisteredSubject + e.Name + emailStructure.updateSubject;
+                    mail_message = emailStructure.succesfullyRegisteredSubject + e.Name + emailStructure.waitingListMessage;
                     break;
                 case "updated":
-                    subject = "Registration update confirmation for " + e.Name;
-                    mail_message = "you updated your registration for " + e.Name + "<br/>";
+                    subject = emailStructure.waitingListSubject + e.Name;
+                    mail_message = emailStructure.waitingListMessage + e.Name + "<br/>";
                     break;
-                case "resend":
-                    subject = "Resend of registration confirmation for " + e.Name;
-                    mail_message = "your registration for " + e.Name + "<br/>";
-                    break;
+                //case "resend":
+                //    subject = "Resend of registration confirmation for " + e.Name;
+                //    mail_message = "your registration for " + e.Name + "<br/>";
+                //    break;
             }
 
             string details = "";
@@ -1163,16 +1157,15 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 }
             }
 
-                string body = "Dear " + first_name + " " + last_name + ", " + "<br/><br/>" +
+                string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
                  mail_message +
-                 "<br/> Your registration details are: <br/>" + 
+                 "<br/>" + emailStructure.bodyOpening +"<br/>" + 
                  details + "<br/><br/>" +
-                 "To view or change your registration follow this link: " + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "<br/><br/>" +
-                 "Sincerely yours, <br/>" +
-                 "BExIS Team";
+                 emailStructure.bodyHintToLink + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "<br/><br/>" +
+                 emailStructure.bodyClosing + "<br/>" +
+                 emailStructure.bodyClosingName;
      
             var es = new EmailService();
-
 
             // If no explicit Reply to mail is set use the SystemEmail
             string replyTo = "";

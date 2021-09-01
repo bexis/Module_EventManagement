@@ -57,6 +57,10 @@
       <HintPath>..\..\..\..\packages\Microsoft.AspNet.WebHelpers.3.2.3\lib\net45\Microsoft.Web.Helpers.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -152,6 +156,7 @@
     <Compile Include="Controllers\EventRegistrationResultController.cs" />
     <Compile Include="Controllers\EventRegistrationController.cs" />
     <Compile Include="EMMModule.cs" />
+    <Compile Include="Helper\EmailHelper.cs" />
     <Compile Include="Helper\EMMSeedDataGenerator.cs" />
     <Compile Include="Helper\FormHelper.cs" />
     <Compile Include="Models\AbstractMetadataStepModel.cs" />
