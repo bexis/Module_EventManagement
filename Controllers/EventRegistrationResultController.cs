@@ -183,9 +183,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 if (!xe.HasElements)
                 {
                     DataColumn dc = new DataColumn();
-                    dc.Caption = xe.Name.ToString();
-                    dc.ColumnName = xe.Name.ToString();
-
+                    string colName = xe.Name.ToString().Replace("Type", "");
+                    dc.Caption = colName;
+                    dc.ColumnName = colName;
                     dt.Columns.Add(dc); // add columns to your dt
                 }
             }
@@ -201,7 +201,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             {
                 if (!xe.HasElements)
                 {
-                    dr[xe.Name.ToString()] = xe.Value; //add in the values
+                    dr[xe.Name.ToString().Replace("Type", "")] = xe.Value; //add in the values
                 }
             }
 
