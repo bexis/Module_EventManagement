@@ -20,6 +20,10 @@ using BExIS.Xml.Helpers;
 using Vaiona.Utils.Cfg;
 using System;
 using BExIS.Modules.EMM.UI.Models;
+using BExIS.Security.Services.Subjects;
+using BExIS.Security.Services.Authorization;
+using BExIS.Security.Services.Objects;
+using BExIS.Security.Entities.Authorization;
 
 namespace BExIS.Modules.EMM.UI.Controllers
 {
@@ -134,6 +138,31 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                         newEvent = SaveFile(file, newEvent, eManager);
                         eManager.UpdateEvent(newEvent);
+
+                        //add security
+                        using (var groupManager = new GroupManager())
+                        using (var entityTypeManager = new EntityManager())
+                        using (EntityPermissionManager pManager = new EntityPermissionManager())
+                        {
+                            Entity entityType = entityTypeManager.FindByName("Event");
+
+                            var adminGroup = groupManager.FindByNameAsync("administrator").Result;
+                            //temp hartcoded until the new settings implementation is available
+                            var beoGroup = groupManager.FindByNameAsync("beo").Result;
+
+                            int fullRights = (int)RightType.Read + (int)RightType.Write + (int)RightType.Delete + (int)RightType.Grant;
+
+                            if (adminGroup != null)
+                            {
+                                if (pManager.GetRights(adminGroup.Id, entityType.Id, newEvent.Id) == 0)
+                                    pManager.Create(adminGroup.Id, entityType.Id, newEvent.Id, fullRights);
+                            }
+                            if (beoGroup != null)
+                            {
+                                if (pManager.GetRights(beoGroup.Id, entityType.Id, newEvent.Id) == 0)
+                                    pManager.Create(beoGroup.Id, entityType.Id, newEvent.Id, fullRights);
+                            }
+                        }
                     }
                     else
                     {

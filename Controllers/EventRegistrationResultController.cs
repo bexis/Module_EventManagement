@@ -2,6 +2,11 @@
 using BExIS.Emm.Services.Event;
 using BExIS.IO.Transform.Output;
 using BExIS.Modules.EMM.UI.Models;
+using BExIS.Security.Entities.Authorization;
+using BExIS.Security.Entities.Objects;
+using BExIS.Security.Services.Authorization;
+using BExIS.Security.Services.Objects;
+using BExIS.Security.Services.Subjects;
 using BExIS.Xml.Helpers;
 using System;
 using System.Collections.Generic;
@@ -125,6 +130,16 @@ namespace BExIS.Modules.EMM.UI.Controllers
             EventRegistrationResultModel model = new EventRegistrationResultModel();
             model.Results = GetEventResults(id);
             model.EventId = id;
+
+            //check rights on event
+            using (var permissionManager = new EntityPermissionManager())
+            using (var entityTypeManager = new EntityManager())
+            using (var userManager = new UserManager())
+            {
+                var user = userManager.FindByNameAsync(HttpContext.User.Identity.Name).Result;
+                Entity entity = entityTypeManager.FindByName("Event");
+                model.UserHasRights = permissionManager.HasEffectiveRight(user.Name, entity.EntityType, id, RightType.Read);
+            }
 
             return View("EventRegistrationResults", model);
         }

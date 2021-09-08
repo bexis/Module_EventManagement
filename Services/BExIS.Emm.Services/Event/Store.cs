@@ -15,7 +15,7 @@ namespace BExIS.Emm.Services.Event
 
         public List<EntityStoreItem> GetEntities()
         {
-            return GetEntities(0, 0);
+            return GetEntities(0, -1);
         }
 
         public List<EntityStoreItem> GetEntities(int skip, int take)

@@ -98,6 +98,12 @@ namespace BExIS.Modules.EMM.UI.Models
         public long EventId { get; set; }
         public XmlDocument Form { get; set; }
         public DataTable Results { get; set; }
+        public bool UserHasRights { get; set; }
+
+        public EventRegistrationResultModel()
+        {
+            UserHasRights = false;
+        }
     }
 
     public class EventRegistrationFilterModel

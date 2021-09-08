@@ -11,38 +11,47 @@
         <a href="/RBM/Help/Index/#_Toc434570750" class="bx-informationLink" title="go to help" target="_blank">More</a>
     </p>
 }
+@if (Model.EventId > 0)
+{
+    if (Model.UserHasRights)
+    {
 
+        @(Html.Telerik().Grid(Model.Results)
+                        .Name("EventRegistrationResults")
+                        .Sortable()
+                        .ClientEvents(clientEvents => clientEvents
+                        .OnDataBound("onDataBound"))
+                       .Columns(columns =>
+                       {
+                           foreach (DataColumn dc in Model.Results.Columns)
+                           {
+                               string title;
 
-@(Html.Telerik().Grid(Model.Results)
-            .Name("EventRegistrationResults")
-            .Sortable()
-            .ClientEvents(clientEvents => clientEvents
-            .OnDataBound("onDataBound"))
-           .Columns(columns =>
-            {
-                foreach (DataColumn dc in Model.Results.Columns)
-                {
-                    string title;
+                               if (dc.Caption == "")
+                               {
+                                   title = dc.ColumnName;
+                               }
+                               else
+                               {
+                                   title = dc.Caption;
+                               }
 
-                    if (dc.Caption == "")
-                    {
-                        title = dc.ColumnName;
-                    }
-                    else
-                    {
-                        title = dc.Caption;
-                    }
+                               columns.Bound(dc.DataType, dc.ColumnName)
+                                         .Title(title).Width(dc.ColumnName.Length * 3); // forced fixed column width to enable horizontal scrolling
+                           }
+                       }
 
-                    columns.Bound(dc.DataType, dc.ColumnName)
-                              .Title(title).Width(dc.ColumnName.Length * 3); // forced fixed column width to enable horizontal scrolling
-                }
-            }
+                    )
+    )
 
-        )
-)
-
-@Html.ActionLink("Export (csv)", "Export", "EventRegistrationResult", new { id = Model.EventId }, new { @class = "bx-button function" })
-<span class="bx-button function" id="" onclick="Delete(@Model.EventId)" title="Delete event">Delete</span>
+    @Html.ActionLink("Export (csv)", "Export", "EventRegistrationResult", new { id = Model.EventId }, new { @class = "bx-button function" })
+    <span class="bx-button function" id="" onclick="Delete(@Model.EventId)" title="Delete event">Delete</span>
+}
+else
+{
+ <p>You have no rights to this event.</p>
+}
+}
 
 
 
