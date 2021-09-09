@@ -30,7 +30,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         public ActionResult Show()
         {
-            ViewBag.Title = PresentationModel.GetViewTitleForTenant("Show Event Results", this.Session.GetTenant());
+            ViewBag.Title = PresentationModel.GetViewTitleForTenant(" Show Reservation", this.Session.GetTenant());
             EventRegistrationResultModel model = new EventRegistrationResultModel();
             model.Results = new DataTable();
             return View("EventRegistrationResults", model);
