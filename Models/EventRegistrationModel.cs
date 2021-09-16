@@ -45,7 +45,7 @@ namespace BExIS.Modules.EMM.UI.Models
 
             using (EventRegistrationManager erManger = new EventRegistrationManager())
             {
-                NumberOfRegistration = erManger.GetAllRegistrationsByEvent(e.Id).Count();
+                NumberOfRegistration = erManger.GetAllRegistrationsNotDeletedByEvent(e.Id).Count;
             }
         }
     }

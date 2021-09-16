@@ -116,6 +116,11 @@ namespace BExIS.Emm.Services.Event
             return EventRegistrationRepo.Query(a=>a.Event.Id == id).ToList();
         }
 
+        public List<E.EventRegistration> GetAllRegistrationsNotDeletedByEvent(long id)
+        {
+            return EventRegistrationRepo.Query(a => a.Event.Id == id && a.Deleted == false).ToList();
+        }
+
         public List<E.EventRegistration> GetRegistrationByUserAndEvent(long userId, long eventId)
         {
             return EventRegistrationRepo.Query(a => a.Event.Id == eventId && a.Person.Id == userId).ToList();
