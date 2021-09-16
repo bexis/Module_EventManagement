@@ -45,16 +45,23 @@
                         <div onclick="onClickView(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function fa-eye" style="cursor: pointer;" title="View registration"></div>
                         <div onclick="onClickDelete(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"></div>
                     }
-                  
+
                 </text>
                     ).Width(150);
             columns.Bound(r => r.Event.Name);
             columns.Bound(r => r.Event.Deadline).Format("{0: dd-MM-yyyy}").Width(200);
             columns.Template(
                         @<text>
-                            @item.NumberOfRegistration/@item.Event.ParticipantsLimitation
+                            @item.NumberOfRegistration/
+                              @if (item.Event.ParticipantsLimitation == 0)
+                              {
+                                  <span>no limitation</span>
+                              }
+                              else {
+                                    @item.Event.ParticipantsLimitation
+                              }
                         </text>
-                            ).Width(90);
+                            ).Width(150);
                     //columns.Bound(r => r.Event.ParticipantsLimitation);
                 })
                                       .Pageable(paging =>
