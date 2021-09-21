@@ -86,9 +86,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
             {
                 eventName = eventManager.GetEventById(long.Parse(id)).Name;
             }
+            //remove invaid chars in eventname for filename
+            string filename = string.Join("_", eventName.Split(Path.GetInvalidFileNameChars()));
 
             string dataPath = AppConfiguration.DataPath;
-            string storePath = Path.Combine(dataPath, "EMM", "Temp", eventName + ".csv");
+            string storePath = Path.Combine(dataPath, "EMM", "Temp", filename + ".csv");
 
             System.IO.File.WriteAllLines(storePath, lines);
 
