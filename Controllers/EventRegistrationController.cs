@@ -1118,12 +1118,12 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     mail_message = emailStructure.succesfullyRegisteredMessage + e.Name + "<br/>";
                     break;
                 case "succesfully_registered_waiting_list":
-                    subject = emailStructure.succesfullyRegisteredSubject + e.Name + emailStructure.updateSubject;
-                    mail_message = emailStructure.succesfullyRegisteredSubject + e.Name + emailStructure.waitingListMessage;
-                    break;
-                case "updated":
                     subject = emailStructure.waitingListSubject + e.Name;
                     mail_message = emailStructure.waitingListMessage + e.Name + "<br/>";
+                    break;
+                case "updated":
+                    subject = emailStructure.updateSubject + e.Name; 
+                    mail_message = emailStructure.updateMessage + e.Name + "<br/>";
                     break;
                 //case "resend":
                 //    subject = "Resend of registration confirmation for " + e.Name;
