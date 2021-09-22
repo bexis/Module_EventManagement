@@ -134,7 +134,7 @@ namespace BExIS.Emm.Services.Event
 
         public int GetNumerOfRegistrationsByEvent(long id)
         {
-            return EventRegistrationRepo.Query(a => a.Event.Id == id).Count();
+            return EventRegistrationRepo.Query(a => a.Event.Id == id && a.Deleted == false).Count();
         }
 
         #endregion
