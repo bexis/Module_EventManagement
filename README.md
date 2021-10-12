@@ -6,7 +6,7 @@ Customizable module to manage event registrations (e.g. workshops, meetings).
 2. [How to use / Workflow](#how_to)
     1. [Event creation](#event_creation)
     2. [Event registration](#event_reg)
-3. [Installtion](#install)
+3. [Installation](#install)
 
 ## Features<a name="features"></a>
 - registration form is fully flexible
@@ -38,7 +38,7 @@ Customizable module to manage event registrations (e.g. workshops, meetings).
 ### Event registration<a name="event_reg"></a>
 
 
-## Installtion <a name="install"></a>
+## Installation <a name="install"></a>
 This module requires seed data.
 - Entity type: "Event"
 
