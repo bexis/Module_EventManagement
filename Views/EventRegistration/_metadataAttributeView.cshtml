@@ -67,7 +67,14 @@
 
         if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_language_1" && Model.Value == null)
         {
-            Model.Value = defaultEventInformation.Language;
+            if (defaultEventInformation.Id == "12")
+            {
+                Model.Value = "Deutsch";
+            }
+            else
+            {
+                Model.Value = defaultEventInformation.Language;
+            }
             Model.Locked = true;
             <script>
                 OnChangeDefault("@Model.Value");
@@ -118,7 +125,7 @@
             Model.Value = defaultEventInformation.ImportantInformation;
             Model.Locked = true;
             <script>
-                OnChangeDefault("@Model.Value");
+                OnChangeDefault(unescape("@Model.Value"));
             </script>
         }
     }
@@ -142,6 +149,10 @@
         if (wordList[i].ToUpper() != wordList[i])
         {
             wordList[i] = wordList[i].ToLower();
+            if (defaultEventInformation.Language == "Deutsch")
+            {
+                wordList[i] =  char.ToUpper(wordList[i][0]) + wordList[i].Substring(1);
+            }
         }
     }
 
@@ -158,7 +169,7 @@
     {
         autoCompleteType = "PartyCustomType";
     }
-}
+    }
 
 @if (Model.Number > 1)
 {
