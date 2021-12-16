@@ -21,6 +21,9 @@ namespace BExIS.Modules.EMM.UI.Models
         [DisplayName("Important information")]
         public string ImportantInformation { get; set; }
 
+        [DisplayName("Additional Mail information")]
+        public string MailInformation { get; set; }
+
         [DisplayName("Event language")]
         public List<string> EventLanguages { get; set; }
 

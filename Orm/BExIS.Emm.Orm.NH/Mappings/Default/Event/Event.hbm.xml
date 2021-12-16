@@ -64,6 +64,10 @@
       <column name="ImportantInformation" />
     </property>
 
+    <property name="MailInformation" type="string">
+      <column name="MailInformation" />
+    </property>
+    
     <property name="EventLanguage" type="string">
       <column name="EventLanguage" />
     </property>

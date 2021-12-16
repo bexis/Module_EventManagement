@@ -53,6 +53,15 @@
     <tr>
         <td>
             <b title="This field is required" style="color:red">*</b>
+            @Html.LabelFor(m => m.MailInformation)
+        </td>
+        <td>
+            @Html.TextAreaFor(m => m.MailInformation, new { @class = "bx-textarea", @tabindex = "2" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b title="This field is required" style="color:red">*</b>
             @Html.LabelFor(m => m.SelectedEventLanguage)
         </td>
         <td>

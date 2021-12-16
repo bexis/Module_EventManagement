@@ -184,10 +184,15 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     //add default value to session
                     DefaultEventInformation defaultEventInformation = new DefaultEventInformation();
                     defaultEventInformation.EventName = e.Name;
+                    defaultEventInformation.Id = e.Id.ToString();
                     if (!String.IsNullOrEmpty(e.EventDate))
                         defaultEventInformation.Date = e.EventDate;
                     if (!String.IsNullOrEmpty(e.EventLanguage))
+                        if(e.Id ==12)
+                            defaultEventInformation.Language = "English";
+                    else
                         defaultEventInformation.Language = e.EventLanguage;
+
                     if (!String.IsNullOrEmpty(e.ImportantInformation))
                         defaultEventInformation.ImportantInformation = e.ImportantInformation;
 
@@ -1101,7 +1106,12 @@ namespace BExIS.Modules.EMM.UI.Controllers
         {
             // todo: add not allowed / log in info to mail
 
-           EmailStructure emailStructure = EmailHelper.ReadFile(e.EventLanguage);
+            //temp for alb symosium
+            EmailStructure emailStructure = new EmailStructure();
+            if(e.Id == 12)
+                emailStructure = EmailHelper.ReadFile("English");
+            else
+                 emailStructure = EmailHelper.ReadFile(e.EventLanguage);
 
            string first_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName(emailStructure.lableFirstName)[0].InnerText;
            string  last_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName(emailStructure.lableLastname)[0].InnerText;
@@ -1115,15 +1125,15 @@ namespace BExIS.Modules.EMM.UI.Controllers
             {
                 case "succesfully_registered":
                     subject = emailStructure.succesfullyRegisteredSubject + e.Name;
-                    mail_message = emailStructure.succesfullyRegisteredMessage + e.Name + "<br/>";
+                    mail_message = emailStructure.succesfullyRegisteredMessage + e.Name + ".<br/>";
                     break;
                 case "succesfully_registered_waiting_list":
                     subject = emailStructure.waitingListSubject + e.Name;
-                    mail_message = emailStructure.waitingListMessage + e.Name + "<br/>";
+                    mail_message = emailStructure.waitingListMessage + e.Name + ".<br/>";
                     break;
                 case "updated":
                     subject = emailStructure.updateSubject + e.Name; 
-                    mail_message = emailStructure.updateMessage + e.Name + "<br/>";
+                    mail_message = emailStructure.updateMessage + e.Name + ".<br/>";
                     break;
                 //case "resend":
                 //    subject = "Resend of registration confirmation for " + e.Name;
@@ -1158,7 +1168,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
 
                 string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
-                 mail_message +
+
+                 mail_message + "<br/>" +
+                 e.MailInformation + "<br/>" +
                  "<br/>" + emailStructure.bodyOpening +"<br/>" + 
                  details + "<br/><br/>" +
                  emailStructure.bodyHintToLink + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "<br/><br/>" +

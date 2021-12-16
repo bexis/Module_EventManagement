@@ -134,7 +134,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                     if (model.Id == 0)
                     {
-                        Event newEvent = eManager.CreateEvent(model.Name, model.EventDate, model.ImportantInformation, model.SelectedEventLanguage, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.EditAllowed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, ms, null);
+                        Event newEvent = eManager.CreateEvent(model.Name, model.EventDate, model.ImportantInformation, model.MailInformation, model.SelectedEventLanguage, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.EditAllowed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, ms, null);
 
                         newEvent = SaveFile(file, newEvent, eManager);
                         eManager.UpdateEvent(newEvent);

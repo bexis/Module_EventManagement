@@ -19,6 +19,8 @@ namespace BExIS.Emm.Entities.Event
 
         public virtual string ImportantInformation { get; set; }
 
+        public virtual string MailInformation { get; set; }
+
         public virtual string EventLanguage { get; set; }
 
         public virtual DateTime StartDate { get; set; }

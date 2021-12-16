@@ -58,6 +58,8 @@ namespace BExIS.Modules.EMM.UI.Models
         public string Language { get; set; }
         public string ImportantInformation { get; set; }
 
+        public string Id { get; set; }
+
         public DefaultEventInformation()
         {
 
