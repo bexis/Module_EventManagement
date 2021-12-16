@@ -67,18 +67,13 @@
 
         if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_language_1" && Model.Value == null)
         {
-            if (defaultEventInformation.Id == "12")
-            {
-                Model.Value = "Deutsch";
-            }
-            else
-            {
                 Model.Value = defaultEventInformation.Language;
-            }
-            Model.Locked = true;
-            <script>
-                OnChangeDefault("@Model.Value");
-            </script>
+                Model.Locked = true;
+
+                <script>
+                    OnChangeDefault("@Model.Value");
+                </script>
+           
         }
 
         if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_importantInformation_1" && Model.Value == null)
@@ -86,7 +81,8 @@
             Model.Value = defaultEventInformation.ImportantInformation;
             Model.Locked = true;
             <script>
-                OnChangeDefault("@Model.Value");
+               
+                OnChangeDefault(`@Model.Value`);
             </script>
         }
     }
@@ -107,7 +103,7 @@
             Model.Value = defaultEventInformation.Date;
             Model.Locked = true;
             <script>
-                OnChangeDefault("@Model.Value");
+                OnChangeDefault(`@Model.Value`);
             </script>
         }
 
