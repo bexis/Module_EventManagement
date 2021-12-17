@@ -120,8 +120,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
 
 
-                            // Show event if either registered or deadline is not over
-                            if (today <= e.Deadline.AddDays(1) || model.AlreadyRegistered == true)
+                            // Show event if deadline is not over
+                            if (today <= e.Deadline.AddDays(1))
                                 availableEvents.Add(model);
                         }
                     }
