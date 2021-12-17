@@ -145,22 +145,20 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         using (EntityPermissionManager pManager = new EntityPermissionManager())
                         {
                             Entity entityType = entityTypeManager.FindByName("Event");
-
-                            var adminGroup = groupManager.FindByNameAsync("administrator").Result;
-                            //temp hartcoded until the new settings implementation is available
-                            var beoGroup = groupManager.FindByNameAsync("beo").Result;
-
-                            int fullRights = (int)RightType.Read + (int)RightType.Write + (int)RightType.Delete + (int)RightType.Grant;
-
-                            if (adminGroup != null)
+                            string[] eventAdminGroups = Helper.Settings.get("EventAdminGroups").ToString().Split(',');
+                            if (eventAdminGroups != null && eventAdminGroups.Length > 0)
                             {
-                                if (pManager.GetRights(adminGroup.Id, entityType.Id, newEvent.Id) == 0)
-                                    pManager.Create(adminGroup.Id, entityType.Id, newEvent.Id, fullRights);
-                            }
-                            if (beoGroup != null)
-                            {
-                                if (pManager.GetRights(beoGroup.Id, entityType.Id, newEvent.Id) == 0)
-                                    pManager.Create(beoGroup.Id, entityType.Id, newEvent.Id, fullRights);
+                                foreach(var g in eventAdminGroups)
+                                {
+                                    int fullRights = (int)RightType.Read + (int)RightType.Write + (int)RightType.Delete + (int)RightType.Grant;
+                                    var group = groupManager.FindByNameAsync(g).Result;
+                                    if (group != null)
+                                    {
+                                        if (pManager.GetRights(group.Id, entityType.Id, newEvent.Id) == 0)
+                                            pManager.Create(group.Id, entityType.Id, newEvent.Id, fullRights);
+                                    }
+
+                                }
                             }
                         }
                     }

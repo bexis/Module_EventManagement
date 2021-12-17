@@ -159,6 +159,7 @@
     <Compile Include="Helper\EmailHelper.cs" />
     <Compile Include="Helper\EMMSeedDataGenerator.cs" />
     <Compile Include="Helper\FormHelper.cs" />
+    <Compile Include="Helper\Settings.cs" />
     <Compile Include="Models\AbstractMetadataStepModel.cs" />
     <Compile Include="Models\AbstractStepModel.cs" />
     <Compile Include="Models\EventModel.cs" />
@@ -174,6 +175,7 @@
   <ItemGroup>
     <Content Include="Content\main.css" />
     <Content Include="EMM.Manifest.xml" />
+    <Content Include="Emm.Settings.xml" />
     <Content Include="packages.config" />
     <Content Include="Scripts\Form.js" />
     <Content Include="Views\Web.config" />
