@@ -545,7 +545,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 string ref_id = GetRefIdFromEmail(email);
 
                 string notificationType = "";
-                string message = "";
 
                 // Check for logged in user
                 User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
@@ -568,14 +567,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         erManager.UpdateEventRegistration(reg);
 
                         SendEmailNotification("updated", email, ref_id, data, e, user);
-                        message = "Registration details sucessfully updated.";
                     }
                     else
-                        CreateNewEventRegistration(e, data, user, email, notificationType, ref_id, message);
+                        CreateNewEventRegistration(e, data, user, email, notificationType, ref_id);
                 }
                 // New event registration
                 else
-                    CreateNewEventRegistration(e, data, user, email, notificationType, ref_id, message);
+                    CreateNewEventRegistration(e, data, user, email, notificationType, ref_id);
 
 
                 return Json(new { result = "redirect", url = Url.Action("EventRegistration", "EventRegistration", new { area = "EMM", ref_id = ref_id }) }, JsonRequestBehavior.AllowGet);
@@ -587,7 +585,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
         /// </summary>
         /// <param name=""></param>
         /// <returns></returns>
-        private void CreateNewEventRegistration(Event e, XDocument data, User user, string email, string notificationType, string ref_id, string message)
+        private void CreateNewEventRegistration(Event e, XDocument data, User user, string email, string notificationType, string ref_id)
         {
             using (var erManager = new EventRegistrationManager())
             { 
@@ -597,39 +595,17 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     int countRegs = erManager.GetNumerOfRegistrationsByEvent(e.Id);
                     if (countRegs >= e.ParticipantsLimitation)
                     {
-                        message = "Number of participants has been reached. You are now on the waiting list.";
                         notificationType = "succesfully_registered_waiting_list";
                     }
                     else
                     {
-                        message = "You registered sucessfully.";
                         notificationType = "succesfully_registered";
                     }
                 }
                 else
                 {
-                    message = "You registered sucessfully.";
                     notificationType = "succesfully_registered";
                 }
-
-            // Add hint to message text
-            string change = "";
-            if (e.EditAllowed == true)
-            {
-                change = "and change";
-            }
-            else
-            {
-                change = "(edit is not allowed - in urgent cases please contact ...)"; // todo fill with mail adress
-            }
-            if (user != null)
-            {
-                message = message + " To view " + change + " your registration log in or follow the link send via email.";
-            }
-            else
-            {
-                message = message + " To view " + change + " your registration follow the link send via email.";
-            }
 
             // Save registration and send notification
             erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id);
@@ -637,7 +613,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
             SendEmailNotification(notificationType, email, ref_id, data, e, user);
         }
     }
-
 
         #endregion
 
