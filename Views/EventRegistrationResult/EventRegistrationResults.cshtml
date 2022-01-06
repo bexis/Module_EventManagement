@@ -1,8 +1,12 @@
-﻿@using Telerik.Web.Mvc.UI
-@using System.Data
-@using BExIS.Modules.EMM.UI.Models;
+﻿@using BExIS.Modules.EMM.UI.Models;
 
 @model EventRegistrationResultModel
+
+@section scripts
+{
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+}
 
 @section Information
 {
@@ -15,42 +19,43 @@
 {
     if (Model.UserHasRights)
     {
+<table id="regResults">
+    <thead>
+        <tr>
+            @for (int c = 0; c < Model.Results.Columns.Count; c++)
+            {
+                <th>
+                    @Model.Results.Columns[c].ColumnName
+                </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.Results.Rows.Count; i++) 
+         {
+        <tr>
+            @for (int c = 0; c < Model.Results.Columns.Count; c++)
+            {
+                <td>
+                    @Model.Results.Rows[i][c].ToString()
+                </td>
 
-        @(Html.Telerik().Grid(Model.Results)
-                        .Name("EventRegistrationResults")
-                        .Sortable()
-                        .ClientEvents(clientEvents => clientEvents
-                        .OnDataBound("onDataBound"))
-                       .Columns(columns =>
-                       {
-                           foreach (DataColumn dc in Model.Results.Columns)
-                           {
-                               string title;
+            }
+        </tr>
+            }
 
-                               if (dc.Caption == "")
-                               {
-                                   title = dc.ColumnName;
-                               }
-                               else
-                               {
-                                   title = dc.Caption;
-                               }
+    </tbody>
+</table>
 
-                               columns.Bound(dc.DataType, dc.ColumnName)
-                                         .Title(title).Width(dc.ColumnName.Length * 3); // forced fixed column width to enable horizontal scrolling
-                           }
-                       }
+      
 
-                    )
-    )
-
-    @Html.ActionLink("Export (csv)", "Export", "EventRegistrationResult", new { id = Model.EventId }, new { @class = "bx-button function" })
-    <span class="bx-button function" id="" onclick="Delete(@Model.EventId)" title="Delete event">Delete</span>
-}
-else
-{
- <p>You have no rights to this event.</p>
-}
+        @Html.ActionLink("Export (csv)", "Export", "EventRegistrationResult", new { id = Model.EventId }, new { @class = "bx-button function" })
+        <span class="bx-button function" id="" onclick="Delete(@Model.EventId)" title="Delete event">Delete</span>
+    }
+    else
+    {
+        <p>You have no rights to this event.</p>
+    }
 }
 
 
@@ -64,6 +69,11 @@ else
 
 
 <script type="text/javascript">
+
+    $(document).ready(function () {
+        $('#regResults').DataTable();
+    });
+
 
     function onDataBound() {
         addTooltips();
