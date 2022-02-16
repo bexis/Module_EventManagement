@@ -587,8 +587,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
         /// <returns></returns>
         private void CreateNewEventRegistration(Event e, XDocument data, User user, string email, string notificationType, string ref_id)
         {
+            bool waitingList = false;
             using (var erManager = new EventRegistrationManager())
             { 
+
                 //check Participants Limitation
                 if (e.ParticipantsLimitation != 0)
                 {
@@ -596,6 +598,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     if (countRegs >= e.ParticipantsLimitation)
                     {
                         notificationType = "succesfully_registered_waiting_list";
+                        waitingList = true;
                     }
                     else
                     {
@@ -608,7 +611,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 }
 
             // Save registration and send notification
-            erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id);
+            erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id, waitingList);
 
             SendEmailNotification(notificationType, email, ref_id, data, e, user);
         }

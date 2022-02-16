@@ -58,7 +58,7 @@ namespace BExIS.Emm.Services.Event
         /// <summary>
         /// Creates an EventRegistration <seealso cref="EventRegistration"/> and persists the entity in the database.
         /// </summary>
-        public E.EventRegistration CreateEventRegistration(XmlDocument data, E.Event e, User user, bool deleted, string token)
+        public E.EventRegistration CreateEventRegistration(XmlDocument data, E.Event e, User user, bool deleted, string token, bool waitingList)
         {
             E.EventRegistration eventRegistration = new E.EventRegistration();
             eventRegistration.Data = data;
@@ -66,6 +66,7 @@ namespace BExIS.Emm.Services.Event
             eventRegistration.Event = e;
             eventRegistration.Person = user;
             eventRegistration.Token= token;
+            eventRegistration.WaitingList = waitingList;
 
             using (IUnitOfWork uow = this.GetUnitOfWork())
             {
@@ -115,6 +116,12 @@ namespace BExIS.Emm.Services.Event
         {
             return EventRegistrationRepo.Query(a=>a.Event.Id == id).ToList();
         }
+
+        public List<E.EventRegistration> GetAllWaitingListRegsByEvent(long id)
+        {
+            return EventRegistrationRepo.Query(a => a.Event.Id == id && a.WaitingList == true).ToList();
+        }
+
 
         public List<E.EventRegistration> GetAllRegistrationsNotDeletedByEvent(long id)
         {

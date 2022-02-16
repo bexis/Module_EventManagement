@@ -118,6 +118,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             if (model.ImportantInformation == null)
                 ModelState.AddModelError("ImportantInformation", "Important information is required.");
+            
+            if(model.ParticipantsLimitation == 0 && model.WaitingList == true)
+                ModelState.AddModelError("WaitingList", "You don't need a waiting list if there is no participants limitation.");
+
+            if (model.WaitingListLimitation > 0 && model.WaitingList == false)
+                ModelState.AddModelError("WaitingListLimitation", "You don't need a waiting list limitation if you dont use the waiting list.");
+
 
             //check if schema file is uploaded
             //if (attachments ==null &&model.Id == 0)
@@ -134,7 +141,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                     if (model.Id == 0)
                     {
-                        Event newEvent = eManager.CreateEvent(model.Name, model.EventDate, model.ImportantInformation, model.MailInformation, model.SelectedEventLanguage, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.EditAllowed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, ms, null);
+                        Event newEvent = eManager.CreateEvent(model.Name, model.EventDate, model.ImportantInformation, model.MailInformation, model.SelectedEventLanguage, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.WaitingList,model.WaitingListLimitation, model.EditAllowed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, ms, null);
 
                         newEvent = SaveFile(file, newEvent, eManager);
                         eManager.UpdateEvent(newEvent);

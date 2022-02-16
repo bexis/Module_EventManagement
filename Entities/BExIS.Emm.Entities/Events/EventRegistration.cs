@@ -19,6 +19,9 @@ namespace BExIS.Emm.Entities.Event
 
         public virtual string Token { get; set; }
 
+        public virtual bool WaitingList { get; set; }
+
+
         #endregion
 
         #region Associations

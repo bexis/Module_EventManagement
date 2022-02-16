@@ -12,7 +12,7 @@ namespace BExIS.Modules.EMM.UI.Models
 {
 
     /// <summary>
-    /// The EventRegistrationModel represent all informatio ehich are needed to handel a event registration.
+    /// The EventRegistrationModel represent all information which are needed to handel a event registration.
     /// </summary>
     /// <remarks></remarks>
     public class EventRegistrationModel
@@ -100,6 +100,7 @@ namespace BExIS.Modules.EMM.UI.Models
         public long EventId { get; set; }
         public XmlDocument Form { get; set; }
         public DataTable Results { get; set; }
+        public DataTable WaitingListResults { get; set; }
         public bool UserHasRights { get; set; }
 
         public EventRegistrationResultModel()

@@ -131,6 +131,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
         {
             EventRegistrationResultModel model = new EventRegistrationResultModel();
             model.Results = GetEventResults(id);
+            
             model.EventId = id;
 
             //check rights on event
@@ -177,6 +178,32 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return results;
         }
 
+        private DataTable GetWaitingListResults(long eventId)
+        {
+            DataTable results = new DataTable();
+            results.Columns.Add("Deleted");
+
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
+            {
+                List<EventRegistration> eventRegistrations = erManager.GetAllWaitingListRegsByEvent(eventId);
+
+                if (eventRegistrations.Count != 0)
+                {
+                    XmlNodeReader xmlNodeReader = new XmlNodeReader(eventRegistrations[0].Data);
+                    results = CreateDataTableColums(results, XElement.Load(xmlNodeReader));
+                    xmlNodeReader.Dispose();
+                }
+
+                foreach (EventRegistration er in eventRegistrations)
+                {
+                    XmlNodeReader xmlNodeReader = new XmlNodeReader(er.Data);
+                    results.Rows.Add(AddDataRow(XElement.Load(xmlNodeReader), results, er.Deleted.ToString()));
+                    xmlNodeReader.Dispose();
+                }
+            }
+
+            return results;
+        }
         //private DataTable GetEventRegistration(long eventId, XDocument data)
         //{
         //    DataTable results = new DataTable();

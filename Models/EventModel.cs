@@ -41,6 +41,12 @@ namespace BExIS.Modules.EMM.UI.Models
         [DisplayName("Participants limitation")]
         public int ParticipantsLimitation { get; set; }
 
+        [DisplayName("Allow waiting list")]
+        public bool WaitingList { get; set;  }
+
+        [DisplayName("Waiting list limitation")]
+        public int WaitingListLimitation { get; set; }
+
         [DisplayName("Allow edit")]
         public bool EditAllowed { get; set; }
 

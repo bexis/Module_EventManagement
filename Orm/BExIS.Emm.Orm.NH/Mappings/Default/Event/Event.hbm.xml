@@ -83,6 +83,14 @@
     <property name="ParticipantsLimitation" type="Int32">
       <column name="ParticipantsLimitation" />
     </property>
+    
+      <property name="WaitingList" type="Boolean">
+      <column name="WaitingList" />
+    </property>
+    
+    <property name="WaitingListLimitation" type="Int32">
+      <column name="WaitingListLimitation" />
+    </property>
 
     <property name="EditAllowed" type="Boolean">
       <column name="EditAllowed" />
