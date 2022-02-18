@@ -131,6 +131,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
         {
             EventRegistrationResultModel model = new EventRegistrationResultModel();
             model.Results = GetEventResults(id);
+            model.WaitingListResults =  GetWaitingListResults(id);
             
             model.EventId = id;
 
@@ -147,6 +148,20 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return View("EventRegistrationResults", model);
         }
 
+        public ActionResult MoveFromWaitingList(long id, long eventId)
+        {
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
+            {
+                var registration = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
+                if (registration.WaitingList == true)
+                    registration.WaitingList = false;
+
+                erManager.UpdateEventRegistration(registration);
+            }
+
+            return RedirectToAction("OnSelectTreeViewItem", new { id = eventId });
+        }
+
         #endregion
 
         #region Xml to DataTable
@@ -154,6 +169,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
         private DataTable GetEventResults(long eventId)
         {
             DataTable results = new DataTable();
+            results.Columns.Add("Id");
             results.Columns.Add("Deleted");
 
             using (EventRegistrationManager erManager = new EventRegistrationManager())
@@ -170,7 +186,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 foreach (EventRegistration er in eventRegistrations)
                 {
                     XmlNodeReader xmlNodeReader = new XmlNodeReader(er.Data);
-                    results.Rows.Add(AddDataRow(XElement.Load(xmlNodeReader), results, er.Deleted.ToString()));
+                    results.Rows.Add(AddDataRow(XElement.Load(xmlNodeReader), results, er.Deleted.ToString(), er.Id));
                     xmlNodeReader.Dispose();
                 }
             }
@@ -181,7 +197,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
         private DataTable GetWaitingListResults(long eventId)
         {
             DataTable results = new DataTable();
+            results.Columns.Add("Id");
             results.Columns.Add("Deleted");
+            results.Columns.Add("Action");
 
             using (EventRegistrationManager erManager = new EventRegistrationManager())
             {
@@ -197,7 +215,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 foreach (EventRegistration er in eventRegistrations)
                 {
                     XmlNodeReader xmlNodeReader = new XmlNodeReader(er.Data);
-                    results.Rows.Add(AddDataRow(XElement.Load(xmlNodeReader), results, er.Deleted.ToString()));
+                    results.Rows.Add(AddDataRow(XElement.Load(xmlNodeReader), results, er.Deleted.ToString(), er.Id));
                     xmlNodeReader.Dispose();
                 }
             }
@@ -237,9 +255,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return dt;
         }
 
-        private DataRow AddDataRow(XElement x, DataTable dt, string deleted)
+        private DataRow AddDataRow(XElement x, DataTable dt, string deleted, long id)
         {
             DataRow dr = dt.NewRow();
+            dr["Id"] = id;
             dr["Deleted"] = deleted;
             foreach (XElement xe in x.Descendants())
             {
