@@ -119,7 +119,7 @@ namespace BExIS.Emm.Services.Event
 
         public List<E.EventRegistration> GetAllWaitingListRegsByEvent(long id)
         {
-            return EventRegistrationRepo.Query(a => a.Event.Id == id && a.WaitingList == true).ToList();
+            return EventRegistrationRepo.Query(a => a.Event.Id == id && a.WaitingList == true && a.Deleted == false).ToList();
         }
 
 

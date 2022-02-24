@@ -86,6 +86,14 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         if (today >= e.StartDate)
                         {
                             EventRegistrationModel model = new EventRegistrationModel(e);
+                            model.NumberOfRegistration = erManager.GetAllRegistrationsNotDeletedByEvent(e.Id).Count;
+                            model.NrOfRegistrationWaitingList = erManager.GetAllWaitingListRegsByEvent(e.Id).Count;
+
+                            if((model.NrOfRegistrationWaitingList >= e.WaitingListLimitation) && (model.NrOfRegistrationWaitingList>= e.ParticipantsLimitation) )
+                            {
+                                model.Closed = true;
+                            }
+
                             //check if user already registered (if logged in)
                             if (user != null)
                             {

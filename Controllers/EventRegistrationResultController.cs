@@ -159,6 +159,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 erManager.UpdateEventRegistration(registration);
             }
 
+
+
             return RedirectToAction("OnSelectTreeViewItem", new { id = eventId });
         }
 

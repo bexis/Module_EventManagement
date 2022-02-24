@@ -19,19 +19,50 @@ namespace BExIS.Modules.EMM.UI.Models
     {
         public EventModel Event { get; set; }
 
-        public string Participants { get; set; } //number of participants limitation
+        /// <summary>
+        /// Number of participants limitation
+        /// </summary>
+        public string Participants { get; set; }
 
-        public int NumberOfRegistration { get; set; } //number of already registered participants
+        /// <summary>
+        /// Number of already registered participants
+        /// </summary>
+        public int NumberOfRegistration { get; set; }
 
-        public bool EditAllowed { get; set; } // edit allowed by user
+        /// <summary>
+        /// Number of already registered participants on waiting list
+        /// </summary>
+        public int NrOfRegistrationWaitingList { get; set; }
 
-        public bool AlreadyRegistered { get; set; } //user already registered, this will find out via user email
+        /// <summary>
+        /// edit allowed by user
+        /// </summary>
+        public bool EditAllowed { get; set; }
 
-        public bool Deleted { get; set; } //is registration deleted by user
+        /// <summary>
+        /// user already registered, this will find out via user email
+        /// </summary>
+        public bool AlreadyRegistered { get; set; }
 
-        public string AlreadyRegisteredRefId { get; set; } //Already registered RefId
+        /// <summary>
+        /// is registration deleted by user
+        /// </summary>
+        public bool Deleted { get; set; }
 
-        public string Message { get; set; } //
+        /// <summary>
+        ///true if ParticipantsLimitation and WaitingListLimitation is reached
+        /// </summary>
+        public bool Closed { get; set; }
+
+        /// <summary>
+        ///Already registered RefId
+        /// </summary>
+        public string AlreadyRegisteredRefId { get; set; }
+
+        /// <summary>
+        ///
+        /// </summary>
+        //public string Message { get; set; } 
 
         public EventRegistrationModel()
         {
@@ -43,10 +74,6 @@ namespace BExIS.Modules.EMM.UI.Models
             Event = new EventModel(e);
             EditAllowed = e.EditAllowed;
 
-            using (EventRegistrationManager erManger = new EventRegistrationManager())
-            {
-                NumberOfRegistration = erManger.GetAllRegistrationsNotDeletedByEvent(e.Id).Count;
-            }
         }
     }
 
