@@ -1,15 +1,18 @@
 ﻿using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
 using BExIS.IO.Transform.Output;
+using BExIS.Modules.EMM.UI.Helper;
 using BExIS.Modules.EMM.UI.Models;
 using BExIS.Security.Entities.Authorization;
 using BExIS.Security.Entities.Objects;
 using BExIS.Security.Services.Authorization;
 using BExIS.Security.Services.Objects;
 using BExIS.Security.Services.Subjects;
+using BExIS.Security.Services.Utilities;
 using BExIS.Xml.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -151,17 +154,68 @@ namespace BExIS.Modules.EMM.UI.Controllers
         public ActionResult MoveFromWaitingList(long id, long eventId)
         {
             using (EventRegistrationManager erManager = new EventRegistrationManager())
+            using (EventManager eventManager = new EventManager())
             {
                 var registration = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
                 if (registration.WaitingList == true)
                     registration.WaitingList = false;
 
                 erManager.UpdateEventRegistration(registration);
+
+                var e = eventManager.GetEventById(eventId);
+                SendNotification(registration.Data, e);
+
             }
 
 
 
             return RedirectToAction("OnSelectTreeViewItem", new { id = eventId });
+        }
+
+        private void SendNotification(XmlDocument data, Event e)
+        {
+            // todo: add not allowed / log in info to mail
+
+            EmailStructure emailStructure = new EmailStructure();
+            emailStructure = EmailHelper.ReadFile(e.EventLanguage);
+
+            string first_name = data.GetElementsByTagName(emailStructure.lableFirstName)[0].InnerText;
+            string last_name = data.GetElementsByTagName(emailStructure.lableLastname)[0].InnerText;
+            string email = data.GetElementsByTagName(emailStructure.lableEmail)[0].InnerText;
+
+            string url = Request.Url.GetLeftPart(UriPartial.Authority);
+
+            string mail_message = "";
+            string subject = emailStructure.removeFromWaitingListSubject + e.Name;
+
+            string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
+                emailStructure.removeFromWaitingList1 + e.Name + emailStructure.removeFromWaitingList2 + "<br/><br/>" +
+                 emailStructure.bodyClosing + "<br/>" +
+                 emailStructure.bodyClosingName;
+
+
+            var es = new EmailService();
+
+            // If no explicit Reply to mail is set use the SystemEmail
+            string replyTo = "";
+            if (String.IsNullOrEmpty(e.EmailReply))
+            {
+                replyTo = ConfigurationManager.AppSettings["SystemEmail"];
+            }
+            else
+            {
+                replyTo = e.EmailReply;
+            }
+
+            es.Send(
+                subject,
+                body,
+                new List<string> { email }, // to
+                new List<string> { e.EmailCC }, // CC 
+                new List<string> { ConfigurationManager.AppSettings["SystemEmail"], e.EmailBCC }, // Allways send BCC to SystemEmail + additional set 
+                new List<string> { replyTo }
+                );
+
         }
 
         #endregion

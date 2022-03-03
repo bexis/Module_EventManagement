@@ -24,6 +24,7 @@ namespace BExIS.Modules.EMM.UI.Helper
     {
         public string lableFirstName { get; set; }
         public string lableLastname { get; set; }
+        public string lableEmail { get; set; }
         public string succesfullyRegisteredSubject { get; set; }
         public string succesfullyRegisteredMessage { get; set; }
         public string waitingListSubject { get; set; }
@@ -35,6 +36,10 @@ namespace BExIS.Modules.EMM.UI.Helper
         public string bodyHintToLink { get; set; }
         public string bodyClosing { get; set; }
         public string bodyClosingName { get; set; }
+        public string removeFromWaitingListSubject { get; set; }
+        public string removeFromWaitingList1 { get; set; }
+        public string removeFromWaitingList2 { get; set; }
+
 
         public EmailStructure()
         {

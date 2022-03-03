@@ -73,7 +73,7 @@
                             if (Model.WaitingListResults.Columns[c].ColumnName == "Action")
                             {
                                 <td>
-                                    @Html.ActionLink("Move to list", "MoveFromWaitingList", "EventRegistrationResult", new { id = Model.WaitingListResults.Rows[i][0], eventId = Model.EventId }, new { @class = "bx bx-grid-function"})
+                                    @Html.ActionLink("Move", "MoveFromWaitingList", "EventRegistrationResult", new { id = Model.WaitingListResults.Rows[i][0], eventId = Model.EventId }, new { @class = "bx bx-grid-function"})
                                 </td>
                             }
                             else
