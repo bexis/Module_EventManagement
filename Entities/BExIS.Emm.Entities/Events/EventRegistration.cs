@@ -21,6 +21,8 @@ namespace BExIS.Emm.Entities.Event
 
         public virtual bool WaitingList { get; set; }
 
+        public virtual DateTime InsertDate { get; set; }
+
 
         #endregion
 

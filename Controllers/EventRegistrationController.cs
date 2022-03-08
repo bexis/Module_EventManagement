@@ -498,6 +498,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         {
                             reg.Deleted = true;
                             erManager.UpdateEventRegistration(reg);
+                            MoveFromWaitingList(reg.Event.Id);
+
                         }
                     }
                     else if (ref_id != null)
@@ -507,11 +509,75 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         {
                             reg.Deleted = true;
                             erManager.UpdateEventRegistration(reg);
+                            MoveFromWaitingList(reg.Event.Id);
                         }
                     }
                 }
             }
             return Json(new { result = "redirect", url = Url.Action("EventRegistration", "EventRegistration", new { area = "EMM" }) }, JsonRequestBehavior.AllowGet);
+        }
+
+        private void MoveFromWaitingList(long eventId)
+        {
+            using (var erManager = new EventRegistrationManager())
+            using (var eventManager = new EventManager())
+            {
+                int countWaitingList = erManager.GetAllWaitingListRegsByEvent(eventId).Count;
+                if (countWaitingList > 0)
+                {
+                    var reg = erManager.GetLatestWaitingListEntry(eventId);
+                    reg.WaitingList = false;
+                    erManager.UpdateEventRegistration(reg);
+                    var e = eventManager.GetEventById(eventId);
+                    SendWaitingListNotification(reg.Data, e);
+                }
+            }
+        }
+
+        private void SendWaitingListNotification(XmlDocument data, Event e)
+        {
+            // todo: add not allowed / log in info to mail
+
+            EmailStructure emailStructure = new EmailStructure();
+            emailStructure = EmailHelper.ReadFile(e.EventLanguage);
+
+            string first_name = data.GetElementsByTagName(emailStructure.lableFirstName)[0].InnerText;
+            string last_name = data.GetElementsByTagName(emailStructure.lableLastname)[0].InnerText;
+            string email = data.GetElementsByTagName(emailStructure.lableEmail)[0].InnerText;
+
+            string url = Request.Url.GetLeftPart(UriPartial.Authority);
+
+            string mail_message = "";
+            string subject = emailStructure.removeFromWaitingListSubject + e.Name;
+
+            string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
+                emailStructure.removeFromWaitingList1 + e.Name + emailStructure.removeFromWaitingList2 + "<br/><br/>" +
+                 emailStructure.bodyClosing + "<br/>" +
+                 emailStructure.bodyClosingName;
+
+
+            var es = new EmailService();
+
+            // If no explicit Reply to mail is set use the SystemEmail
+            string replyTo = "";
+            if (String.IsNullOrEmpty(e.EmailReply))
+            {
+                replyTo = ConfigurationManager.AppSettings["SystemEmail"];
+            }
+            else
+            {
+                replyTo = e.EmailReply;
+            }
+
+            es.Send(
+                subject,
+                body,
+                new List<string> { email }, // to
+                new List<string> { e.EmailCC }, // CC 
+                new List<string> { ConfigurationManager.AppSettings["SystemEmail"], e.EmailBCC }, // Allways send BCC to SystemEmail + additional set 
+                new List<string> { replyTo }
+                );
+
         }
 
         public ActionResult Save()
@@ -633,7 +699,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 }
 
                 // Save registration and send notification
-                erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id, waitingList);
+                erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id, waitingList, DateTime.Now);
 
                 SendEmailNotification(notificationType, email, ref_id, data, e, user);
         }
