@@ -194,6 +194,10 @@
             <small>@Html.ValidationMessage("EmailReply")</small>
         </td>
     </tr>
+    <tr>
+        <td>@Html.LabelFor(m => m.Closed)</td>
+        <td>@Html.CheckBoxFor(m => m.Closed, new { @class = "js-switch" })</td>
+    </tr>
 
 </table>
 

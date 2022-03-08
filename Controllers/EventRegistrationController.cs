@@ -89,10 +89,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             model.NumberOfRegistration = erManager.GetAllRegistrationsNotDeletedByEvent(e.Id).Count;
                             model.NrOfRegistrationWaitingList = erManager.GetAllWaitingListRegsByEvent(e.Id).Count;
 
-                            if((model.NrOfRegistrationWaitingList >= e.WaitingListLimitation) && (model.NrOfRegistrationWaitingList>= e.ParticipantsLimitation) )
-                            {
-                                model.Closed = true;
-                            }
+                            model.Closed = e.Closed;
 
                             //check if user already registered (if logged in)
                             if (user != null)
@@ -583,7 +580,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 else
                     CreateNewEventRegistration(e, data, user, email, notificationType, ref_id);
 
-
                 return Json(new { result = "redirect", url = Url.Action("EventRegistration", "EventRegistration", new { area = "EMM", ref_id = ref_id }) }, JsonRequestBehavior.AllowGet);
             }
         }
@@ -597,16 +593,34 @@ namespace BExIS.Modules.EMM.UI.Controllers
         {
             bool waitingList = false;
             using (var erManager = new EventRegistrationManager())
+            using(var eventManager = new EventManager())
             { 
-
                 //check Participants Limitation
                 if (e.ParticipantsLimitation != 0)
                 {
                     int countRegs = erManager.GetNumerOfRegistrationsByEvent(e.Id);
+                    int countWaitingList = erManager.GetAllWaitingListRegsByEvent(e.Id).Count + 1;
+
                     if (countRegs >= e.ParticipantsLimitation)
                     {
-                        notificationType = "succesfully_registered_waiting_list";
-                        waitingList = true;
+                        if(e.WaitingList && !e.Closed)
+                        {
+                            if(countWaitingList == e.WaitingListLimitation)
+                            {
+                                e.Closed = true;
+                                eventManager.UpdateEvent(e);
+                            }
+                            
+                            notificationType = "succesfully_registered_waiting_list";
+                            waitingList = true;
+                            
+                        }
+                        else
+                        {
+                            e.Closed = true;
+                            eventManager.UpdateEvent(e);
+                            notificationType = "succesfully_registered";
+                        }
                     }
                     else
                     {
@@ -618,10 +632,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     notificationType = "succesfully_registered";
                 }
 
-            // Save registration and send notification
-            erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id, waitingList);
+                // Save registration and send notification
+                erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id, waitingList);
 
-            SendEmailNotification(notificationType, email, ref_id, data, e, user);
+                SendEmailNotification(notificationType, email, ref_id, data, e, user);
         }
     }
 

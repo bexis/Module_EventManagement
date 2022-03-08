@@ -72,7 +72,7 @@ namespace BExIS.Emm.Services.Event
         /// <summary>
         /// Creates an EventRegistration <seealso cref="EventRegistration"/> and persists the entity in the database.
         /// </summary>
-        public E.Event CreateEvent(string name, string eventDate, string importantInformation, string mailInformation, string eventLanguage, DateTime startDate, DateTime deadline, int participantsLimitation, bool waitingList, int waitingListLimitation, bool editAllowed, string logInPassword, string emailBCC, string emailCC, string emailReply, MetadataStructure metadataStructure, string javaScriptPath)
+        public E.Event CreateEvent(string name, string eventDate, string importantInformation, string mailInformation, string eventLanguage, DateTime startDate, DateTime deadline, int participantsLimitation, bool waitingList, int waitingListLimitation, bool editAllowed, bool closed, string logInPassword, string emailBCC, string emailCC, string emailReply, MetadataStructure metadataStructure, string javaScriptPath)
         {
             E.Event newEvent = new E.Event();
             newEvent.Name = name;
@@ -87,6 +87,7 @@ namespace BExIS.Emm.Services.Event
             newEvent.WaitingList = waitingList;
             newEvent.WaitingListLimitation = waitingListLimitation;
             newEvent.EditAllowed = editAllowed;
+            newEvent.Closed = closed;
             newEvent.LogInPassword = logInPassword;
             newEvent.EmailBCC = emailBCC;
             newEvent.EmailCC = emailCC;

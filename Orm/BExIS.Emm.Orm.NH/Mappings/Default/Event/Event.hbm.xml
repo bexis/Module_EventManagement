@@ -95,6 +95,10 @@
     <property name="EditAllowed" type="Boolean">
       <column name="EditAllowed" />
     </property>
+    
+    <property name="Closed" type="Boolean">
+      <column name="Closed" />
+    </property>
 
     <property name="LogInPassword" type="string">
       <column name="LogInPassword" />

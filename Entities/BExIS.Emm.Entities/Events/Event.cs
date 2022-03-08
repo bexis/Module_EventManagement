@@ -35,6 +35,8 @@ namespace BExIS.Emm.Entities.Event
 
         public virtual bool EditAllowed { get; set; }
 
+        public virtual bool Closed { get; set; }
+
         public virtual string LogInPassword { get; set; }
 
         public virtual string EmailBCC { get; set; }

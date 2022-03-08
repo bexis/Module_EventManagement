@@ -50,6 +50,7 @@ namespace BExIS.Modules.EMM.UI.Models
         [DisplayName("Allow edit")]
         public bool EditAllowed { get; set; }
 
+        public bool Closed { get; set; }
         public bool EditMode { get; set; }
 
         [DisplayName("Event password")]
@@ -103,6 +104,9 @@ namespace BExIS.Modules.EMM.UI.Models
             StartDate = eEvent.StartDate;
             Deadline = eEvent.Deadline;
             ParticipantsLimitation = eEvent.ParticipantsLimitation;
+            WaitingList = eEvent.WaitingList;
+            WaitingListLimitation = eEvent.WaitingListLimitation;
+            Closed = eEvent.Closed;
 
             //if (eEvent.ParticipantsLimitation == 0)
             //    ParticipantsLimitation = "no limitation";
