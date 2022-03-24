@@ -11,70 +11,68 @@
      </p>-->
 }
 
-@{
-    GridPagerStyles pagerStyles = GridPagerStyles.PageSizeDropDown;
-    pagerStyles |= GridPagerStyles.NextPreviousAndNumeric;
-    pagerStyles |= GridPagerStyles.Numeric;
-}
-
 <span style="color:green">@ViewBag.Message</span>
 
-@(Html.Telerik().Grid(Model)
-            .Name("Events")
-            .Columns(columns =>
-            {
-                columns.Template(
-                @<text>
-                    @if (item.AlreadyRegistered == false || item.Deleted == true)
-                                {
-                        <div onclick="onClickRegister(@item.Event.Id)" class="bx bx-grid-function fa-sign-in" style="cursor: pointer;" title="Register for event"> Register</div>
-                                }
-                                <!--else
-                                {
-                        <div class="bx bx-grid-function fa-sign-in bx-disabled" disabled="disabled" title="Register for event"></div>
-                                }-->
-
-                    @if (item.EditAllowed && item.AlreadyRegistered == true && item.Deleted == false && item.Event.Deadline >= DateTime.Now)
+<table id="events">
+    <thead>
+        <tr>
+            <th>Actions</th>
+            <th>Event name</th>
+            <th>Deadline</th>
+            <th>Participant number</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for(int i = 0; i < Model.Count; i++)
+        {
+            <tr>
+                <td>
+                    @if (Model[i].Closed)
                     {
-                        <div onclick="onClickEdit(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
-                        <div onclick="onClickDelete(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function bx-trash" title="Delete registration"></div>
-
-                        }
-                    else if (item.AlreadyRegistered == true && item.Deleted == false)
+                        <p>Booked out</p>
+                    }
+                    else if (Model[i].AlreadyRegistered == false || Model[i].Deleted == true)
                     {
-                        <div onclick="onClickView(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function fa-eye" style="cursor: pointer;" title="View registration"></div>
-                        <div onclick="onClickDelete(@item.Event.Id, '@item.AlreadyRegisteredRefId')" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"></div>
+                        <div onclick="onClickRegister(@Model[i].Event.Id)" class="bx bx-grid-function fa-sign-in" style="cursor: pointer;" title="Register for event"> Register</div>
                     }
 
-                </text>
-                    ).Width(150);
-            columns.Bound(r => r.Event.Name);
-            columns.Bound(r => r.Event.Deadline).Format("{0: dd-MM-yyyy}").Width(200);
-            columns.Template(
-                        @<text>
-                            @item.NumberOfRegistration/
-                              @if (item.Event.ParticipantsLimitation == 0)
-                              {
-                                  <span>no limitation</span>
-                              }
-                              else {
-                                    @item.Event.ParticipantsLimitation
-                              }
-                        </text>
-                            ).Width(150);
-                    //columns.Bound(r => r.Event.ParticipantsLimitation);
-                })
-                                      .Pageable(paging =>
-                                    paging
-                                        .Style(pagerStyles)
-                                        .PageSize(50)
-                                        .Position(GridPagerPosition.Both)
-                                        )
-                            .Filterable()
-                    //.Sortable(sortable => sortable
-                    //    .OrderBy(orderby => orderby
-                    //        .Add(r => r.Id).Descending()))
-)
+
+                    @if (Model[i].EditAllowed && Model[i].AlreadyRegistered == true && Model[i].Deleted == false && Model[i].Event.Deadline >= DateTime.Now)
+                    {
+                        <div onclick="onClickEdit(@Model[i].Event.Id, '@Model[i].AlreadyRegisteredRefId')" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
+                        <div onclick="onClickDelete(@Model[i].Event.Id, '@Model[i].AlreadyRegisteredRefId')" class="bx bx-grid-function bx-trash" title="Delete registration"></div>
+
+                    }
+                    else if (Model[i].AlreadyRegistered == true && Model[i].Deleted == false)
+                    {
+                        <div onclick="onClickView(@Model[i].Event.Id, '@Model[i].AlreadyRegisteredRefId')" class="bx bx-grid-function fa-eye" style="cursor: pointer;" title="View registration"></div>
+                        <div onclick="onClickDelete(@Model[i].Event.Id, '@Model[i].AlreadyRegisteredRefId')" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"></div>
+                    }
+
+                </td>
+                <td>
+                    @Model[i].Event.Name
+                </td>
+                <td>
+                    @Model[i].Event.Deadline.ToString("dd-MM-yyyy")
+                </td>
+                <td>
+                    @Model[i].NumberOfRegistration/
+                    @if(Model[i].Event.ParticipantsLimitation == 0)
+                    {
+                        <span>no limitation</span>
+                    }
+                    else
+                    {
+                        @Model[i].Event.ParticipantsLimitation
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
 @(Html.Telerik().Window()
         .Name("Window_LogInToEvent")
         .Title("Event registration")
@@ -94,10 +92,10 @@
 
 <script type="text/javascript">
 
-    //function onDataBound() {
-    //resetAllTelerikIconTitles();
-    //addTooltips();
-    //}
+    $(document).ready(function () {
+        $('#events').DataTable();
+        
+    });
 
 
     function onClickRegister(id)
@@ -156,7 +154,5 @@
             window23.center().open();
         }
     }
-
-
 </script>
 

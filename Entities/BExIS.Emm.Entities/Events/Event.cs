@@ -29,7 +29,13 @@ namespace BExIS.Emm.Entities.Event
 
         public virtual int ParticipantsLimitation { get; set; }
 
+        public virtual bool WaitingList { get; set; }
+
+        public virtual int WaitingListLimitation { get; set; }
+
         public virtual bool EditAllowed { get; set; }
+
+        public virtual bool Closed { get; set; }
 
         public virtual string LogInPassword { get; set; }
 

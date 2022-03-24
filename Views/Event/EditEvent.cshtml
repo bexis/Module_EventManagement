@@ -111,10 +111,22 @@
         </td>
         <td>
             @(Html.Telerik().IntegerTextBoxFor(m => m.ParticipantsLimitation)
-                                                                                                                                                    .MinValue(0)
-                                                                                                                                                    .MaxValue(Int32.MaxValue)
-                                                                                                                                                    .Value(Model.ParticipantsLimitation)
-                                                                                                                                                    .HtmlAttributes(new { tabindex = "2", style = "border-width: 2px; height: 30px;" })
+                                                                                                                                      .HtmlAttributes(new { tabindex = "2", style = "border-width: 2px; height: 30px;" })
+            )
+        </td>
+    </tr>
+    <tr>
+        <td>@Html.LabelFor(m => m.WaitingList)</td>
+        <td>@Html.CheckBoxFor(m => m.WaitingList, new { @class = "js-switch" })</td>
+    </tr>
+    <tr>
+        <td>
+            <b title="This field is required" style="color:red">*</b>
+            @Html.LabelFor(m => m.WaitingListLimitation)
+        </td>
+        <td>
+            @(Html.Telerik().IntegerTextBoxFor(m => m.WaitingListLimitation)
+                                                                                                                                      .HtmlAttributes(new { tabindex = "2", style = "border-width: 2px; height: 30px;" })
             )
         </td>
     </tr>
@@ -181,6 +193,10 @@
             @Html.TextBoxFor(m => m.EmailReply, new { @class = "bx-input", @tabindex = "2" })
             <small>@Html.ValidationMessage("EmailReply")</small>
         </td>
+    </tr>
+    <tr>
+        <td>@Html.LabelFor(m => m.Closed)</td>
+        <td>@Html.CheckBoxFor(m => m.Closed, new { @class = "js-switch" })</td>
     </tr>
 
 </table>

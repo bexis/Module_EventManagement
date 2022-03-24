@@ -31,6 +31,14 @@
     <property name="Token" type="String">
       <column name="Token" />
     </property>
+    
+     <property name="WaitingList" type="Boolean">
+      <column name="WaitingList" />
+    </property>
+    
+    <property name="InsertDate" type="Date">
+      <column name="InsertDate" />
+    </property>
 
     <!-- Mapping Entity Associations -->
 

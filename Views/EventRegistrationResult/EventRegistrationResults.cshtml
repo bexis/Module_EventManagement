@@ -19,38 +19,79 @@
 {
     if (Model.UserHasRights)
     {
-<table id="regResults">
-    <thead>
-        <tr>
-            @for (int c = 0; c < Model.Results.Columns.Count; c++)
-            {
-                <th>
-                    @Model.Results.Columns[c].ColumnName
-                </th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @for (int i = 0; i < Model.Results.Rows.Count; i++) 
-         {
-        <tr>
-            @for (int c = 0; c < Model.Results.Columns.Count; c++)
-            {
-                <td>
-                    @Model.Results.Rows[i][c].ToString()
-                </td>
+        <table id="regResults">
+            <thead>
+                <tr>
+                    @for (int c = 0; c < Model.Results.Columns.Count; c++)
+                    {
+                        <th>
+                            @Model.Results.Columns[c].ColumnName
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Results.Rows.Count; i++)
+                {
+                    <tr>
+                        @for (int c = 0; c < Model.Results.Columns.Count; c++)
+                        {
+                            <td>
+                                @Model.Results.Rows[i][c].ToString()
+                            </td>
 
-            }
-        </tr>
-            }
+                        }
+                    </tr>
+                }
 
-    </tbody>
-</table>
-
-      
+            </tbody>
+        </table>
 
         @Html.ActionLink("Export (csv)", "Export", "EventRegistrationResult", new { id = Model.EventId }, new { @class = "bx-button function" })
         <span class="bx-button function" id="" onclick="Delete(@Model.EventId)" title="Delete event">Delete</span>
+
+        if (Model.WaitingListResults.Rows.Count > 0)
+        {
+            <h3>Waiting list</h3>
+            <table id="regWaitingListResults">
+                <thead>
+                    <tr>
+                        @for (int c = 0; c < Model.WaitingListResults.Columns.Count; c++)
+                        {
+                            <th>
+                                @Model.WaitingListResults.Columns[c].ColumnName
+                            </th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.WaitingListResults.Rows.Count; i++)
+                    {
+                    <tr>
+                        @for (int c = 0; c < Model.WaitingListResults.Columns.Count; c++)
+                        {
+                            if (Model.WaitingListResults.Columns[c].ColumnName == "Action")
+                            {
+                                <td>
+                                    @Html.ActionLink("Move", "MoveFromWaitingList", "EventRegistrationResult", new { id = Model.WaitingListResults.Rows[i][0], eventId = Model.EventId }, new { @class = "bx bx-grid-function"})
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    @Model.WaitingListResults.Rows[i][c].ToString()
+                                </td>
+                            }
+
+                        }
+                    </tr>
+                    }
+
+
+                </tbody>
+            </table>
+        }
+
     }
     else
     {
@@ -72,6 +113,7 @@
 
     $(document).ready(function () {
         $('#regResults').DataTable();
+        $('#regWaitingListResults').DataTable();
     });
 
 

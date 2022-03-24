@@ -1,5 +1,4 @@
-﻿@using Telerik.Web.Mvc.UI
-@using BExIS.Modules.EMM.UI.Models;
+﻿@using BExIS.Modules.EMM.UI.Models;
 
 @model List<EventModel>
 
@@ -11,106 +10,57 @@
 </p>
 }
 
-@{
-    GridPagerStyles pagerStyles = GridPagerStyles.PageSizeDropDown;
-    pagerStyles |= GridPagerStyles.NextPreviousAndNumeric;
-    pagerStyles |= GridPagerStyles.Numeric;
-}
-
 @Html.ActionLink("Create new Event", "Create", "Event", new { @class = "bx-button function" })
 <br />
-@(Html.Telerik().Grid(Model)
-                .Name("Grid_Event")
-                .DataKeys(keys =>
-                {
-                    keys.Add(r => r.Id);
-                })
-                .Columns(columns =>
-                {
+<br />
+<table id="events">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Event name</th>
+            <th>Participants limitation</th>
+            <th>Start date</th>
+            <th>Deadline</th>
+            <th>Allow edit</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            <tr>
+                <td>@Model[i].Id</td>
+                <td>@Model[i].Name</td>
+                <td>@Model[i].ParticipantsLimitation</td>
+                <td>@Model[i].StartDate.ToString("dd-MM-yyyy")</td>
+                <td>@Model[i].Deadline.ToString("dd-MM-yyyy")</td>
+                <td>
+                    @if (Model[i].EditAllowed)
+                    {
+                        <input type="checkbox" checked disabled />
+                    }
+                    else
+                    {
+                        <input type="checkbox" disabled />
+                    }
 
-                    columns.Bound(r => r.Id).Width(90);
-                    columns.Bound(r => r.Name);
-                    columns.Bound(r => r.ParticipantsLimitation) ;
-                    columns.Bound(r => r.StartDate).Format("{0: dd-MM-yyyy}");
-                    columns.Bound(r => r.Deadline).Format("{0: dd-MM-yyyy}"); ;
-                    columns.Bound(r => r.EditAllowed);
-                    columns.Template(
-                        @<text>
-                            @if (!item.InUse)
-                                        {
+                </td>
+                <td>
+                    <div class="bx bx-grid-function bx-edit" title='Edit event "@Model[i].Name"' onclick="OnClickEdit(@Model[i].Id)"></div>
+                    <div class="bx bx-grid-function bx-trash" title='Delete event "@Model[i].Name"' onclick="OnClickDelete(@Model[i].Id)"></div>
+                </td>
+            </tr>
+        }
+    </tbody>
 
-                                <div>
-                                    <div class="bx bx-grid-function bx-edit" title='Edit Unit "@item.Name"' onclick="OnClickEdit(@item.Id)"></div>
-                                    <div class="bx bx-grid-function bx-trash" title='Delete Unit "@item.Name"' onclick="OnClickDelete(@item.Id)"></div>
-                                </div>
-                                        }
-                                        else
-                                        {
-                                <div>
-                                    <div class="bx bx-grid-function bx-edit bx-disabled" disabled="disabled" title='Edit Unit "@item.Name"'></div>
-                                    <div class="bx bx-grid-function bx-trash bx-disabled" disabled="disabled" title='Delete Unit "@item.Name"'></div>
-                                </div>
-                                        }                
-
-                        </text>
-                                                ).Title(" ")
-                                                .ClientTemplate(
-                                                "<div style='display:inline;'>" +
-                                                "<div style=\"<#= InUse ? 'display:none;' : 'display:inline;' #>\">" +
-                                                "<div style=\"<#= EditAccess ? 'display:inline;' : 'display:none;' #>\">" +
-                                                "<a id=\"<#= Id #>\" onclick=\"OnClickEdit('<#= Id #>')\" class=\"t-icon t-edit\" ></a>" +
-                                                "</div>" +
-                                                "<div style=\"<#= EditAccess ? 'display:none;' : 'display:inline;' #>\">" +
-                                                "<div class = \"bx bx-grid-function bx-edit bx-disabled\" disabled = \"disabled\" title = \'Edit Unit \"@item.Name\"\'></div>" +
-                                                "</div>" +
-                                                "<div style=\"<#= DeleteAccess ? 'display:inline;' : 'display:none;' #>\">" +
-                                                "<a id=\"<#= Id #>\" onclick=\"OnClickDelete('<#= Id #>')\" class=\"bx bx-grid-function bx-trash\" ></a>" +
-                                                "</div>" +
-                                                "<div style=\"<#= DeleteAccess ? 'display:none;' : 'display:inline;' #>\">" +
-                                                "<div class = \"bx bx-grid-function bx-trash bx-disabled\" disabled = \"disabled\" title = \'Edit Unit \"@item.Name\"\'></div>" +
-                                                "</div>" +
-                                                "</div>" +
-                                                "<div class=\"locked\" style=\"<#= InUse ? 'display:inline;' : 'display:none;' #>\">" +
-                                                "<div class = \"bx bx-grid-function bx-edit bx-disabled\" disabled = \"disabled\" title = \'Edit Unit \"@item.Name\"\'></div>" +
-                                                "<div class = \"bx bx-grid-function bx-trash bx-disabled\" disabled = \"disabled\" title = \'Edit Unit \"@item.Name\"\'></div>" +
-                                                "</div>"
-
-                                                ).Width(90);
-                        })
-                                          .ClientEvents(clientevents => clientevents
-                                            .OnDataBound("onDataBound")
-                                          )
-                                                  .DataBinding(databinding => databinding
-                                                      .Ajax()
-                                                      .Select("AllEvents", "Event")
-                                                  )
-                                          .Pageable(paging =>
-                                        paging
-                                            .Style(pagerStyles)
-                                            .PageSize(50)
-                                            .Position(GridPagerPosition.Both)
-                                            )
-                                .Filterable()
-                                .Sortable(sortable => sortable
-                                    .OrderBy(orderby => orderby
-                                        .Add(r => r.Deadline).Descending()))
-)
+</table>
 
 <script type="text/javascript">
 
-    function onDataBound() {
-    resetAllTelerikIconTitles();
-    addTooltips();
-    }
+        $(document).ready(function () {
+            $('#events').DataTable();
 
-    $(document).ready(function () {
-        resetAllTelerikIconTitles();
-        addTooltips();
-    })
-
-    function refreshGrid() {
-        $(".t-grid .t-refresh").trigger('click');
-    }
+        });
 
     function OnClickEdit(id)
     {

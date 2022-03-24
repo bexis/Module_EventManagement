@@ -1,15 +1,18 @@
 ﻿using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
 using BExIS.IO.Transform.Output;
+using BExIS.Modules.EMM.UI.Helper;
 using BExIS.Modules.EMM.UI.Models;
 using BExIS.Security.Entities.Authorization;
 using BExIS.Security.Entities.Objects;
 using BExIS.Security.Services.Authorization;
 using BExIS.Security.Services.Objects;
 using BExIS.Security.Services.Subjects;
+using BExIS.Security.Services.Utilities;
 using BExIS.Xml.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -131,6 +134,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
         {
             EventRegistrationResultModel model = new EventRegistrationResultModel();
             model.Results = GetEventResults(id);
+            model.WaitingListResults =  GetWaitingListResults(id);
+            
             model.EventId = id;
 
             //check rights on event
@@ -146,6 +151,71 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return View("EventRegistrationResults", model);
         }
 
+        public ActionResult MoveFromWaitingList(long id, long eventId)
+        {
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
+            using (EventManager eventManager = new EventManager())
+            {
+                var registration = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
+                if (registration.WaitingList == true)
+                    registration.WaitingList = false;
+
+                erManager.UpdateEventRegistration(registration);
+
+                var e = eventManager.GetEventById(eventId);
+                SendNotification(registration.Data, e);
+
+            }
+
+            return RedirectToAction("OnSelectTreeViewItem", new { id = eventId });
+        }
+
+        private void SendNotification(XmlDocument data, Event e)
+        {
+            // todo: add not allowed / log in info to mail
+
+            EmailStructure emailStructure = new EmailStructure();
+            emailStructure = EmailHelper.ReadFile(e.EventLanguage);
+
+            string first_name = data.GetElementsByTagName(emailStructure.lableFirstName)[0].InnerText;
+            string last_name = data.GetElementsByTagName(emailStructure.lableLastname)[0].InnerText;
+            string email = data.GetElementsByTagName(emailStructure.lableEmail)[0].InnerText;
+
+            string url = Request.Url.GetLeftPart(UriPartial.Authority);
+
+            string mail_message = "";
+            string subject = emailStructure.removeFromWaitingListSubject + e.Name;
+
+            string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
+                emailStructure.removeFromWaitingList1  + "<br/><br/>" +
+                 emailStructure.bodyClosing + "<br/>" +
+                 emailStructure.bodyClosingName;
+
+
+            var es = new EmailService();
+
+            // If no explicit Reply to mail is set use the SystemEmail
+            string replyTo = "";
+            if (String.IsNullOrEmpty(e.EmailReply))
+            {
+                replyTo = ConfigurationManager.AppSettings["SystemEmail"];
+            }
+            else
+            {
+                replyTo = e.EmailReply;
+            }
+
+            es.Send(
+                subject,
+                body,
+                new List<string> { email }, // to
+                new List<string> { e.EmailCC }, // CC 
+                new List<string> { ConfigurationManager.AppSettings["SystemEmail"], e.EmailBCC }, // Allways send BCC to SystemEmail + additional set 
+                new List<string> { replyTo }
+                );
+
+        }
+
         #endregion
 
         #region Xml to DataTable
@@ -153,6 +223,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
         private DataTable GetEventResults(long eventId)
         {
             DataTable results = new DataTable();
+            results.Columns.Add("Id");
             results.Columns.Add("Deleted");
 
             using (EventRegistrationManager erManager = new EventRegistrationManager())
@@ -169,7 +240,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 foreach (EventRegistration er in eventRegistrations)
                 {
                     XmlNodeReader xmlNodeReader = new XmlNodeReader(er.Data);
-                    results.Rows.Add(AddDataRow(XElement.Load(xmlNodeReader), results, er.Deleted.ToString()));
+                    results.Rows.Add(AddDataRow(XElement.Load(xmlNodeReader), results, er.Deleted.ToString(), er.Id));
                     xmlNodeReader.Dispose();
                 }
             }
@@ -177,6 +248,34 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return results;
         }
 
+        private DataTable GetWaitingListResults(long eventId)
+        {
+            DataTable results = new DataTable();
+            results.Columns.Add("Id");
+            results.Columns.Add("Deleted");
+            results.Columns.Add("Action");
+
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
+            {
+                List<EventRegistration> eventRegistrations = erManager.GetAllWaitingListRegsByEvent(eventId);
+
+                if (eventRegistrations.Count != 0)
+                {
+                    XmlNodeReader xmlNodeReader = new XmlNodeReader(eventRegistrations[0].Data);
+                    results = CreateDataTableColums(results, XElement.Load(xmlNodeReader));
+                    xmlNodeReader.Dispose();
+                }
+
+                foreach (EventRegistration er in eventRegistrations)
+                {
+                    XmlNodeReader xmlNodeReader = new XmlNodeReader(er.Data);
+                    results.Rows.Add(AddDataRow(XElement.Load(xmlNodeReader), results, er.Deleted.ToString(), er.Id));
+                    xmlNodeReader.Dispose();
+                }
+            }
+
+            return results;
+        }
         //private DataTable GetEventRegistration(long eventId, XDocument data)
         //{
         //    DataTable results = new DataTable();
@@ -210,9 +309,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return dt;
         }
 
-        private DataRow AddDataRow(XElement x, DataTable dt, string deleted)
+        private DataRow AddDataRow(XElement x, DataTable dt, string deleted, long id)
         {
             DataRow dr = dt.NewRow();
+            dr["Id"] = id;
             dr["Deleted"] = deleted;
             foreach (XElement xe in x.Descendants())
             {

@@ -58,7 +58,7 @@ namespace BExIS.Emm.Services.Event
         /// <summary>
         /// Creates an EventRegistration <seealso cref="EventRegistration"/> and persists the entity in the database.
         /// </summary>
-        public E.EventRegistration CreateEventRegistration(XmlDocument data, E.Event e, User user, bool deleted, string token)
+        public E.EventRegistration CreateEventRegistration(XmlDocument data, E.Event e, User user, bool deleted, string token, bool waitingList, DateTime insertDate)
         {
             E.EventRegistration eventRegistration = new E.EventRegistration();
             eventRegistration.Data = data;
@@ -66,6 +66,8 @@ namespace BExIS.Emm.Services.Event
             eventRegistration.Event = e;
             eventRegistration.Person = user;
             eventRegistration.Token= token;
+            eventRegistration.WaitingList = waitingList;
+            eventRegistration.InsertDate = insertDate;
 
             using (IUnitOfWork uow = this.GetUnitOfWork())
             {
@@ -113,8 +115,21 @@ namespace BExIS.Emm.Services.Event
 
         public List<E.EventRegistration> GetAllRegistrationsByEvent(long id)
         {
-            return EventRegistrationRepo.Query(a=>a.Event.Id == id).ToList();
+            return EventRegistrationRepo.Query(a=>a.Event.Id == id && a.WaitingList == false).ToList();
         }
+
+        public List<E.EventRegistration> GetAllWaitingListRegsByEvent(long id)
+        {
+            return EventRegistrationRepo.Query(a => a.Event.Id == id && a.WaitingList == true && a.Deleted == false).ToList();
+        }
+
+        public E.EventRegistration GetLatestWaitingListEntry(long id)
+        {
+            var lastestDates = EventRegistrationRepo.Query(d=>d.Event.Id == id && d.WaitingList == true).ToList();
+            var date = lastestDates.Max(a => a.InsertDate);
+            return EventRegistrationRepo.Query(a => a.Event.Id == id && a.WaitingList == true && a.InsertDate == date).FirstOrDefault();
+        }
+
 
         public List<E.EventRegistration> GetAllRegistrationsNotDeletedByEvent(long id)
         {
