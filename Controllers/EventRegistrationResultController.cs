@@ -187,7 +187,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             string subject = emailStructure.removeFromWaitingListSubject + e.Name;
 
             string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
-                emailStructure.removeFromWaitingList1 + e.Name + emailStructure.removeFromWaitingList2 + "<br/><br/>" +
+                emailStructure.removeFromWaitingList1  + "<br/><br/>" +
                  emailStructure.bodyClosing + "<br/>" +
                  emailStructure.bodyClosingName;
 

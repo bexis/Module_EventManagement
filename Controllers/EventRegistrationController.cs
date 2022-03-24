@@ -487,6 +487,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             using (SubjectManager subManager = new SubjectManager())
             {
                 using (EventRegistrationManager erManager = new EventRegistrationManager())
+                using (var eventManager = new EventManager())
                 {
                     User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
                     if (user != null)
@@ -500,6 +501,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             erManager.UpdateEventRegistration(reg);
                             MoveFromWaitingList(reg.Event.Id);
 
+                            SendEmailNotification("deleted", user.Email, ref_id, reg.Data, reg.Event, user);
                         }
                     }
                     else if (ref_id != null)
@@ -510,9 +512,15 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             reg.Deleted = true;
                             erManager.UpdateEventRegistration(reg);
                             MoveFromWaitingList(reg.Event.Id);
+
+                            SendEmailNotification("deleted", user.Email, ref_id, reg.Data, reg.Event, user);
                         }
                     }
                 }
+
+               
+
+
             }
             return Json(new { result = "redirect", url = Url.Action("EventRegistration", "EventRegistration", new { area = "EMM" }) }, JsonRequestBehavior.AllowGet);
         }
@@ -551,7 +559,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             string subject = emailStructure.removeFromWaitingListSubject + e.Name;
 
             string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
-                emailStructure.removeFromWaitingList1 + e.Name + emailStructure.removeFromWaitingList2 + "<br/><br/>" +
+                 emailStructure.removeFromWaitingList1 + "<br/><br/>" +
                  emailStructure.bodyClosing + "<br/>" +
                  emailStructure.bodyClosingName;
 
@@ -630,14 +638,14 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     {
                         if (e.EditAllowed != true)
                         {
-                            SendEmailNotification("resend", email, ref_id, data, e, user);
+                            SendEmailNotification("resend", email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, user);
                             return RedirectToAction("EventRegistrationPatial", new { message = "Update of your previous registration is not allowed. You registration details are send to your Email adress again.", message_type = "error" });
                         }
 
                         reg.Data = XmlMetadataWriter.ToXmlDocument(data);
                         erManager.UpdateEventRegistration(reg);
 
-                        SendEmailNotification("updated", email, ref_id, data, e, user);
+                        SendEmailNotification("updated", email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, user);
                     }
                     else
                         CreateNewEventRegistration(e, data, user, email, notificationType, ref_id);
@@ -664,7 +672,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 //check Participants Limitation
                 if (e.ParticipantsLimitation != 0)
                 {
-                    int countRegs = erManager.GetNumerOfRegistrationsByEvent(e.Id);
+                    int countRegs = erManager.GetNumerOfRegistrationsByEvent(e.Id) + 1;
                     int countWaitingList = erManager.GetAllWaitingListRegsByEvent(e.Id).Count + 1;
 
                     if (countRegs >= e.ParticipantsLimitation)
@@ -701,7 +709,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 // Save registration and send notification
                 erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id, waitingList, DateTime.Now);
 
-                SendEmailNotification(notificationType, email, ref_id, data, e, user);
+                SendEmailNotification(notificationType, email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, user);
         }
     }
 
@@ -1168,19 +1176,15 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
         }
 
-        private void SendEmailNotification(string notificationType, string email, string ref_id, XDocument data, Event e, User user)
+        private void SendEmailNotification(string notificationType, string email, string ref_id, XmlDocument data, Event e, User user)
         {
             // todo: add not allowed / log in info to mail
 
-            //temp for alb symosium
             EmailStructure emailStructure = new EmailStructure();
-            if(e.Id == 12)
-                emailStructure = EmailHelper.ReadFile("English");
-            else
-                 emailStructure = EmailHelper.ReadFile(e.EventLanguage);
+            emailStructure = EmailHelper.ReadFile(e.EventLanguage);
 
-           string first_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName(emailStructure.lableFirstName)[0].InnerText;
-           string  last_name = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName(emailStructure.lableLastname)[0].InnerText;
+           string first_name = data.GetElementsByTagName(emailStructure.lableFirstName)[0].InnerText;
+           string  last_name = data.GetElementsByTagName(emailStructure.lableLastname)[0].InnerText;
           
             string url = Request.Url.GetLeftPart(UriPartial.Authority);
 
@@ -1201,6 +1205,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     subject = emailStructure.updateSubject + e.Name; 
                     mail_message = emailStructure.updateMessage + e.Name + ".<br/>";
                     break;
+                case "deleted":
+                    subject = emailStructure.deletedSubject + e.Name;
+                    mail_message = emailStructure.deletedMessage + e.Name + ".<br/>";
+                    break;
                 //case "resend":
                 //    subject = "Resend of registration confirmation for " + e.Name;
                 //    mail_message = "your registration for " + e.Name + "<br/>";
@@ -1209,7 +1217,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             string details = "";
             //read xml file and format email output
-            foreach (XElement xe in XElement.Parse(data.ToString()).Elements())
+            XDocument xDocument = XDocument.Parse(data.OuterXml);
+            foreach (XElement xe in XElement.Parse(xDocument.ToString()).Elements())
             {
                 string displayNameRoot = "";
                 if (xe.HasElements)
@@ -1233,14 +1242,15 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 }
             }
 
-                string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
+            string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
 
-                 mail_message + "<br/>" +
-                 e.MailInformation + "<br/>" +
-                 "<br/>" + emailStructure.bodyOpening +"<br/>" + 
-                 details + "<br/><br/>" +
-                 emailStructure.bodyHintToLink + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "<br/><br/>" +
-                 emailStructure.bodyClosing + "<br/>" +
+             mail_message + "<br/>" +
+             e.MailInformation + "<br/>" +
+             "<br/>" + emailStructure.bodyOpening + "<br/>" +
+             details + "<br/><br/>";
+            if (notificationType != "deleted")
+                body += emailStructure.bodyHintToLink + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "<br/><br/>";
+            body += emailStructure.bodyClosing + "<br/>" +
                  emailStructure.bodyClosingName;
      
             var es = new EmailService();

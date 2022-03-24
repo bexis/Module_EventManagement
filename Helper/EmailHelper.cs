@@ -38,7 +38,8 @@ namespace BExIS.Modules.EMM.UI.Helper
         public string bodyClosingName { get; set; }
         public string removeFromWaitingListSubject { get; set; }
         public string removeFromWaitingList1 { get; set; }
-        public string removeFromWaitingList2 { get; set; }
+        public string deletedSubject { get; set; }
+        public string deletedMessage { get; set; }
 
 
         public EmailStructure()
