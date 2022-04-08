@@ -28,6 +28,7 @@
                             @Model.Results.Columns[c].ColumnName
                         </th>
                     }
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -41,6 +42,7 @@
                             </td>
 
                         }
+                        <td><div onclick="onClickEdit(@Model.Results.Rows[0][i].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div></td>
                     </tr>
                 }
 
@@ -137,5 +139,11 @@
             });
         }
     }
+
+    function onClickEdit(id, eventid) {
+        $.get('@Url.Action("LoadForm", "EventRegistrationResult", new RouteValueDictionary { { "area", "EMM" } })', { id: id, eventid: eventid }, function (data) {
+            window.location.href = "/EMM/EventRegistration/LoadMetadataForm?edit=true";
+        });
+            }
 
 </script>

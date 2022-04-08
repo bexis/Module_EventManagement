@@ -1,4 +1,6 @@
-﻿using BExIS.Emm.Entities.Event;
+﻿using BExIS.Dcm.CreateDatasetWizard;
+using BExIS.Dcm.Wizard;
+using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
 using BExIS.IO.Transform.Output;
 using BExIS.Modules.EMM.UI.Helper;
@@ -28,6 +30,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
 {
     public class EventRegistrationResultController : Controller
     {
+
+        private CreateTaskmanager TaskManager;
 
         #region Show Event Registration Results
 
@@ -215,6 +219,85 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 );
 
         }
+
+        #endregion
+
+        #region edit event registration
+
+        public ActionResult LoadForm(long id, long eventid)
+        {
+            using (EventManager eManager = new EventManager())
+            {
+                Event e = eManager.EventRepo.Get(eventid);
+
+                //add default value to session
+                DefaultEventInformation defaultEventInformation = new DefaultEventInformation();
+                defaultEventInformation.EventName = e.Name;
+                defaultEventInformation.Id = e.Id.ToString();
+                if (!String.IsNullOrEmpty(e.EventDate))
+                    defaultEventInformation.Date = e.EventDate;
+                if (!String.IsNullOrEmpty(e.EventLanguage))
+                       defaultEventInformation.Language = e.EventLanguage;
+
+                if (!String.IsNullOrEmpty(e.ImportantInformation))
+                    defaultEventInformation.ImportantInformation = e.ImportantInformation;
+
+                Session["DefaultEventInformation"] = defaultEventInformation;
+
+                //CreateTaskmanager taskManager = new CreateTaskmanager();
+                if (TaskManager == null)
+                    TaskManager = new CreateTaskmanager();
+
+                TaskManager.AddToBus(CreateTaskmanager.METADATASTRUCTURE_ID, e.MetadataStructure.Id);
+                TaskManager.AddToBus(CreateTaskmanager.ENTITY_ID, e.Id);
+                
+                using (EventRegistrationManager erManager = new EventRegistrationManager())
+                {
+
+                    EventRegistration reg = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
+                    XmlNodeReader xmlNodeReader = new XmlNodeReader(reg.Data);
+                    TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, reg.Data);
+                    xmlNodeReader.Dispose();
+                    }
+
+                }
+
+                TaskManager.AddToBus(CreateTaskmanager.SAVE_WITH_ERRORS, false);
+
+                TaskManager.AddToBus(CreateTaskmanager.NO_IMPORT_ACTION, true);
+                TaskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_TITLE, "Event registration");
+                TaskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_DESCRIPTION, "<p><b>help</b></p>");
+
+
+                Session["EventRegistrationTaskmanager"] = TaskManager;
+
+                setAdditionalFunctions();
+
+            return new EmptyResult();
+
+         }
+        private void setAdditionalFunctions()
+        {
+            CreateTaskmanager taskManager = (CreateTaskmanager)Session["EventRegistrationTaskmanager"];
+
+
+            ActionInfo submitAction = new ActionInfo();
+            submitAction.ActionName = "Save";
+            submitAction.ControllerName = "EventRegistration";
+            submitAction.AreaName = "EMM";
+
+            ActionInfo cancelAction = new ActionInfo();
+            cancelAction.ActionName = "Cancel";
+            cancelAction.ControllerName = "EventRegistration";
+            cancelAction.AreaName = "EMM";
+
+            taskManager.Actions.Add(CreateTaskmanager.SUBMIT_ACTION, submitAction);
+            taskManager.Actions.Add(CreateTaskmanager.CANCEL_ACTION, cancelAction);
+
+            Session["EventRegistrationTaskmanager"] = taskManager;
+
+        }
+
 
         #endregion
 
