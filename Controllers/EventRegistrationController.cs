@@ -1209,10 +1209,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     subject = emailStructure.deletedSubject + e.Name;
                     mail_message = emailStructure.deletedMessage + e.Name + ".<br/>";
                     break;
-                //case "resend":
-                //    subject = "Resend of registration confirmation for " + e.Name;
-                //    mail_message = "your registration for " + e.Name + "<br/>";
-                //    break;
+                case "resend":
+                    subject = "Resend of registration confirmation for " + e.Name;
+                    mail_message = "your registration for " + e.Name + "<br/>";
+                    break;
             }
 
             string details = "";
