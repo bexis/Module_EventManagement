@@ -1261,6 +1261,16 @@ namespace BExIS.Modules.EMM.UI.Controllers
      
             var es = new EmailService();
 
+            List<string> ccMails = new List<string>();
+            if(!String.IsNullOrEmpty(e.EmailCC))
+                ccMails.AddRange(e.EmailCC.Split(',').ToList());
+
+
+            List<string> bccMails = new List<string>();
+            bccMails.Add(ConfigurationManager.AppSettings["SystemEmail"]);
+            if(!String.IsNullOrEmpty(e.EmailBCC))
+                bccMails.AddRange(e.EmailBCC.Split(',').ToList());
+           
             // If no explicit Reply to mail is set use the SystemEmail
             string replyTo = "";
             if (String.IsNullOrEmpty(e.EmailReply))
@@ -1276,8 +1286,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 subject,
                 body,
                 new List<string> { email }, // to
-                new List<string> { e.EmailCC }, // CC 
-                new List<string> { ConfigurationManager.AppSettings["SystemEmail"] , e.EmailBCC}, // Allways send BCC to SystemEmail + additional set 
+                ccMails, // CC 
+                bccMails, // Allways send BCC to SystemEmail + additional set 
                 new List<string> { replyTo }  
                 );
         }
