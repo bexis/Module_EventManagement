@@ -1244,9 +1244,15 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
 
-             mail_message + "<br/>" +
-             e.MailInformation + "<br/>" +
-             "<br/>" + emailStructure.bodyOpening + "<br/>" +
+             mail_message + "<br/>";
+
+            if (!String.IsNullOrEmpty(e.MailInformation))
+            {
+                body += e.MailInformation + "<br/>" +
+                "<br/>";
+             }
+             
+             body += emailStructure.bodyOpening + "<br/>" +
              details + "<br/><br/>";
             if (notificationType != "deleted")
                 body += emailStructure.bodyHintToLink + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "<br/><br/>";

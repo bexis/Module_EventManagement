@@ -99,6 +99,7 @@ namespace BExIS.Modules.EMM.UI.Models
             Name = eEvent.Name;
             EventDate = eEvent.EventDate;
             ImportantInformation = eEvent.ImportantInformation;
+            MailInformation = eEvent.MailInformation;
             EventLanguages = new List<string>() { "English", "Deutsch" };
             SelectedEventLanguage = eEvent.EventLanguage;
             StartDate = eEvent.StartDate;
