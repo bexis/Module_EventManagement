@@ -38,11 +38,11 @@
                         @for (int c = 0; c < Model.Results.Columns.Count; c++)
                         {
                             <td>
-                                @Model.Results.Rows[i][c].ToString()
+                                @Model.Results.Rows[i].ItemArray[c].ToString()
                             </td>
 
                         }
-                        <td><div onclick="onClickEdit(@Model.Results.Rows[0][i].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div></td>
+                        <td><div onclick="onClickEdit(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div></td>
                     </tr>
                 }
 
