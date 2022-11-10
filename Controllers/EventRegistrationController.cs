@@ -675,7 +675,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     int countRegs = erManager.GetNumerOfRegistrationsByEvent(e.Id) + 1;
                     int countWaitingList = erManager.GetAllWaitingListRegsByEvent(e.Id).Count + 1;
 
-                    if (countRegs >= e.ParticipantsLimitation)
+                    if (countRegs > e.ParticipantsLimitation)
                     {
                         if(e.WaitingList && !e.Closed)
                         {
