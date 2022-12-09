@@ -42,7 +42,9 @@
                             </td>
 
                         }
-                        <td><div onclick="onClickEdit(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div></td>
+                        <td><div onclick="onClickEdit(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
+                            <div onclick="onClickDeleteRegistration(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"></div>
+                        </td>
                     </tr>
                 }
 
@@ -144,6 +146,17 @@
         $.get('@Url.Action("LoadForm", "EventRegistrationResult", new RouteValueDictionary { { "area", "EMM" } })', { id: id, eventid: eventid }, function (data) {
             window.location.href = "/EMM/EventRegistration/LoadMetadataForm?edit=true";
         });
-            }
+    }
+
+    function onClickDeleteRegistration(id, eventid) {
+
+        var result = confirm('Are you sure you want to delete this reservation?');
+        if (result) {
+            $.get('@Url.Action("DeleteRegistration", "EventRegistrationResult", new RouteValueDictionary { { "area", "EMM" } })', { id: id }, function (data) {
+
+                window.location.href = "/EMM/EventRegistrationResult/Show";
+            });
+        }
+    }
 
 </script>

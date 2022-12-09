@@ -7,6 +7,7 @@ using BExIS.Modules.EMM.UI.Helper;
 using BExIS.Modules.EMM.UI.Models;
 using BExIS.Security.Entities.Authorization;
 using BExIS.Security.Entities.Objects;
+using BExIS.Security.Entities.Subjects;
 using BExIS.Security.Services.Authorization;
 using BExIS.Security.Services.Objects;
 using BExIS.Security.Services.Subjects;
@@ -296,6 +297,51 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             Session["EventRegistrationTaskmanager"] = taskManager;
 
+        }
+
+
+        #endregion
+
+        #region delete reg
+
+        public ActionResult DeleteRegistration(long id)
+        {
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
+            using (UserManager userManager = new UserManager())
+            {
+                EventRegistration reg = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
+                User user = userManager.FindByIdAsync(reg.Person.Id).Result;
+                if (reg != null)
+                {
+                    reg.Deleted = true;
+                    erManager.UpdateEventRegistration(reg);
+                    MoveFromWaitingList(reg.Event.Id);
+                }
+
+
+                string url = Request.Url.GetLeftPart(UriPartial.Authority);
+
+                EmailHelper.SendEmailNotification("deleted", user.Email, "", reg.Data, reg.Event, user, url);
+            }
+
+            return RedirectToAction("Show");
+
+        }
+
+        private void MoveFromWaitingList(long eventId)
+        {
+            using (var erManager = new EventRegistrationManager())
+            using (var eventManager = new EventManager())
+            {
+                int countWaitingList = erManager.GetAllWaitingListRegsByEvent(eventId).Count;
+                if (countWaitingList > 0)
+                {
+                    var reg = erManager.GetLatestWaitingListEntry(eventId);
+                    reg.WaitingList = false;
+                    erManager.UpdateEventRegistration(reg);
+                    var e = eventManager.GetEventById(eventId); 
+                }
+            }
         }
 
 
