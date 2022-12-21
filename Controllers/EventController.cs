@@ -175,6 +175,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         e.Name = model.Name;
                         e.EventDate = model.EventDate;
                         e.ImportantInformation = model.ImportantInformation;
+                        e.MailInformation = model.MailInformation;
                         e.EventLanguage = model.SelectedEventLanguage;
                         e.StartDate = model.StartDate;
                         e.Deadline = model.Deadline;
