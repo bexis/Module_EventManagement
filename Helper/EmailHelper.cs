@@ -25,7 +25,7 @@ namespace BExIS.Modules.EMM.UI.Helper
             return emailStructure;
         }
 
-        public static void SendEmailNotification(string notificationType, string email, string ref_id, XmlDocument data, Event e, User user, string url)
+        public static void SendEmailNotification(string notificationType, string email, string ref_id, XmlDocument data, Event e, string url)
         {
             // todo: add not allowed / log in info to mail
 
@@ -46,6 +46,10 @@ namespace BExIS.Modules.EMM.UI.Helper
                 case "succesfully_registered_waiting_list":
                     subject = emailStructure.waitingListSubject + e.Name;
                     mail_message = emailStructure.waitingListMessage + e.Name + ".<br/>";
+                    break;
+                case "remove_from_waiting_list":
+                    subject = emailStructure.removeFromWaitingListSubject + e.Name;
+                    mail_message = emailStructure.removeFromWaitingList1 + "<br/><br/>";
                     break;
                 case "updated":
                     subject = emailStructure.updateSubject + e.Name;

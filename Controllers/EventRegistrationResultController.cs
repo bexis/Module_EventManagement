@@ -310,7 +310,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
             using (UserManager userManager = new UserManager())
             {
                 EventRegistration reg = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
-                User user = userManager.FindByIdAsync(reg.Person.Id).Result;
                 if (reg != null)
                 {
                     reg.Deleted = true;
@@ -318,10 +317,18 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     MoveFromWaitingList(reg.Event.Id);
                 }
 
-
                 string url = Request.Url.GetLeftPart(UriPartial.Authority);
+                string email = "";
 
-                EmailHelper.SendEmailNotification("deleted", user.Email, "", reg.Data, reg.Event, user, url);
+                if (reg.Person != null)
+                {
+                    User user = userManager.FindByIdAsync(reg.Person.Id).Result;
+                    email = user.Email;
+                }
+                else
+                    email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
+
+                EmailHelper.SendEmailNotification("deleted", email, "", reg.Data, reg.Event, url);
             }
 
             return RedirectToAction("Show");
@@ -330,6 +337,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         private void MoveFromWaitingList(long eventId)
         {
+            string url = Request.Url.GetLeftPart(UriPartial.Authority);
+
             using (var erManager = new EventRegistrationManager())
             using (var eventManager = new EventManager())
             {
@@ -339,7 +348,15 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     var reg = erManager.GetLatestWaitingListEntry(eventId);
                     reg.WaitingList = false;
                     erManager.UpdateEventRegistration(reg);
-                    var e = eventManager.GetEventById(eventId); 
+                    var e = eventManager.GetEventById(eventId);
+                    string email = "";
+                    if (reg.Person != null)
+                        email = reg.Person.Email;
+                    else
+                        email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
+
+                    EmailHelper.SendEmailNotification("remove_from_waiting_list", email, "", reg.Data, reg.Event, url);
+
                 }
             }
         }

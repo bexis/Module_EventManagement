@@ -503,8 +503,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             erManager.UpdateEventRegistration(reg);
                             MoveFromWaitingList(reg.Event.Id);
 
+                            string email = "";
+                            if (user != null)
+                                email = user.Email;
+                            else
+                                email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
 
-                            EmailHelper.SendEmailNotification("deleted", user.Email, ref_id, reg.Data, reg.Event, user, url);
+                            EmailHelper.SendEmailNotification("deleted",email, ref_id, reg.Data, reg.Event, url);
                         }
                     }
                     else if (ref_id != null)
@@ -515,8 +520,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             reg.Deleted = true;
                             erManager.UpdateEventRegistration(reg);
                             MoveFromWaitingList(reg.Event.Id);
+                            string email = "";
+                            if (user != null)
+                                email = user.Email;
+                            else
+                                email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
 
-                            EmailHelper.SendEmailNotification("deleted", user.Email, ref_id, reg.Data, reg.Event, user, url);
+                            EmailHelper.SendEmailNotification("deleted", email, ref_id, reg.Data, reg.Event, url);
                         }
                     }
                 }
@@ -530,6 +540,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         private void MoveFromWaitingList(long eventId)
         {
+            string url = Request.Url.GetLeftPart(UriPartial.Authority);
+
             using (var erManager = new EventRegistrationManager())
             using (var eventManager = new EventManager())
             {
@@ -540,7 +552,14 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     reg.WaitingList = false;
                     erManager.UpdateEventRegistration(reg);
                     var e = eventManager.GetEventById(eventId);
-                    SendWaitingListNotification(reg.Data, e);
+                    string email = "";
+                    if (reg.Person != null)
+                        email = reg.Person.Email;
+                    else
+                        email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
+
+                    EmailHelper.SendEmailNotification("remove_from_waiting_list", email, "", reg.Data, reg.Event, url);
+
                 }
             }
         }
@@ -644,14 +663,14 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     {
                         if (e.EditAllowed != true)
                         {
-                            EmailHelper.SendEmailNotification("resend", email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, user, url);
+                            EmailHelper.SendEmailNotification("resend", email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, url);
                             return RedirectToAction("EventRegistrationPatial", new { message = "Update of your previous registration is not allowed. You registration details are send to your Email adress again.", message_type = "error" });
                         }
 
                         reg.Data = XmlMetadataWriter.ToXmlDocument(data);
                         erManager.UpdateEventRegistration(reg);
 
-                        EmailHelper.SendEmailNotification("updated", email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, user, url);
+                        EmailHelper.SendEmailNotification("updated", email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, url);
                     }
                     else
                         CreateNewEventRegistration(e, data, user, email, notificationType, ref_id);
@@ -717,7 +736,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 string url = Request.Url.GetLeftPart(UriPartial.Authority);
 
-                EmailHelper.SendEmailNotification(notificationType, email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, user, url);
+                EmailHelper.SendEmailNotification(notificationType, email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, url);
         }
     }
 
