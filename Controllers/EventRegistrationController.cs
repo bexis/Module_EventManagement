@@ -485,6 +485,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
         /// <returns></returns>
         public ActionResult DeleteRegistration(string id, string ref_id = null)
         {
+            string url = Request.Url.GetLeftPart(UriPartial.Authority);
+
             using (SubjectManager subManager = new SubjectManager())
             {
                 using (EventRegistrationManager erManager = new EventRegistrationManager())
@@ -502,7 +504,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             erManager.UpdateEventRegistration(reg);
                             MoveFromWaitingList(reg.Event.Id);
 
-                            SendEmailNotification("deleted", user.Email, ref_id, reg.Data, reg.Event, user);
+                            string email = "";
+                            if (user != null)
+                                email = user.Email;
+                            else
+                                email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
+
+                            EmailHelper.SendEmailNotification("deleted",email, ref_id, reg.Data, reg.Event, url);
                         }
                     }
                     else if (ref_id != null)
@@ -513,8 +521,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             reg.Deleted = true;
                             erManager.UpdateEventRegistration(reg);
                             MoveFromWaitingList(reg.Event.Id);
+                            string email = "";
+                            if (user != null)
+                                email = user.Email;
+                            else
+                                email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
 
-                            SendEmailNotification("deleted", user.Email, ref_id, reg.Data, reg.Event, user);
+                            EmailHelper.SendEmailNotification("deleted", email, ref_id, reg.Data, reg.Event, url);
                         }
                     }
                 }
@@ -528,6 +541,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         private void MoveFromWaitingList(long eventId)
         {
+            string url = Request.Url.GetLeftPart(UriPartial.Authority);
+
             using (var erManager = new EventRegistrationManager())
             using (var eventManager = new EventManager())
             {
@@ -538,7 +553,14 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     reg.WaitingList = false;
                     erManager.UpdateEventRegistration(reg);
                     var e = eventManager.GetEventById(eventId);
-                    SendWaitingListNotification(reg.Data, e);
+                    string email = "";
+                    if (reg.Person != null)
+                        email = reg.Person.Email;
+                    else
+                        email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
+
+                    EmailHelper.SendEmailNotification("remove_from_waiting_list", email, "", reg.Data, reg.Event, url);
+
                 }
             }
         }
@@ -626,6 +648,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 string notificationType = "";
 
+                string url = Request.Url.GetLeftPart(UriPartial.Authority);
+
+
                 // Check for logged in user
                 User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
 
@@ -639,14 +664,14 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     {
                         if (e.EditAllowed != true)
                         {
-                            SendEmailNotification("resend", email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, user);
+                            EmailHelper.SendEmailNotification("resend", email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, url);
                             return RedirectToAction("EventRegistrationPatial", new { message = "Update of your previous registration is not allowed. You registration details are send to your Email adress again.", message_type = "error" });
                         }
 
                         reg.Data = XmlMetadataWriter.ToXmlDocument(data);
                         erManager.UpdateEventRegistration(reg);
 
-                        SendEmailNotification("updated", email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, user);
+                        EmailHelper.SendEmailNotification("updated", email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, url);
                     }
                     else
                         CreateNewEventRegistration(e, data, user, email, notificationType, ref_id);
@@ -676,7 +701,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     int countRegs = erManager.GetNumerOfRegistrationsByEvent(e.Id) + 1;
                     int countWaitingList = erManager.GetAllWaitingListRegsByEvent(e.Id).Count + 1;
 
-                    if (countRegs >= e.ParticipantsLimitation)
+                    if (countRegs > e.ParticipantsLimitation)
                     {
                         if(e.WaitingList && !e.Closed)
                         {
@@ -710,7 +735,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 // Save registration and send notification
                 erManager.CreateEventRegistration(XmlMetadataWriter.ToXmlDocument(data), e, user, false, ref_id, waitingList, DateTime.Now);
 
-                SendEmailNotification(notificationType, email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, user);
+                string url = Request.Url.GetLeftPart(UriPartial.Authority);
+
+                EmailHelper.SendEmailNotification(notificationType, email, ref_id, XmlMetadataWriter.ToXmlDocument(data), e, url);
         }
     }
 
@@ -1177,106 +1204,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
         }
 
-        private void SendEmailNotification(string notificationType, string email, string ref_id, XmlDocument data, Event e, User user)
-        {
-            // todo: add not allowed / log in info to mail
-
-            EmailStructure emailStructure = new EmailStructure();
-            emailStructure = EmailHelper.ReadFile(e.EventLanguage);
-
-           string first_name = data.GetElementsByTagName(emailStructure.lableFirstName)[0].InnerText;
-           string  last_name = data.GetElementsByTagName(emailStructure.lableLastname)[0].InnerText;
-          
-            string url = Request.Url.GetLeftPart(UriPartial.Authority);
-
-            string mail_message = "";
-            string subject = "";
-
-            switch (notificationType)
-            {
-                case "succesfully_registered":
-                    subject = emailStructure.succesfullyRegisteredSubject + e.Name;
-                    mail_message = emailStructure.succesfullyRegisteredMessage + e.Name + ".<br/>";
-                    break;
-                case "succesfully_registered_waiting_list":
-                    subject = emailStructure.waitingListSubject + e.Name;
-                    mail_message = emailStructure.waitingListMessage + e.Name + ".<br/>";
-                    break;
-                case "updated":
-                    subject = emailStructure.updateSubject + e.Name; 
-                    mail_message = emailStructure.updateMessage + e.Name + ".<br/>";
-                    break;
-                case "deleted":
-                    subject = emailStructure.deletedSubject + e.Name;
-                    mail_message = emailStructure.deletedMessage + e.Name + ".<br/>";
-                    break;
-                //case "resend":
-                //    subject = "Resend of registration confirmation for " + e.Name;
-                //    mail_message = "your registration for " + e.Name + "<br/>";
-                //    break;
-            }
-
-            string details = "";
-            //read xml file and format email output
-            XDocument xDocument = XDocument.Parse(data.OuterXml);
-            foreach (XElement xe in XElement.Parse(xDocument.ToString()).Elements())
-            {
-                string displayNameRoot = "";
-                if (xe.HasElements)
-                {
-                    displayNameRoot = char.ToUpper(xe.Name.ToString()[0]) + xe.Name.ToString().Substring(1);
-                    displayNameRoot = Regex.Replace(displayNameRoot, "((?<=[a-z])[A-Z])", " $1");
-                    details = details + "<br/><b>" + displayNameRoot + "</b><br/><br/>";
-
-                    foreach(XElement x in xe.Elements())
-                    {
-                        foreach(XElement r in x.Elements())
-                        {
-                            string displayName = "";
-                            displayName = char.ToUpper(r.Name.ToString()[0]) + r.Name.ToString().Substring(1);
-                            displayName = Regex.Replace(displayName, "((?<=[a-z])[A-Z])", " $1");
-                            details = details + "<b>" + displayName + "</b>: " + r.Descendants().First().Value + "<br/>";
-
-                        }
-                    } 
-
-                }
-            }
-
-            string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
-
-             mail_message + "<br/>" +
-             e.MailInformation + "<br/>" +
-             "<br/>" + emailStructure.bodyOpening + "<br/>" +
-             details + "<br/><br/>";
-            if (notificationType != "deleted")
-                body += emailStructure.bodyHintToLink + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "<br/><br/>";
-            body += emailStructure.bodyClosing + "<br/>" +
-                 emailStructure.bodyClosingName;
-     
-            var es = new EmailService();
-
-            // If no explicit Reply to mail is set use the SystemEmail
-            string replyTo = "";
-            if (String.IsNullOrEmpty(e.EmailReply))
-            {
-                replyTo = ConfigurationManager.AppSettings["SystemEmail"];
-            }
-            else
-            {
-                replyTo = e.EmailReply;
-            }
-
-            es.Send(
-                subject,
-                body,
-                new List<string> { email }, // to
-                new List<string> { e.EmailCC }, // CC 
-                new List<string> { ConfigurationManager.AppSettings["SystemEmail"] , e.EmailBCC}, // Allways send BCC to SystemEmail + additional set 
-                new List<string> { replyTo }  
-                );
-        }
-
+        
         private void setAdditionalFunctions()
         {
             CreateTaskmanager taskManager = (CreateTaskmanager)Session["EventRegistrationTaskmanager"];
