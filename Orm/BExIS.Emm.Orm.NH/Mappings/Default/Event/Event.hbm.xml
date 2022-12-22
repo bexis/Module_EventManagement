@@ -64,6 +64,10 @@
       <column name="ImportantInformation" />
     </property>
 
+	  <property name="Location" type="string">
+		  <column name="Location" />
+	  </property>
+
     <property name="MailInformation" type="string">
       <column name="MailInformation" />
     </property>

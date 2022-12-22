@@ -67,13 +67,24 @@
 
         if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_language_1" && Model.Value == null)
         {
-                Model.Value = defaultEventInformation.Language;
-                Model.Locked = true;
+            Model.Value = defaultEventInformation.Language;
+            Model.Locked = true;
 
-                <script>
+            <script>
                     OnChangeDefault("@Model.Value");
-                </script>
-           
+            </script>
+
+        }
+
+        if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_location_1" && Model.Value == null)
+        {
+            Model.Value = defaultEventInformation.Location;
+            Model.Locked = true;
+
+            <script>
+                    OnChangeDefault("@Model.Value");
+            </script>
+
         }
 
         if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_importantInformation_1" && Model.Value == null)
@@ -81,7 +92,7 @@
             Model.Value = defaultEventInformation.ImportantInformation;
             Model.Locked = true;
             <script>
-               
+
                 OnChangeDefault(`@Model.Value`);
             </script>
         }
@@ -147,7 +158,7 @@
             wordList[i] = wordList[i].ToLower();
             if (defaultEventInformation.Language == "Deutsch")
             {
-                wordList[i] =  char.ToUpper(wordList[i][0]) + wordList[i].Substring(1);
+                wordList[i] = char.ToUpper(wordList[i][0]) + wordList[i].Substring(1);
             }
         }
     }
@@ -165,7 +176,7 @@
     {
         autoCompleteType = "PartyCustomType";
     }
-    }
+}
 
 @if (Model.Number > 1)
 {
