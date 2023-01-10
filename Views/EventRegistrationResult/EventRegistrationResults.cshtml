@@ -43,7 +43,11 @@
 
                         }
                         <td><div onclick="onClickEdit(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
+
+                        @if (@Model.Results.Rows[i][1].ToString() == "False")
+                        {
                             <div onclick="onClickDeleteRegistration(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"></div>
+                        }
                         </td>
                     </tr>
                 }
