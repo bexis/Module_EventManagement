@@ -655,7 +655,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
 
                 // Check if event registration already exists - update registration
-                EventRegistration reg = CheckEventRegistration(user, ref_id, e.Id, erManager);
+                EventRegistration reg = CheckEventRegistration(ref_id, e.Id, erManager);
 
                 // Update event registration
                 if (reg != null)
@@ -1184,17 +1184,18 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return ref_id;
         }
 
-        private EventRegistration CheckEventRegistration(User user, string ref_id, long event_id, EventRegistrationManager erManager)
+        private EventRegistration CheckEventRegistration(string ref_id, long event_id, EventRegistrationManager erManager)
         {
             EventRegistration reg_ref_id = erManager.GetRegistrationByRefIdAndEvent(ref_id, event_id);
-            if (user != null)
-            {
-                List<EventRegistration> regs = erManager.GetRegistrationByUserAndEvent(user.Id, event_id);
-                EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
+            //if (user != null)
+            //{
+            //    List<EventRegistration> regs = erManager.GetRegistrationByUserAndEvent(user.Id, event_id);
+            //    EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
 
-                return reg; // user is logged in
-            }
-            else if (reg_ref_id != null)
+            //    return reg; // user is logged in
+            //}
+            //else 
+            if (reg_ref_id != null)
             {
                 return reg_ref_id; // provided ref_id fits to event
             }
