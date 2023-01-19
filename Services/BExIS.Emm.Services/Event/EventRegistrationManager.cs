@@ -145,7 +145,10 @@ namespace BExIS.Emm.Services.Event
         {
             return EventRegistrationRepo.Query(a => a.Event.Id == eventId && a.Token == ref_id).FirstOrDefault();
         }
-
+        public List<E.EventRegistration> GetRegistrationsByRefIdAndEvent(string ref_id, long eventId)
+        {
+            return EventRegistrationRepo.Query(a => a.Event.Id == eventId && a.Token == ref_id).ToList();
+        }
 
         public int GetNumerOfRegistrationsByEvent(long id)
         {

@@ -78,7 +78,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 using (EventRegistrationManager erManager = new EventRegistrationManager())
                 {
-                    User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+                    //User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
 
                     foreach (Event e in allEvents)
                     {
@@ -91,10 +91,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                             model.Closed = e.Closed;
 
-                            //check if user already registered (if logged in)
-                            if (user != null)
+                            if (ref_id != null)
                             {
-                                List<EventRegistration> regs = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+                                List<EventRegistration> regs = erManager.GetRegistrationsByRefIdAndEvent(ref_id, e.Id);
                                 if (regs.Count > 0)
                                 {
                                     //if there is any registration where deleted == false there is an activ registration for that user 
@@ -111,19 +110,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                                         model.Deleted = true;
                                     }
                                 }
-                            }
-                            else if (ref_id != null)
-                            {
-                                EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, e.Id);
-                                if (reg != null)
-                                {
-                                    model.AlreadyRegistered = true;
-                                    model.Deleted = reg.Deleted;
-                                }
                                 model.AlreadyRegisteredRefId = ref_id;
                             }
-
-
 
                             // Show event if deadline is not over
                             if (today <= e.Deadline.AddDays(1))
