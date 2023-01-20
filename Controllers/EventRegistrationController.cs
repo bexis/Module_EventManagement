@@ -78,7 +78,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 using (EventRegistrationManager erManager = new EventRegistrationManager())
                 {
-                    //User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+                    User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
 
                     foreach (Event e in allEvents)
                     {
@@ -90,10 +90,16 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             model.NrOfRegistrationWaitingList = erManager.GetAllWaitingListRegsByEvent(e.Id).Count;
 
                             model.Closed = e.Closed;
-
-                            if (ref_id != null)
+                            List<EventRegistration> regs = new List<EventRegistration>();
+                            if (ref_id.Length > 0)
                             {
-                                List<EventRegistration> regs = erManager.GetRegistrationsByRefIdAndEvent(ref_id, e.Id);
+                                regs = erManager.GetRegistrationsByRefIdAndEvent(ref_id, e.Id);
+                            }
+                            else if(user != null)
+                            {
+                                regs = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+                            }
+
                                 if (regs.Count > 0)
                                 {
                                     //if there is any registration where deleted == false there is an activ registration for that user 
@@ -111,7 +117,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                                     }
                                 }
                                 model.AlreadyRegisteredRefId = ref_id;
-                            }
+                            
 
                             // Show event if deadline is not over
                             if (today <= e.Deadline.AddDays(1))
@@ -178,7 +184,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     DefaultEventInformation defaultEventInformation = new DefaultEventInformation();
                     defaultEventInformation.EventName = e.Name;
                     defaultEventInformation.Location = e.Location;
-                    defaultEventInformation.Id = e.Id.ToString();
+                    defaultEventInformation.Eventid = e.Id.ToString();
                     if (!String.IsNullOrEmpty(e.EventDate))
                         defaultEventInformation.Date = e.EventDate;
                     if (!String.IsNullOrEmpty(e.EventLanguage))
@@ -210,6 +216,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             {
                                 List<EventRegistration> regs = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
                                 EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
+                                defaultEventInformation.RegistrationId = reg.Id;
 
                                 XmlNodeReader xmlNodeReader = new XmlNodeReader(reg.Data);
                                 TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, reg.Data);
@@ -218,6 +225,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             else if (model.RefId != null)
                             {
                                 EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(model.RefId, e.Id);
+                                defaultEventInformation.RegistrationId = reg.Id;
                                 XmlNodeReader xmlNodeReader = new XmlNodeReader(reg.Data);
                                 TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, reg.Data);
                                 xmlNodeReader.Dispose();
@@ -606,6 +614,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             using (SubjectManager subManager = new SubjectManager())
             {
                 CreateTaskmanager taskManager = (CreateTaskmanager)Session["EventRegistrationTaskmanager"];
+                DefaultEventInformation defaultEventInformation = (DefaultEventInformation)Session["DefaultEventInformation"];
 
                 XDocument data = new XDocument();
                 if (taskManager.Bus.ContainsKey(CreateTaskmanager.METADATA_XML))
@@ -643,7 +652,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
 
                 // Check if event registration already exists - update registration
-                EventRegistration reg = CheckEventRegistration(ref_id, e.Id, erManager);
+                //EventRegistration reg = CheckEventRegistration(ref_id, e.Id, erManager);
+                // get reg bei id
+                EventRegistration reg = erManager.GetRegistrationById(defaultEventInformation.RegistrationId);
 
                 // Update event registration
                 if (reg != null)

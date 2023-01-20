@@ -87,7 +87,9 @@ namespace BExIS.Modules.EMM.UI.Models
 
         public string Location { get; set; }
 
-        public string Id { get; set; }
+        public string Eventid { get; set; }
+
+        public long RegistrationId    { get; set; }
 
         public DefaultEventInformation()
         {
