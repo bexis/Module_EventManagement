@@ -105,7 +105,7 @@ namespace BExIS.Modules.EMM.UI.Helper
             body += emailStructure.bodyOpening + "<br/>" +
             details + "<br/><br/>";
             if (notificationType != "deleted")
-                body += emailStructure.bodyHintToLink + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "<br/><br/>";
+                body += emailStructure.bodyHintToLink + "<a href=\"" + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "\" >" +  url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "</a><br/><br/>";
             body += emailStructure.bodyClosing + "<br/>" +
                  emailStructure.bodyClosingName;
 
