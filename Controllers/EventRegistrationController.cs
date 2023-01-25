@@ -511,7 +511,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     }
                     else if (ref_id != null)
                     {
-                        EventRegistration reg = erManager.GetRegistrationByRefIdAndEvent(ref_id, long.Parse(id));
+                        List<EventRegistration> regs = erManager.GetRegistrationsByRefIdAndEvent(ref_id, long.Parse(id));
+                        EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
                         if (reg != null)
                         {
                             reg.Deleted = true;
