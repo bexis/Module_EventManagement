@@ -234,7 +234,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 //add default value to session
                 DefaultEventInformation defaultEventInformation = new DefaultEventInformation();
                 defaultEventInformation.EventName = e.Name;
-                defaultEventInformation.Id = e.Id.ToString();
+                defaultEventInformation.Eventid = e.Id.ToString();
                 if (!String.IsNullOrEmpty(e.EventDate))
                     defaultEventInformation.Date = e.EventDate;
                 if (!String.IsNullOrEmpty(e.EventLanguage))

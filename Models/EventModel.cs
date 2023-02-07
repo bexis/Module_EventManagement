@@ -21,6 +21,8 @@ namespace BExIS.Modules.EMM.UI.Models
         [DisplayName("Important information")]
         public string ImportantInformation { get; set; }
 
+        public string Location { get; set; }
+
         [DisplayName("Additional Mail information")]
         public string MailInformation { get; set; }
 
@@ -99,6 +101,7 @@ namespace BExIS.Modules.EMM.UI.Models
             Name = eEvent.Name;
             EventDate = eEvent.EventDate;
             ImportantInformation = eEvent.ImportantInformation;
+            Location = eEvent.Location;
             MailInformation = eEvent.MailInformation;
             EventLanguages = new List<string>() { "English", "Deutsch" };
             SelectedEventLanguage = eEvent.EventLanguage;
