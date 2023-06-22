@@ -127,6 +127,15 @@
             </script>
         }
 
+        if (idByXpath == "Metadata_veranstaltungsInformationen_1__veranstaltungsInformationenType_1_ort_1" && Model.Value == null)
+        {
+            Model.Value = defaultEventInformation.Location;
+            Model.Locked = true;
+            <script>
+                OnChangeDefault("@Model.Value");
+            </script>
+        }
+
         if (idByXpath == "Metadata_veranstaltungsInformationen_1__veranstaltungsInformationenType_1_wichtigeHinweise_1" && Model.Value == null)
         {
             Model.Value = defaultEventInformation.ImportantInformation;
