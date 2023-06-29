@@ -36,31 +36,30 @@ namespace BExIS.Modules.EMM.UI.Controllers
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Manage Events", this.Session.GetTenant());
 
             using (EventManager eManger = new EventManager())
+            using (var eventRegistrationManager = new EventRegistrationManager())
             {
 
                 List<EventModel> model = new List<EventModel>();
                 List<Event> data = eManger.GetAllEvents().ToList();
 
-                data.ToList().ForEach(r => model.Add(new EventModel(r)));
+                foreach (Event e in data)
+                {
+                    EventModel m = new EventModel(e);
+                    List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(e.Id);
+                    if (eventRegistrations.Count > 0)
+                        m.InUse = true;
+                    else
+                        m.InUse = false;
+
+                    model.Add(m);
+                }
+
+                //data.ToList().ForEach(r => model.Add(new EventModel(r)));
 
                 return View("EventManager", model);
             }
         }
 
-        [GridAction]
-        public ActionResult AllEvents()
-        {
-            using (EventManager eManger = new EventManager())
-            {
-                List<EventModel> model = new List<EventModel>();
-                List<Event> data = eManger.GetAllEvents().ToList();
-
-                data.ToList().ForEach(r => model.Add(new EventModel(r)));
-
-                return View("EventManager", new GridModel<EventModel> { Data = model });
-            }
-
-        }
 
         #region Create, Edit Delete ans Save Event
 
