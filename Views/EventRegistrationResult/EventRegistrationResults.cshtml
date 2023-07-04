@@ -10,7 +10,7 @@
 
 @section Information
 {
-    With this interface you get all registration from all open and closed events.
+    Overview of all registrations for current and previous events
     <p>
         <a href="/RBM/Help/Index/#_Toc434570750" class="bx-informationLink" title="go to help" target="_blank">More</a>
     </p>
@@ -42,12 +42,13 @@
                             </td>
 
                         }
-                        <td><div onclick="onClickEdit(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
+                        <td>
+                            <div onclick="onClickEdit(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
 
-                        @if (@Model.Results.Rows[i][1].ToString() == "False")
-                        {
-                            <div onclick="onClickDeleteRegistration(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"></div>
-                        }
+                            @if (@Model.Results.Rows[i][1].ToString() == "False")
+                            {
+                                <div onclick="onClickDeleteRegistration(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"></div>
+                            }
                         </td>
                     </tr>
                 }
@@ -75,24 +76,24 @@
                 <tbody>
                     @for (int i = 0; i < Model.WaitingListResults.Rows.Count; i++)
                     {
-                    <tr>
-                        @for (int c = 0; c < Model.WaitingListResults.Columns.Count; c++)
-                        {
-                            if (Model.WaitingListResults.Columns[c].ColumnName == "Action")
+                        <tr>
+                            @for (int c = 0; c < Model.WaitingListResults.Columns.Count; c++)
                             {
-                                <td>
-                                    @Html.ActionLink("Move", "MoveFromWaitingList", "EventRegistrationResult", new { id = Model.WaitingListResults.Rows[i][0], eventId = Model.EventId }, new { @class = "bx bx-grid-function"})
-                                </td>
-                            }
-                            else
-                            {
-                                <td>
-                                    @Model.WaitingListResults.Rows[i][c].ToString()
-                                </td>
-                            }
+                                if (Model.WaitingListResults.Columns[c].ColumnName == "Action")
+                                {
+                                    <td>
+                                        @Html.ActionLink("Move", "MoveFromWaitingList", "EventRegistrationResult", new { id = Model.WaitingListResults.Rows[i][0], eventId = Model.EventId }, new { @class = "bx bx-grid-function" })
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td>
+                                        @Model.WaitingListResults.Rows[i][c].ToString()
+                                    </td>
+                                }
 
-                        }
-                    </tr>
+                            }
+                        </tr>
                     }
 
 
