@@ -65,6 +65,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         public ActionResult Create()
         {
+            ViewBag.Title = PresentationModel.GetViewTitleForTenant("Create Event", this.Session.GetTenant());
+
             EventModel model = new EventModel();
             model.MetadataStructureList = GetMetadataStructureList();
             return View("EditEvent", model);
