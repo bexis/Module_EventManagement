@@ -169,6 +169,81 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         #region Load Registration Form
 
+        public ActionResult LoadFormEdit(string id, string ref_id = "")
+        {
+            using (EventManager eManager = new EventManager())
+            {
+                Event e = eManager.EventRepo.Get(long.Parse(id));
+
+
+                    //add default value to session
+                    DefaultEventInformation defaultEventInformation = new DefaultEventInformation();
+                    defaultEventInformation.EventName = e.Name;
+                    defaultEventInformation.Location = e.Location;
+                    defaultEventInformation.Eventid = e.Id.ToString();
+                    if (!String.IsNullOrEmpty(e.EventDate))
+                        defaultEventInformation.Date = e.EventDate;
+                    if (!String.IsNullOrEmpty(e.EventLanguage))
+                        if (e.Id == 12)
+                            defaultEventInformation.Language = "English";
+                        else
+                            defaultEventInformation.Language = e.EventLanguage;
+
+                    if (!String.IsNullOrEmpty(e.ImportantInformation))
+                        defaultEventInformation.ImportantInformation = e.ImportantInformation;
+
+                    Session["DefaultEventInformation"] = defaultEventInformation;
+
+                    //CreateTaskmanager taskManager = new CreateTaskmanager();
+                    if (TaskManager == null)
+                        TaskManager = new CreateTaskmanager();
+
+                    TaskManager.AddToBus(CreateTaskmanager.METADATASTRUCTURE_ID, e.MetadataStructure.Id);
+                    TaskManager.AddToBus(CreateTaskmanager.ENTITY_ID, e.Id);
+
+                        using (EventRegistrationManager erManager = new EventRegistrationManager())
+                        using (SubjectManager subManager = new SubjectManager())
+                        {
+                            User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+
+                            if (ref_id.Length > 0)
+                            {
+                                List<EventRegistration> regs = erManager.GetRegistrationsByRefIdAndEvent(ref_id, e.Id);
+                                EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
+                                defaultEventInformation.RegistrationId = reg.Id;
+                                XmlNodeReader xmlNodeReader = new XmlNodeReader(reg.Data);
+                                TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, reg.Data);
+                                xmlNodeReader.Dispose();
+                            }
+                            else if (user != null)
+                            {
+                                List<EventRegistration> regs = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+                                EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
+                                defaultEventInformation.RegistrationId = reg.Id;
+
+                                XmlNodeReader xmlNodeReader = new XmlNodeReader(reg.Data);
+                                TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, reg.Data);
+                                xmlNodeReader.Dispose();
+                            }
+
+                    }
+
+                    TaskManager.AddToBus(CreateTaskmanager.SAVE_WITH_ERRORS, false);
+                    TaskManager.AddToBus(CreateTaskmanager.NO_IMPORT_ACTION, true);
+                    TaskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_TITLE, "Event registration");
+                    TaskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_DESCRIPTION, "<p><b>help</b></p>");
+
+
+                    Session["EventRegistrationTaskmanager"] = TaskManager;
+
+                    setAdditionalFunctions();
+
+                return new EmptyResult();
+
+            }
+
+        }
+
         public ActionResult LoadForm(LogInToEventModel model)
         {
             using (EventManager eManager = new EventManager())
@@ -263,13 +338,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         }
 
-        //public ActionResult LoadMetadataForm()
-        //{
-        //    var view = this.Render("DCM", "Form", "StartMetadataEditor", new RouteValueDictionary()   
-        //    {});
-
-        //    return Content(view.ToHtmlString(), "text/html");
-        //}
 
         public ActionResult LoadMetadataForm(string edit, bool fromEditMode = true)
         {

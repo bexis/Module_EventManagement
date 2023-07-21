@@ -108,10 +108,8 @@
 
     function onClickEdit(id, ref_id = null)
     {
-        $.get('@Url.Action("LogInToEvent", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', { id: id, ref_id: ref_id}, function (data) {
-            $('#Content_Creation').html(data);
-            var window = $('#Window_LogInToEvent').data('tWindow');
-            window.center().open();
+        $.get('@Url.Action("LoadFormEdit", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', { id: id, ref_id: ref_id}, function (data) {
+            window.location.href = "/EMM/EventRegistration/LoadMetadataForm?edit=true";
         });
     }
 
