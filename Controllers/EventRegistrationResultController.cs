@@ -19,6 +19,8 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml;
@@ -174,6 +176,31 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             return RedirectToAction("OnSelectTreeViewItem", new { id = eventId });
         }
+
+        public ActionResult ResendNotification(long id, long eventId)
+        {
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
+            using (EventManager eventManager = new EventManager())
+            {
+                var registration = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
+
+                var e = eventManager.GetEventById(eventId);
+                Resend(registration.Data, e);
+            }
+
+            return RedirectToAction("OnSelectTreeViewItem", new { id = eventId });
+        }
+
+        private void Resend(XmlDocument data, Event e)
+        {
+            // get email adress from XML && get ref_id based on email adress
+            string email = data.GetElementsByTagName("Email")[0].InnerText;
+            string ref_id = EmailHelper.GetRefIdFromEmail(email);
+            string url = Request.Url.GetLeftPart(UriPartial.Authority);
+            EmailHelper.SendEmailNotification("resend", email, ref_id, data, e, url);
+        }
+
+      
 
         private void SendNotification(XmlDocument data, Event e)
         {

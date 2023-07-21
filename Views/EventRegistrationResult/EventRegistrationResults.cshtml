@@ -42,14 +42,17 @@
                             </td>
 
                         }
-                        <td>
-                            <div onclick="onClickEdit(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
+                    <td>
+                        <div onclick="onClickEdit(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
 
-                            @if (@Model.Results.Rows[i][1].ToString() == "False")
-                            {
-                                <div onclick="onClickDeleteRegistration(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"></div>
-                            }
-                        </td>
+                        @if (@Model.Results.Rows[i][1].ToString() == "False")
+                        {
+                            <div onclick="onClickDeleteRegistration(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"></div>
+                        }
+
+                        @Html.ActionLink("Resend", "ResendNotification", "EventRegistrationResult", new { id = Model.Results.Rows[i][0], eventId = Model.EventId }, new { @class = "bx bx-grid-function" })
+
+                    </td>
                     </tr>
                 }
 
@@ -152,6 +155,7 @@
             window.location.href = "/EMM/EventRegistration/LoadMetadataForm?edit=true";
         });
     }
+
 
     function onClickDeleteRegistration(id, eventid) {
 

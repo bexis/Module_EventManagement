@@ -713,7 +713,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 // get email adress from XML && get ref_id based on email adress
                 string email = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("Email")[0].InnerText;
-                string ref_id = GetRefIdFromEmail(email);
+                string ref_id = EmailHelper.GetRefIdFromEmail(email);
 
                 string notificationType = "";
 
@@ -1236,23 +1236,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
 
             return false;
-        }
-
-        private string GetRefIdFromEmail(string email)
-        {
-            StringBuilder hash = new StringBuilder();
-            using (MD5CryptoServiceProvider md5provider = new MD5CryptoServiceProvider())
-            {
-                byte[] bytes = md5provider.ComputeHash(new UTF8Encoding().GetBytes("abd_" + email));
-
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    hash.Append(bytes[i].ToString("x2"));
-                }
-            }
-            string ref_id = hash.ToString();
-
-            return ref_id;
         }
 
         private EventRegistration CheckEventRegistration(string ref_id, long event_id, EventRegistrationManager erManager)
