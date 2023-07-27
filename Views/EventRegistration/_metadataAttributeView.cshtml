@@ -46,6 +46,29 @@
 
     if (defaultEventInformation.Language == "English")
     {
+        if (xpath == defaultEventInformation.XPathToEmail && Model.Value == null && defaultEventInformation.Email != null)
+        {
+            Model.Value = defaultEventInformation.Email;
+            <script>
+                OnChangeDefault("@Model.Value");
+            </script>
+        }
+
+        if (xpath == defaultEventInformation.XPathToFirstName && Model.Value == null && defaultEventInformation.FirstName != null)
+        {
+            Model.Value = defaultEventInformation.FirstName;
+            <script>
+                OnChangeDefault("@Model.Value");
+            </script>
+        }
+
+        if (xpath == defaultEventInformation.XPathToLastName && Model.Value == null && defaultEventInformation.LastName != null)
+        {
+            Model.Value = defaultEventInformation.LastName;
+            <script>
+                OnChangeDefault("@Model.Value");
+            </script>
+        }
 
         if (idByXpath == "Metadata_eventInformation_1__eventInformationType_1_name_1" && Model.Value == null)
         {

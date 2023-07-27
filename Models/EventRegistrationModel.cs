@@ -91,6 +91,14 @@ namespace BExIS.Modules.EMM.UI.Models
 
         public long RegistrationId    { get; set; }
 
+        public string XPathToEmail { get; set; }
+        public string XPathToFirstName { get; set; }
+        public string XPathToLastName { get; set; }
+
+        public string Email { get; set; }
+        public string LastName  { get; set; }
+        public string FirstName { get; set; }
+
         public DefaultEventInformation()
         {
 

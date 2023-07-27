@@ -175,6 +175,7 @@
     <Compile Include="Models\MetadataEditorModel.cs" />
     <Compile Include="Models\MetadataInstanceModel.cs" />
     <Compile Include="Models\MetadataPackageModel.cs" />
+    <Compile Include="Models\SearchMetadataNode.cs" />
     <Compile Include="Models\StepModelHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

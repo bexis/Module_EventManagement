@@ -108,7 +108,21 @@
       <column name="LogInPassword" />
     </property>
 
-    <property name="EmailBCC" type="string">
+	  <property name="XPathToEmail" type="string">
+		  <column name="XPathToEmail" />
+	  </property>
+
+	  <property name="XPathToFirstName" type="string">
+		  <column name="XPathToFirstName" />
+	  </property>
+
+	  <property name="XPathToLastName" type="string">
+		  <column name="XPathToLastName" />
+	  </property>
+
+
+
+	  <property name="EmailBCC" type="string">
       <column name="EmailBCC" />
     </property>
 

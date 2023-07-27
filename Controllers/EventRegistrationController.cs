@@ -3,6 +3,7 @@ using BExIS.Dcm.Wizard;
 using BExIS.Dlm.Entities.Common;
 using BExIS.Dlm.Entities.MetadataStructure;
 using BExIS.Dlm.Services.MetadataStructure;
+using BExIS.Dlm.Services.Party;
 using BExIS.Dlm.Services.TypeSystem;
 using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
@@ -174,13 +175,70 @@ namespace BExIS.Modules.EMM.UI.Controllers
             using (EventManager eManager = new EventManager())
             {
                 Event e = eManager.EventRepo.Get(long.Parse(id));
-
+                using (EventRegistrationManager erManager = new EventRegistrationManager())
+                using (SubjectManager subManager = new SubjectManager())
+                {
+                    User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
 
                     //add default value to session
                     DefaultEventInformation defaultEventInformation = new DefaultEventInformation();
                     defaultEventInformation.EventName = e.Name;
                     defaultEventInformation.Location = e.Location;
                     defaultEventInformation.Eventid = e.Id.ToString();
+
+                    //xpath 
+                    var emailList = e.XPathToEmail.Split('/').ToList();
+                    var fNameList = e.XPathToFirstName.Split('/').ToList();
+                    var lNameList = e.XPathToLastName.Split('/').ToList();
+
+                    var firstE = emailList.First();
+                    var lastE = emailList.Last();
+                    foreach (var m in emailList)
+                    {
+                        if (firstE == m)
+                            defaultEventInformation.XPathToEmail += m + "//";
+                        else if(lastE == m)
+                            defaultEventInformation.XPathToEmail += m + "[1]";
+                        else
+                            defaultEventInformation.XPathToEmail += m + "[1]//";
+                    }
+
+                    var firstF = fNameList.First();
+                    var lastF = fNameList.Last();
+                    foreach (var m in fNameList)
+                    {
+                        if (firstF == m)
+                            defaultEventInformation.XPathToFirstName += m + "//";
+                        else if (lastF == m)
+                            defaultEventInformation.XPathToFirstName += m + "[1]";
+                        else
+                            defaultEventInformation.XPathToFirstName += m + "[1]//";
+                    }
+
+                    var firstL = lNameList.First();
+                    var lastL = lNameList.Last();
+                    foreach (var m in lNameList)
+                    {
+                        if (firstL == m)
+                            defaultEventInformation.XPathToLastName += m + "//";
+                        else if (lastL == m)
+                            defaultEventInformation.XPathToLastName += m + "[1]";
+                        else
+                            defaultEventInformation.XPathToLastName += m + "[1]//";
+                    }
+
+
+                    if (user != null)
+                    {
+                        using (var partyManager = new PartyManager())
+                        {
+                            defaultEventInformation.Email = user.Email;
+                            var party = partyManager.GetPartyByUser(user.Id);
+                            defaultEventInformation.FirstName = party.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "FirstName").Select(v => v.Value).FirstOrDefault();
+                            defaultEventInformation.LastName = party.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "LastName").Select(v => v.Value).FirstOrDefault();
+                        }
+                    }
+
                     if (!String.IsNullOrEmpty(e.EventDate))
                         defaultEventInformation.Date = e.EventDate;
                     if (!String.IsNullOrEmpty(e.EventLanguage))
@@ -198,13 +256,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     if (TaskManager == null)
                         TaskManager = new CreateTaskmanager();
 
-                    TaskManager.AddToBus(CreateTaskmanager.METADATASTRUCTURE_ID, e.MetadataStructure.Id);
-                    TaskManager.AddToBus(CreateTaskmanager.ENTITY_ID, e.Id);
-
-                        using (EventRegistrationManager erManager = new EventRegistrationManager())
-                        using (SubjectManager subManager = new SubjectManager())
-                        {
-                            User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+                        TaskManager.AddToBus(CreateTaskmanager.METADATASTRUCTURE_ID, e.MetadataStructure.Id);
+                        TaskManager.AddToBus(CreateTaskmanager.ENTITY_ID, e.Id);
 
                             if (ref_id.Length > 0)
                             {
@@ -247,8 +300,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
         public ActionResult LoadForm(LogInToEventModel model)
         {
             using (EventManager eManager = new EventManager())
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
+            using (SubjectManager subManager = new SubjectManager())
             {
                 Event e = eManager.EventRepo.Get(model.EventId);
+                User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
 
                 if (e.LogInPassword != model.LogInPassword)
                     ModelState.AddModelError("passwort", "The event passwort is wrong.");
@@ -260,6 +316,61 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     defaultEventInformation.EventName = e.Name;
                     defaultEventInformation.Location = e.Location;
                     defaultEventInformation.Eventid = e.Id.ToString();
+
+                    //xpath 
+                    //xpath 
+                    var emailList = e.XPathToEmail.Split('/').ToList();
+                    var fNameList = e.XPathToFirstName.Split('/').ToList();
+                    var lNameList = e.XPathToLastName.Split('/').ToList();
+
+                    var firstE = emailList.First();
+                    var lastE = emailList.Last();
+                    foreach (var m in emailList)
+                    {
+                        if (firstE == m)
+                            defaultEventInformation.XPathToEmail += m + "//";
+                        else if (lastE == m)
+                            defaultEventInformation.XPathToEmail += m + "[1]";
+                        else
+                            defaultEventInformation.XPathToEmail += m + "[1]//";
+                    }
+
+                    var firstF = fNameList.First();
+                    var lastF = fNameList.Last();
+                    foreach (var m in fNameList)
+                    {
+                        if (firstF == m)
+                            defaultEventInformation.XPathToFirstName += m + "//";
+                        else if (lastF == m)
+                            defaultEventInformation.XPathToFirstName += m + "[1]";
+                        else
+                            defaultEventInformation.XPathToFirstName += m + "[1]//";
+                    }
+
+                    var firstL = lNameList.First();
+                    var lastL = lNameList.Last();
+                    foreach (var m in lNameList)
+                    {
+                        if (firstL == m)
+                            defaultEventInformation.XPathToLastName += m + "//";
+                        else if (lastL == m)
+                            defaultEventInformation.XPathToLastName += m + "[1]";
+                        else
+                            defaultEventInformation.XPathToLastName += m + "[1]//";
+                    }
+
+                    //user information
+                    if (user != null)
+                    {
+                        using (var partyManager = new PartyManager())
+                        {
+                            defaultEventInformation.Email = user.Email;
+                            var party = partyManager.GetPartyByUser(user.Id);
+                            defaultEventInformation.FirstName = party.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "FirstName").Select(v => v.Value).FirstOrDefault();
+                            defaultEventInformation.LastName = party.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "LastName").Select(v => v.Value).FirstOrDefault();
+                        }
+                    }
+
                     if (!String.IsNullOrEmpty(e.EventDate))
                         defaultEventInformation.Date = e.EventDate;
                     if (!String.IsNullOrEmpty(e.EventLanguage))
@@ -282,11 +393,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                     if (model.Edit)
                     {
-                        using (EventRegistrationManager erManager = new EventRegistrationManager())
-                        using (SubjectManager subManager = new SubjectManager())
-                        {
-                            User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
-
                             if(model.RefId.Length > 0)
                             {
                                 List<EventRegistration> regs = erManager.GetRegistrationsByRefIdAndEvent(model.RefId, e.Id);
@@ -308,7 +414,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             }
                             //todo error message 
                             
-                        }
+                        
 
                     }
 
