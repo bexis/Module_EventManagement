@@ -491,7 +491,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
             {
                 if (!xe.HasElements)
                 {
-                    dr[xe.Name.ToString().Replace("Type", "")] = xe.Value; //add in the values
+                    string value = xe.Value.Replace("\r\n", " ");
+                    value = value.Replace("\n", " ");
+                    value = HttpUtility.HtmlEncode(value);
+                    dr[xe.Name.ToString().Replace("Type", "")] = value;  //add in the values
                 }
             }
 
