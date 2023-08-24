@@ -493,7 +493,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 {
                     string value = xe.Value.Replace("\r\n", " ");
                     value = value.Replace("\n", " ");
-                    value = HttpUtility.HtmlEncode(value);
+                    value = HttpUtility.HtmlDecode(value);
                     dr[xe.Name.ToString().Replace("Type", "")] = value;  //add in the values
                 }
             }

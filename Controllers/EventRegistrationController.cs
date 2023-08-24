@@ -25,6 +25,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 using System.Web.Mvc;
 using System.Xml;
 using System.Xml.Linq;
@@ -313,8 +314,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 {
                     //add default value to session
                     DefaultEventInformation defaultEventInformation = new DefaultEventInformation();
-                    defaultEventInformation.EventName = e.Name;
-                    defaultEventInformation.Location = e.Location;
+                    defaultEventInformation.EventName = HttpUtility.HtmlDecode(e.Name);
+                    defaultEventInformation.Location = HttpUtility.HtmlDecode(e.Location);
                     defaultEventInformation.Eventid = e.Id.ToString();
 
                     //xpath 
@@ -366,8 +367,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         {
                             defaultEventInformation.Email = user.Email;
                             var party = partyManager.GetPartyByUser(user.Id);
-                            defaultEventInformation.FirstName = party.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "FirstName").Select(v => v.Value).FirstOrDefault();
-                            defaultEventInformation.LastName = party.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "LastName").Select(v => v.Value).FirstOrDefault();
+                            defaultEventInformation.FirstName = HttpUtility.HtmlDecode(party.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "FirstName").Select(v => v.Value).FirstOrDefault());
+                            defaultEventInformation.LastName = HttpUtility.HtmlDecode(party.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "LastName").Select(v => v.Value).FirstOrDefault());
                         }
                     }
 
@@ -380,7 +381,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         defaultEventInformation.Language = e.EventLanguage;
 
                     if (!String.IsNullOrEmpty(e.ImportantInformation))
-                        defaultEventInformation.ImportantInformation = e.ImportantInformation;
+                        defaultEventInformation.ImportantInformation = HttpUtility.HtmlDecode(e.ImportantInformation);
 
                     Session["DefaultEventInformation"] = defaultEventInformation;
 
