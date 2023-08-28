@@ -61,7 +61,7 @@
         </table>
 
         @Html.ActionLink("Export (csv)", "Export", "EventRegistrationResult", new { id = Model.EventId }, new { @class = "bx-button function" })
-        <span class="bx-button function" id="" onclick="Delete(@Model.EventId)" title="Delete event">Delete</span>
+        <span class="bx-button function" id="" onclick="Delete(@Model.EventId)" title="Delete event">Delete Event</span>
 
         if (Model.WaitingListResults.Rows.Count > 0)
         {
