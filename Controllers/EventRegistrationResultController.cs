@@ -68,6 +68,24 @@ namespace BExIS.Modules.EMM.UI.Controllers
         }
 
         /// <summary>
+        /// clear, that means delete all registrations from one event
+        /// </summary>
+        /// <param name="id">event id</param>
+        /// <returns>csv file</returns>
+        public ActionResult Clear(string id)
+        {
+            long eventId = Convert.ToInt64(id);
+            using (var eventRegistrationManager = new EventRegistrationManager())
+            {
+                //delete first all registrations
+                List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(eventId);
+                eventRegistrations.ForEach(a => eventRegistrationManager.DeleteEventRegistration(a));
+            }
+
+            return RedirectToAction("Show");
+        }
+
+        /// <summary>
         /// export as comma seperatred csv
         /// </summary>
         /// <param name="id">event id</param>
