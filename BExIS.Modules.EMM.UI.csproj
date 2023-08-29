@@ -201,6 +201,12 @@
     <Content Include="Views\EventRegistration\_metadataAttributeView.cshtml" />
     <Content Include="Views\EventRegistration\_metadataCompoundAttributeUsageView.cshtml" />
     <Content Include="Views\EventRegistration\_metadataCompoundAttributeView.cshtml" />
+    <None Include="Templates\englishTemplate.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Templates\germanTemplate.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
