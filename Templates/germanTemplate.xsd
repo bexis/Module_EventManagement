@@ -31,7 +31,8 @@ http://www.biodiversity-exploratories.de/
 
 	<xsd:complexType name="registrationType">
 		<xsd:sequence>
-			<xsd:element name="eventInformation" type="eventInformationType" />
+			<xsd:element name="veranstaltungsInformationen" type="eventInformationType" />
+			<xsd:element name="persoenlicheDaten" type="personalDataType" />
 		</xsd:sequence>
 	</xsd:complexType>
 
@@ -43,9 +44,30 @@ http://www.biodiversity-exploratories.de/
 			<xsd:element name="ort" type="stringLabel" />
 			<xsd:element name="sprache" type="stringLabel" />
 			<xsd:element name="wichtigeHinweise" type="stringLabel" />
+			
+		</xsd:sequence>
+		<xsd:attribute name="label" type="xsd:string" />
+
+	</xsd:complexType>
+
+	<!-- =========================== personlDataType declarations ==================== -->
+	<xsd:complexType name="personalDataType">
+		<xsd:sequence>
+			<xsd:element name="Vorname"  type="stringLabel" />
+			<xsd:element name="Nachname" type="stringLabel" />
+			<xsd:element name="Email">
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:restriction base="stringLabel">
+							<xsd:pattern value=".+@.+" />
+						</xsd:restriction>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
 		</xsd:sequence>
 		<xsd:attribute name="label" type="xsd:string" />
 	</xsd:complexType>
+
 
 
 	<!-- =========================== data types declarations ==================== -->
