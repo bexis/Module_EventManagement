@@ -44,17 +44,16 @@ http://www.biodiversity-exploratories.de/
 			<xsd:element name="ort" type="stringLabel" />
 			<xsd:element name="sprache" type="stringLabel" />
 			<xsd:element name="wichtigeHinweise" type="stringLabel" />
-			
 		</xsd:sequence>
 		<xsd:attribute name="label" type="xsd:string" />
-
 	</xsd:complexType>
 
 	<!-- =========================== personlDataType declarations ==================== -->
 	<xsd:complexType name="personalDataType">
 		<xsd:sequence>
-			<xsd:element name="Vorname"  type="stringLabel" />
+			<xsd:element name="Vorname" type="stringLabel" />
 			<xsd:element name="Nachname" type="stringLabel" />
+
 			<xsd:element name="Email">
 				<xsd:complexType>
 					<xsd:simpleContent>
@@ -65,12 +64,10 @@ http://www.biodiversity-exploratories.de/
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="label" type="xsd:string" />
 	</xsd:complexType>
 
-
-
 	<!-- =========================== data types declarations ==================== -->
+
 
 	<xsd:complexType name="stringLabel">
 		<xsd:simpleContent>
@@ -87,9 +84,6 @@ http://www.biodiversity-exploratories.de/
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:attribute>
-				<xsd:attribute name="label" type="xsd:string" use="required"/>
-				<xsd:attribute name="number" type="xsd:nonNegativeInteger" use="optional"/>
-				<xsd:attribute name="font" type="xsd:string" use="optional"/>
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
@@ -110,4 +104,3 @@ http://www.biodiversity-exploratories.de/
 	</xsd:complexType>
 
 </xsd:schema>
-
