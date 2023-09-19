@@ -148,6 +148,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         open.EventFilterItems.Add(new EventFilterItem(e));
                 }
 
+                open.EventFilterItems = open.EventFilterItems.OrderBy(a => a.Id).ToList();
+                closed.EventFilterItems = closed.EventFilterItems.OrderBy(a => a.Id).ToList();
+                open.EventFilterItems = Enumerable.Reverse(open.EventFilterItems).ToList();
+                closed.EventFilterItems = Enumerable.Reverse(closed.EventFilterItems).ToList();
+
                 model.Add(open);
                 model.Add(closed);
 
