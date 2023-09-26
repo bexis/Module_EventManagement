@@ -37,14 +37,15 @@
                 {
                     <tr>
                         <td>
-                            <div onclick="onClickEdit(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
+
 
                             @if (@Model.Results.Rows[i][1].ToString() == "False")
                             {
+                                <div onclick="onClickEdit(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
                                 <div onclick="onClickDeleteRegistration(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"></div>
-                            }
+                                @Html.ActionLink("Resend", "ResendNotification", "EventRegistrationResult", new { id = Model.Results.Rows[i][0], eventId = Model.EventId }, new { @class = "bx bx-grid-function" })
 
-                            @Html.ActionLink("Resend", "ResendNotification", "EventRegistrationResult", new { id = Model.Results.Rows[i][0], eventId = Model.EventId }, new { @class = "bx bx-grid-function" })
+                            }
 
                         </td>
                         @for (int c = 0; c < Model.Results.Columns.Count; c++)
