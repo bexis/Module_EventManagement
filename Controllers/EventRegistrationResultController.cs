@@ -413,6 +413,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     else
                         email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
 
+                    //change Sataus if event if there is again space on waiting list
+                    if((countWaitingList <= e.WaitingListLimitation) && e.Closed == true)
+                    {
+                        e.Closed = false;
+                        eventManager.UpdateEvent(e);
+                    }
+
                     EmailHelper.SendEmailNotification("remove_from_waiting_list", email, "", reg.Data, reg.Event, url);
 
                 }
