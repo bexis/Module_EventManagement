@@ -76,10 +76,18 @@ namespace BExIS.Modules.EMM.UI.Controllers
         {
             long eventId = Convert.ToInt64(id);
             using (var eventRegistrationManager = new EventRegistrationManager())
+            using (var eventManager = new EventManager())
             {
                 //delete first all registrations
                 List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(eventId);
                 eventRegistrations.ForEach(a => eventRegistrationManager.DeleteEventRegistration(a));
+
+                var e = eventManager.GetEventById(eventId);
+                if(e.Closed == true)
+                {
+                    e.Closed = false;
+                    eventManager.UpdateEvent(e);
+                }
             }
 
             return RedirectToAction("Show");
