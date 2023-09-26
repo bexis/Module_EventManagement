@@ -36,7 +36,7 @@
                     }
 
 
-                    @if (Model[i].EditAllowed && Model[i].AlreadyRegistered == true && Model[i].Deleted == false && Model[i].Event.Deadline >= DateTime.Now)
+                    @if (Model[i].EditAllowed && Model[i].AlreadyRegistered == true && Model[i].Deleted == false && DateTime.Now <= Model[i].Event.Deadline.AddDays(1))
                     {
                         <div onclick="onClickEdit(@Model[i].Event.Id, '@Model[i].AlreadyRegisteredRefId')" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
                         <div onclick="onClickDelete(@Model[i].Event.Id, '@Model[i].AlreadyRegisteredRefId')" class="bx bx-grid-function bx-trash" title="Delete registration"></div>
