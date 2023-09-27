@@ -464,7 +464,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             DataTable results = new DataTable();
             results.Columns.Add("Id");
             results.Columns.Add("Deleted");
-            results.Columns.Add("Action");
+            //results.Columns.Add("Action");
 
             using (EventRegistrationManager erManager = new EventRegistrationManager())
             {

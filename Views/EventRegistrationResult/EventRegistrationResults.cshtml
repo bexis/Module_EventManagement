@@ -85,18 +85,18 @@
                         <tr>
                             @for (int c = 0; c < Model.WaitingListResults.Columns.Count; c++)
                             {
-                                if (Model.WaitingListResults.Columns[c].ColumnName == "Action")
+                                @*if (Model.WaitingListResults.Columns[c].ColumnName == "Action")
                                 {
                                     <td>
                                         @Html.ActionLink("Move", "MoveFromWaitingList", "EventRegistrationResult", new { id = Model.WaitingListResults.Rows[i][0], eventId = Model.EventId }, new { @class = "bx bx-grid-function" })
                                     </td>
                                 }
                                 else
-                                {
+                                {*@
                                     <td>
                                         @Model.WaitingListResults.Rows[i][c].ToString()
                                     </td>
-                                }
+                                @*}*@
 
                             }
                         </tr>
