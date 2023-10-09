@@ -5,8 +5,7 @@
 
 @section Information
 {
-    Here you find a list of all events currently available for registration. You can register for an event, view and change (only if allowed) your registration. To register you need a passwort, which is usually send via email by the project administration.
-    <!-- <p>
+ A list of all events currently available for registration. You can register for an event, view and (if allowed) change your registration. To register, you will need a password, which is usually emailed to you by the event organizer.    <!-- <p>
          <a href="/RBM/Help/Index/#_Toc434570750" class="bx-informationLink" title="go to help" target="_blank">More</a>
      </p>-->
 }
@@ -37,7 +36,7 @@
                     }
 
 
-                    @if (Model[i].EditAllowed && Model[i].AlreadyRegistered == true && Model[i].Deleted == false && Model[i].Event.Deadline >= DateTime.Now)
+                    @if (Model[i].EditAllowed && Model[i].AlreadyRegistered == true && Model[i].Deleted == false && DateTime.Now <= Model[i].Event.Deadline.AddDays(1))
                     {
                         <div onclick="onClickEdit(@Model[i].Event.Id, '@Model[i].AlreadyRegisteredRefId')" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
                         <div onclick="onClickDelete(@Model[i].Event.Id, '@Model[i].AlreadyRegisteredRefId')" class="bx bx-grid-function bx-trash" title="Delete registration"></div>
@@ -109,10 +108,8 @@
 
     function onClickEdit(id, ref_id = null)
     {
-        $.get('@Url.Action("LogInToEvent", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', { id: id, ref_id: ref_id}, function (data) {
-            $('#Content_Creation').html(data);
-            var window = $('#Window_LogInToEvent').data('tWindow');
-            window.center().open();
+        $.get('@Url.Action("LoadFormEdit", "EventRegistration", new RouteValueDictionary { { "area", "EMM" } })', { id: id, ref_id: ref_id}, function (data) {
+            window.location.href = "/EMM/EventRegistration/LoadMetadataForm?edit=true";
         });
     }
 

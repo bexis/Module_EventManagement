@@ -81,6 +81,11 @@ namespace BExIS.Modules.EMM.UI.Models
 
         public long MetadataStructureId { get; set; }
 
+        public List<SearchMetadataNode> MetadataNodes { get; set; }
+        public string XPathToEmail { get; set; }
+        public string XPathToFirstName { get; set; }
+        public string XPathToLastName   { get; set; }
+
         public EventModel()
         {
             EventLanguages = new List<string>() { "English", "Deutsch" };
@@ -92,6 +97,7 @@ namespace BExIS.Modules.EMM.UI.Models
             ParticipantsLimitation = 0;
             MetadataStructureList = new List<ListItem>();
             MetadataStructureId = 0;
+            MetadataNodes = new List<SearchMetadataNode>();
 
         }
 
@@ -111,6 +117,10 @@ namespace BExIS.Modules.EMM.UI.Models
             WaitingList = eEvent.WaitingList;
             WaitingListLimitation = eEvent.WaitingListLimitation;
             Closed = eEvent.Closed;
+            MetadataNodes = new List<SearchMetadataNode>();
+            XPathToEmail = eEvent.XPathToEmail;
+            XPathToFirstName = eEvent.XPathToFirstName;
+            XPathToLastName = eEvent.XPathToLastName;
 
             //if (eEvent.ParticipantsLimitation == 0)
             //    ParticipantsLimitation = "no limitation";

@@ -1,0 +1,116 @@
+﻿<?xml version="1.0"?>
+<!--
+
+Biodiversity Exploratories Information System
+
+The Biodiversity Exploratories Information System
+from the Central Data Management in the Biodiversity Exploratories project
+is published under
+Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Germany (CC BY-NC-SA 3.0)
+
+http://creativecommons.org/licenses/by-nc-sa/3.0/de/deed.en
+
+Developed by the Central Data Management of Biodiversity Exploratories
+http://www.biodiversity-exploratories.de/
+
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.bgc-jena.mpg.de"
+	xmlns:bgc="http://www.bgc-jena.mpg.de"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.bgc-jena.mpg.de"  elementFormDefault="qualified" xml:lang="en">
+  <!-- ========================================================================= -->
+  <xsd:element name="registration" type="registrationType">
+		<xsd:annotation>
+			<xsd:documentation>
+				This is the schema for registration tool (especially for workshops) of the BEO of the DFG
+				exploratories / functional biodiversity. --YJ 20101105--
+			</xsd:documentation>
+		</xsd:annotation>
+	</xsd:element>
+
+  <xsd:complexType name="registrationType">
+    <xsd:sequence>
+	  <xsd:element name="eventInformation" type="eventInformationType" />
+      <xsd:element name="personalData" type="personalDataType" />
+    </xsd:sequence>
+  </xsd:complexType>
+ 
+<!-- =========================== generalType declarations ==================== -->
+	<xsd:complexType name="eventInformationType">
+		 <xsd:sequence>
+			<xsd:element name="name" type="stringLabel" />
+      <xsd:element name="date" type="stringLabel" />
+      <xsd:element name="location" type="stringLabel" />      
+			<xsd:element name="language" type="stringLabel" />
+      <xsd:element name="importantInformation" type="stringLabel" />
+		</xsd:sequence>
+		<xsd:attribute name="label" type="xsd:string" />
+	</xsd:complexType>
+	
+
+  <!-- =========================== personlDataType declarations ==================== -->
+  <xsd:complexType name="personalDataType">
+    <xsd:sequence>
+        <xsd:element name="LastName"  type="stringLabel" />
+        <xsd:element name="FirstName" type="stringLabel" />
+		<xsd:element name="Gender">
+			    <xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:restriction base="stringLabel">
+							<xsd:enumeration value="female" />
+							<xsd:enumeration value="male" />
+                            <xsd:enumeration value="diverse" />
+						</xsd:restriction>
+					</xsd:simpleContent>
+				</xsd:complexType>
+		</xsd:element>
+        <xsd:element name="Email">
+                <xsd:complexType>
+                     <xsd:simpleContent>
+                          <xsd:restriction base="stringLabel">
+                                <xsd:pattern value=".+@.+" />
+                          </xsd:restriction>
+                     </xsd:simpleContent>
+                </xsd:complexType>
+        </xsd:element>
+     </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- ================================================================================  -->
+
+  <xsd:complexType name="stringLabel">
+    <xsd:simpleContent>
+      <xsd:extension base="stringNotEmpty">
+        <xsd:attribute name="input" use="required">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+              <xsd:enumeration value="text"/>
+              <xsd:enumeration value="password"/>
+              <xsd:enumeration value="tick"/>
+              <xsd:enumeration value="intern"/>
+              <xsd:enumeration value="hidden"/>
+              <xsd:enumeration value="textarea"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:simpleType name="stringNotEmpty">
+    <xsd:restriction base="xsd:string">
+      <xsd:minLength value="0" />
+      <xsd:maxLength value="554" />
+    </xsd:restriction>
+  </xsd:simpleType>
+
+  <xsd:complexType name="stringTextOnly">
+    <xsd:simpleContent>
+      <xsd:restriction base="stringLabel">
+      <xsd:pattern value="[A-Za-zäöüÄÖÜ -.ß+?:]" />
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+</xsd:schema>

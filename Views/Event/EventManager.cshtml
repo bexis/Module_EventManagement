@@ -47,7 +47,14 @@
                 </td>
                 <td>
                     <div class="bx bx-grid-function bx-edit" title='Edit event "@Model[i].Name"' onclick="OnClickEdit(@Model[i].Id)"></div>
-                    <div class="bx bx-grid-function bx-trash" title='Delete event "@Model[i].Name"' onclick="OnClickDelete(@Model[i].Id)"></div>
+                    @if (Model[i].InUse)
+                    {
+                        <div class="bx bx-grid-function bx-trash bx-disabled" title='Event has registrations, delete not possible' onclick="OnClickDelete(@Model[i].Id)"></div>
+                    }
+                    else
+                    {
+                        <div class="bx bx-grid-function bx-trash" title='Delete event "@Model[i].Name"' onclick="OnClickDelete(@Model[i].Id)"></div>
+                    }
                 </td>
             </tr>
         }

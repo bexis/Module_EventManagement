@@ -3,6 +3,7 @@ using BExIS.Dcm.Wizard;
 using BExIS.Dlm.Entities.Common;
 using BExIS.Dlm.Entities.MetadataStructure;
 using BExIS.Dlm.Services.MetadataStructure;
+using BExIS.Dlm.Services.Party;
 using BExIS.Dlm.Services.TypeSystem;
 using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
@@ -24,6 +25,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 using System.Web.Mvc;
 using System.Xml;
 using System.Xml.Linq;
@@ -169,11 +171,141 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         #region Load Registration Form
 
-        public ActionResult LoadForm(LogInToEventModel model)
+        public ActionResult LoadFormEdit(string id, string ref_id = "")
         {
             using (EventManager eManager = new EventManager())
             {
+                Event e = eManager.EventRepo.Get(long.Parse(id));
+                using (EventRegistrationManager erManager = new EventRegistrationManager())
+                using (SubjectManager subManager = new SubjectManager())
+                {
+                    User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+
+                    //add default value to session
+                    DefaultEventInformation defaultEventInformation = new DefaultEventInformation();
+                    defaultEventInformation.EventName = e.Name;
+                    defaultEventInformation.Location = e.Location;
+                    defaultEventInformation.Eventid = e.Id.ToString();
+
+                    //xpath 
+                    var emailList = e.XPathToEmail.Split('/').ToList();
+                    var fNameList = e.XPathToFirstName.Split('/').ToList();
+                    var lNameList = e.XPathToLastName.Split('/').ToList();
+
+                    var firstE = emailList.First();
+                    var lastE = emailList.Last();
+                    foreach (var m in emailList)
+                    {
+                        if (firstE == m)
+                            defaultEventInformation.XPathToEmail += m + "//";
+                        else if(lastE == m)
+                            defaultEventInformation.XPathToEmail += m + "[1]";
+                        else
+                            defaultEventInformation.XPathToEmail += m + "[1]//";
+                    }
+
+                    var firstF = fNameList.First();
+                    var lastF = fNameList.Last();
+                    foreach (var m in fNameList)
+                    {
+                        if (firstF == m)
+                            defaultEventInformation.XPathToFirstName += m + "//";
+                        else if (lastF == m)
+                            defaultEventInformation.XPathToFirstName += m + "[1]";
+                        else
+                            defaultEventInformation.XPathToFirstName += m + "[1]//";
+                    }
+
+                    var firstL = lNameList.First();
+                    var lastL = lNameList.Last();
+                    foreach (var m in lNameList)
+                    {
+                        if (firstL == m)
+                            defaultEventInformation.XPathToLastName += m + "//";
+                        else if (lastL == m)
+                            defaultEventInformation.XPathToLastName += m + "[1]";
+                        else
+                            defaultEventInformation.XPathToLastName += m + "[1]//";
+                    }
+
+
+                    if (user != null)
+                    {
+                        using (var partyManager = new PartyManager())
+                        {
+                            defaultEventInformation.Email = user.Email;
+                            var party = partyManager.GetPartyByUser(user.Id);
+                            defaultEventInformation.FirstName = party.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "FirstName").Select(v => v.Value).FirstOrDefault();
+                            defaultEventInformation.LastName = party.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "LastName").Select(v => v.Value).FirstOrDefault();
+                        }
+                    }
+
+                    if (!String.IsNullOrEmpty(e.EventDate))
+                        defaultEventInformation.Date = e.EventDate;
+                    if (!String.IsNullOrEmpty(e.EventLanguage))
+                        if (e.Id == 12)
+                            defaultEventInformation.Language = "English";
+                        else
+                            defaultEventInformation.Language = e.EventLanguage;
+
+                    if (!String.IsNullOrEmpty(e.ImportantInformation))
+                        defaultEventInformation.ImportantInformation = e.ImportantInformation;
+
+                    Session["DefaultEventInformation"] = defaultEventInformation;
+
+                    //CreateTaskmanager taskManager = new CreateTaskmanager();
+                    if (TaskManager == null)
+                        TaskManager = new CreateTaskmanager();
+
+                        TaskManager.AddToBus(CreateTaskmanager.METADATASTRUCTURE_ID, e.MetadataStructure.Id);
+                        TaskManager.AddToBus(CreateTaskmanager.ENTITY_ID, e.Id);
+
+                            if (ref_id.Length > 0)
+                            {
+                                List<EventRegistration> regs = erManager.GetRegistrationsByRefIdAndEvent(ref_id, e.Id);
+                                EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
+                                defaultEventInformation.RegistrationId = reg.Id;
+                                XmlNodeReader xmlNodeReader = new XmlNodeReader(reg.Data);
+                                TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, reg.Data);
+                                xmlNodeReader.Dispose();
+                            }
+                            else if (user != null)
+                            {
+                                List<EventRegistration> regs = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
+                                EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
+                                defaultEventInformation.RegistrationId = reg.Id;
+
+                                XmlNodeReader xmlNodeReader = new XmlNodeReader(reg.Data);
+                                TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, reg.Data);
+                                xmlNodeReader.Dispose();
+                            }
+
+                    }
+
+                    TaskManager.AddToBus(CreateTaskmanager.SAVE_WITH_ERRORS, false);
+                    TaskManager.AddToBus(CreateTaskmanager.NO_IMPORT_ACTION, true);
+                    TaskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_TITLE, "Event registration");
+                    TaskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_DESCRIPTION, "<p><b>help</b></p>");
+
+
+                    Session["EventRegistrationTaskmanager"] = TaskManager;
+
+                    setAdditionalFunctions();
+
+                return new EmptyResult();
+
+            }
+
+        }
+
+        public ActionResult LoadForm(LogInToEventModel model)
+        {
+            using (EventManager eManager = new EventManager())
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
+            using (SubjectManager subManager = new SubjectManager())
+            {
                 Event e = eManager.EventRepo.Get(model.EventId);
+                User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
 
                 if (e.LogInPassword != model.LogInPassword)
                     ModelState.AddModelError("passwort", "The event passwort is wrong.");
@@ -182,9 +314,64 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 {
                     //add default value to session
                     DefaultEventInformation defaultEventInformation = new DefaultEventInformation();
-                    defaultEventInformation.EventName = e.Name;
-                    defaultEventInformation.Location = e.Location;
+                    defaultEventInformation.EventName = HttpUtility.HtmlDecode(e.Name);
+                    defaultEventInformation.Location = HttpUtility.HtmlDecode(e.Location);
                     defaultEventInformation.Eventid = e.Id.ToString();
+
+                    //xpath 
+                    //xpath 
+                    var emailList = e.XPathToEmail.Split('/').ToList();
+                    var fNameList = e.XPathToFirstName.Split('/').ToList();
+                    var lNameList = e.XPathToLastName.Split('/').ToList();
+
+                    var firstE = emailList.First();
+                    var lastE = emailList.Last();
+                    foreach (var m in emailList)
+                    {
+                        if (firstE == m)
+                            defaultEventInformation.XPathToEmail += m + "//";
+                        else if (lastE == m)
+                            defaultEventInformation.XPathToEmail += m + "[1]";
+                        else
+                            defaultEventInformation.XPathToEmail += m + "[1]//";
+                    }
+
+                    var firstF = fNameList.First();
+                    var lastF = fNameList.Last();
+                    foreach (var m in fNameList)
+                    {
+                        if (firstF == m)
+                            defaultEventInformation.XPathToFirstName += m + "//";
+                        else if (lastF == m)
+                            defaultEventInformation.XPathToFirstName += m + "[1]";
+                        else
+                            defaultEventInformation.XPathToFirstName += m + "[1]//";
+                    }
+
+                    var firstL = lNameList.First();
+                    var lastL = lNameList.Last();
+                    foreach (var m in lNameList)
+                    {
+                        if (firstL == m)
+                            defaultEventInformation.XPathToLastName += m + "//";
+                        else if (lastL == m)
+                            defaultEventInformation.XPathToLastName += m + "[1]";
+                        else
+                            defaultEventInformation.XPathToLastName += m + "[1]//";
+                    }
+
+                    //user information
+                    if (user != null)
+                    {
+                        using (var partyManager = new PartyManager())
+                        {
+                            defaultEventInformation.Email = user.Email;
+                            var party = partyManager.GetPartyByUser(user.Id);
+                            defaultEventInformation.FirstName = HttpUtility.HtmlDecode(party.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "FirstName").Select(v => v.Value).FirstOrDefault());
+                            defaultEventInformation.LastName = HttpUtility.HtmlDecode(party.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "LastName").Select(v => v.Value).FirstOrDefault());
+                        }
+                    }
+
                     if (!String.IsNullOrEmpty(e.EventDate))
                         defaultEventInformation.Date = e.EventDate;
                     if (!String.IsNullOrEmpty(e.EventLanguage))
@@ -194,7 +381,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         defaultEventInformation.Language = e.EventLanguage;
 
                     if (!String.IsNullOrEmpty(e.ImportantInformation))
-                        defaultEventInformation.ImportantInformation = e.ImportantInformation;
+                        defaultEventInformation.ImportantInformation = HttpUtility.HtmlDecode(e.ImportantInformation);
 
                     Session["DefaultEventInformation"] = defaultEventInformation;
 
@@ -207,11 +394,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                     if (model.Edit)
                     {
-                        using (EventRegistrationManager erManager = new EventRegistrationManager())
-                        using (SubjectManager subManager = new SubjectManager())
-                        {
-                            User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
-
                             if(model.RefId.Length > 0)
                             {
                                 List<EventRegistration> regs = erManager.GetRegistrationsByRefIdAndEvent(model.RefId, e.Id);
@@ -233,7 +415,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             }
                             //todo error message 
                             
-                        }
+                        
 
                     }
 
@@ -263,13 +445,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         }
 
-        //public ActionResult LoadMetadataForm()
-        //{
-        //    var view = this.Render("DCM", "Form", "StartMetadataEditor", new RouteValueDictionary()   
-        //    {});
-
-        //    return Content(view.ToHtmlString(), "text/html");
-        //}
 
         public ActionResult LoadMetadataForm(string edit, bool fromEditMode = true)
         {
@@ -645,7 +820,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 // get email adress from XML && get ref_id based on email adress
                 string email = XmlMetadataWriter.ToXmlDocument(data).GetElementsByTagName("Email")[0].InnerText;
-                string ref_id = GetRefIdFromEmail(email);
+                string ref_id = EmailHelper.GetRefIdFromEmail(email);
 
                 string notificationType = "";
 
@@ -1168,23 +1343,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
 
             return false;
-        }
-
-        private string GetRefIdFromEmail(string email)
-        {
-            StringBuilder hash = new StringBuilder();
-            using (MD5CryptoServiceProvider md5provider = new MD5CryptoServiceProvider())
-            {
-                byte[] bytes = md5provider.ComputeHash(new UTF8Encoding().GetBytes("abd_" + email));
-
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    hash.Append(bytes[i].ToString("x2"));
-                }
-            }
-            string ref_id = hash.ToString();
-
-            return ref_id;
         }
 
         private EventRegistration CheckEventRegistration(string ref_id, long event_id, EventRegistrationManager erManager)

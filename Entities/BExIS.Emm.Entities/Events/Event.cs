@@ -41,6 +41,10 @@ namespace BExIS.Emm.Entities.Event
 
         public virtual string LogInPassword { get; set; }
 
+        public virtual string XPathToEmail { get; set; }
+        public virtual string XPathToFirstName { get; set; }
+        public virtual string XPathToLastName { get; set; }
+
         public virtual string EmailBCC { get; set; }
 
         public virtual string EmailCC { get; set; }

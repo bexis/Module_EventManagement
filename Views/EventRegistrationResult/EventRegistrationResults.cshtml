@@ -10,7 +10,7 @@
 
 @section Information
 {
-    With this interface you get all registration from all open and closed events.
+    Overview of all registrations for current and previous events
     <p>
         <a href="/RBM/Help/Index/#_Toc434570750" class="bx-informationLink" title="go to help" target="_blank">More</a>
     </p>
@@ -22,19 +22,32 @@
         <table id="regResults">
             <thead>
                 <tr>
+                    <th>Actions</th>
                     @for (int c = 0; c < Model.Results.Columns.Count; c++)
                     {
                         <th>
                             @Model.Results.Columns[c].ColumnName
                         </th>
                     }
-                    <th>Actions</th>
+
                 </tr>
             </thead>
             <tbody>
                 @for (int i = 0; i < Model.Results.Rows.Count; i++)
                 {
                     <tr>
+                        <td>
+
+
+                            @if (@Model.Results.Rows[i][1].ToString() == "False")
+                            {
+                                <div onclick="onClickEdit(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
+                                <div onclick="onClickDeleteRegistration(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"></div>
+                                @Html.ActionLink("Resend", "ResendNotification", "EventRegistrationResult", new { id = Model.Results.Rows[i][0], eventId = Model.EventId }, new { @class = "bx bx-grid-function" })
+
+                            }
+
+                        </td>
                         @for (int c = 0; c < Model.Results.Columns.Count; c++)
                         {
                             <td>
@@ -42,13 +55,6 @@
                             </td>
 
                         }
-                        <td><div onclick="onClickEdit(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-edit" style="cursor: pointer;" title="Edit registration"></div>
-
-                        @if (@Model.Results.Rows[i][1].ToString() == "False")
-                        {
-                            <div onclick="onClickDeleteRegistration(@Model.Results.Rows[i][0].ToString(), @Model.EventId)" class="bx bx-grid-function bx-trash" style="cursor: pointer;" title="Delete registration"></div>
-                        }
-                        </td>
                     </tr>
                 }
 
@@ -56,7 +62,8 @@
         </table>
 
         @Html.ActionLink("Export (csv)", "Export", "EventRegistrationResult", new { id = Model.EventId }, new { @class = "bx-button function" })
-        <span class="bx-button function" id="" onclick="Delete(@Model.EventId)" title="Delete event">Delete</span>
+        <span class="bx-button function" id="" onclick="Delete(@Model.EventId)" title="Delete event">Delete Event</span>
+        <span class="bx-button function" id="" onclick="Clear(@Model.EventId)" title="Clear event">Clear</span>
 
         if (Model.WaitingListResults.Rows.Count > 0)
         {
@@ -75,24 +82,24 @@
                 <tbody>
                     @for (int i = 0; i < Model.WaitingListResults.Rows.Count; i++)
                     {
-                    <tr>
-                        @for (int c = 0; c < Model.WaitingListResults.Columns.Count; c++)
-                        {
-                            if (Model.WaitingListResults.Columns[c].ColumnName == "Action")
+                        <tr>
+                            @for (int c = 0; c < Model.WaitingListResults.Columns.Count; c++)
                             {
-                                <td>
-                                    @Html.ActionLink("Move", "MoveFromWaitingList", "EventRegistrationResult", new { id = Model.WaitingListResults.Rows[i][0], eventId = Model.EventId }, new { @class = "bx bx-grid-function"})
-                                </td>
-                            }
-                            else
-                            {
-                                <td>
-                                    @Model.WaitingListResults.Rows[i][c].ToString()
-                                </td>
-                            }
+                                @*if (Model.WaitingListResults.Columns[c].ColumnName == "Action")
+                                {
+                                    <td>
+                                        @Html.ActionLink("Move", "MoveFromWaitingList", "EventRegistrationResult", new { id = Model.WaitingListResults.Rows[i][0], eventId = Model.EventId }, new { @class = "bx bx-grid-function" })
+                                    </td>
+                                }
+                                else
+                                {*@
+                                    <td>
+                                        @Model.WaitingListResults.Rows[i][c].ToString()
+                                    </td>
+                                @*}*@
 
-                        }
-                    </tr>
+                            }
+                        </tr>
                     }
 
 
@@ -146,11 +153,21 @@
         }
     }
 
+    function Clear(id) {
+        var result = confirm('Are you sure you want to clear all reservations from the event?');
+        if (result) {
+            $.get('@Url.Action("Clear", "EventRegistrationResult")', { id: id }, function (data) {
+                window.location.href = '../Show';
+            });
+        }
+    }
+
     function onClickEdit(id, eventid) {
         $.get('@Url.Action("LoadForm", "EventRegistrationResult", new RouteValueDictionary { { "area", "EMM" } })', { id: id, eventid: eventid }, function (data) {
             window.location.href = "/EMM/EventRegistration/LoadMetadataForm?edit=true";
         });
     }
+
 
     function onClickDeleteRegistration(id, eventid) {
 

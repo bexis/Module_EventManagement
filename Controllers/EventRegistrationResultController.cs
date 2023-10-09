@@ -19,6 +19,8 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml;
@@ -62,6 +64,32 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 eventManager.DeleteEvent(eventManager.GetEventById(eventId));
             }
           
+            return RedirectToAction("Show");
+        }
+
+        /// <summary>
+        /// clear, that means delete all registrations from one event
+        /// </summary>
+        /// <param name="id">event id</param>
+        /// <returns>csv file</returns>
+        public ActionResult Clear(string id)
+        {
+            long eventId = Convert.ToInt64(id);
+            using (var eventRegistrationManager = new EventRegistrationManager())
+            using (var eventManager = new EventManager())
+            {
+                //delete first all registrations
+                List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(eventId);
+                eventRegistrations.ForEach(a => eventRegistrationManager.DeleteEventRegistration(a));
+
+                var e = eventManager.GetEventById(eventId);
+                if(e.Closed == true)
+                {
+                    e.Closed = false;
+                    eventManager.UpdateEvent(e);
+                }
+            }
+
             return RedirectToAction("Show");
         }
 
@@ -128,6 +156,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         open.EventFilterItems.Add(new EventFilterItem(e));
                 }
 
+                open.EventFilterItems = open.EventFilterItems.OrderBy(a => a.Id).ToList();
+                closed.EventFilterItems = closed.EventFilterItems.OrderBy(a => a.Id).ToList();
+                open.EventFilterItems = Enumerable.Reverse(open.EventFilterItems).ToList();
+                closed.EventFilterItems = Enumerable.Reverse(closed.EventFilterItems).ToList();
+
                 model.Add(open);
                 model.Add(closed);
 
@@ -174,6 +207,31 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             return RedirectToAction("OnSelectTreeViewItem", new { id = eventId });
         }
+
+        public ActionResult ResendNotification(long id, long eventId)
+        {
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
+            using (EventManager eventManager = new EventManager())
+            {
+                var registration = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
+
+                var e = eventManager.GetEventById(eventId);
+                Resend(registration.Data, e);
+            }
+
+            return RedirectToAction("OnSelectTreeViewItem", new { id = eventId });
+        }
+
+        private void Resend(XmlDocument data, Event e)
+        {
+            // get email adress from XML && get ref_id based on email adress
+            string email = data.GetElementsByTagName("Email")[0].InnerText;
+            string ref_id = EmailHelper.GetRefIdFromEmail(email);
+            string url = Request.Url.GetLeftPart(UriPartial.Authority);
+            EmailHelper.SendEmailNotification("resend", email, ref_id, data, e, url);
+        }
+
+      
 
         private void SendNotification(XmlDocument data, Event e)
         {
@@ -355,6 +413,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     else
                         email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
 
+                    //change Sataus if event if there is again space on waiting list
+                    if((countWaitingList <= e.WaitingListLimitation) && e.Closed == true)
+                    {
+                        e.Closed = false;
+                        eventManager.UpdateEvent(e);
+                    }
+
                     EmailHelper.SendEmailNotification("remove_from_waiting_list", email, "", reg.Data, reg.Event, url);
 
                 }
@@ -399,7 +464,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             DataTable results = new DataTable();
             results.Columns.Add("Id");
             results.Columns.Add("Deleted");
-            results.Columns.Add("Action");
+            //results.Columns.Add("Action");
 
             using (EventRegistrationManager erManager = new EventRegistrationManager())
             {
@@ -464,7 +529,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
             {
                 if (!xe.HasElements)
                 {
-                    dr[xe.Name.ToString().Replace("Type", "")] = xe.Value; //add in the values
+                    string value = xe.Value.Replace("\r\n", " ");
+                    value = value.Replace("\n", " ");
+                    value = HttpUtility.HtmlDecode(value);
+                    dr[xe.Name.ToString().Replace("Type", "")] = value;  //add in the values
                 }
             }
 

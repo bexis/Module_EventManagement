@@ -169,6 +169,42 @@
     </tr>
     <tr>
         <td>
+            @Html.LabelFor(m => m.XPathToEmail)
+        </td>
+        <td>
+            @Html.DropDownListFor(m => m.XPathToEmail, new SelectList(Model.MetadataNodes, "DisplayName", "XPath"), new
+             {
+                 @class = "bx-dropdown",
+        style = "-webkit-appearance: menulist; height: 30px;"
+             })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.XPathToFirstName)
+        </td>
+        <td>
+            @Html.DropDownListFor(m => m.XPathToFirstName, new SelectList(Model.MetadataNodes, "DisplayName", "XPath"), new
+             {
+                 @class = "bx-dropdown",
+        style = "-webkit-appearance: menulist; height: 30px;"
+             })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @Html.LabelFor(m => m.XPathToLastName)
+        </td>
+        <td>
+            @Html.DropDownListFor(m => m.XPathToLastName, new SelectList(Model.MetadataNodes, "DisplayName", "XPath"), new
+             {
+                 @class = "bx-dropdown",
+        style = "-webkit-appearance: menulist; height: 30px;"
+             })
+        </td>
+    </tr>
+    <tr>
+        <td>
             @Html.LabelFor(m => m.JavaScriptPath)
         </td>
         <td>
@@ -217,3 +253,54 @@
 </div><br />
 
 }
+
+<script>
+
+    $(document).ready(function () {
+        var edit = '@Html.Raw(Model.EditMode)';
+        console.log(edit.toLowerCase());
+        if (edit.toLowerCase() == "true") {
+
+            $.get('@Url.Action("GetMetadataNodes", "Event", new RouteValueDictionary { { "area", "EMM" } })', { id: @Model.MetadataStructureId }, function (data) {
+            var jsonData = JSON.parse(data);
+                jsonData.forEach(function (object) {
+                    if ('@Model.XPathToEmail' == object.XPath) {
+                        $('#XPathToEmail').append('<option selected="selected" value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                    }
+                    else {
+                        $('#XPathToEmail').append('<option value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                    }
+
+                    if ('@Model.XPathToFirstName' == object.XPath) {
+                        $('#XPathToFirstName').append('<option selected="selected" value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                    }
+                    else {
+                        $('#XPathToFirstName').append('<option value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                    }
+                    if ('@Model.XPathToLastName' == object.XPath) {
+                        $('#XPathToLastName').append('<option selected="selected" value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                    }
+                    else {
+                        $('#XPathToLastName').append('<option value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                    }
+                });
+            });
+        }
+    });
+
+    $('#MetadataStructureId').change(function () {
+        var id = $('#MetadataStructureId').val();
+        $('#XPathToEmail').empty();
+        $('#XPathToFirstName').empty();
+        $('#XPathToLastName').empty();
+        $.get('@Url.Action("GetMetadataNodes", "Event", new RouteValueDictionary { { "area", "EMM" } })', { id: id }, function (data) {
+            var jsonData = JSON.parse(data);
+            jsonData.forEach(function (object) {
+                $('#XPathToEmail').append('<option value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                $('#XPathToFirstName').append('<option value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                $('#XPathToLastName').append('<option value="' + object.XPath + '">' + object.DisplayName + '</option>');
+            });
+        });
+    });
+
+</script>

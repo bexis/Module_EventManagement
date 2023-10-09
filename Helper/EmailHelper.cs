@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Xml;
@@ -140,6 +142,23 @@ namespace BExIS.Modules.EMM.UI.Helper
                 bccMails, // Allways send BCC to SystemEmail + additional set 
                 new List<string> { replyTo }
                 );
+        }
+
+        public static string GetRefIdFromEmail(string email)
+        {
+            StringBuilder hash = new StringBuilder();
+            using (MD5CryptoServiceProvider md5provider = new MD5CryptoServiceProvider())
+            {
+                byte[] bytes = md5provider.ComputeHash(new UTF8Encoding().GetBytes("abd_" + email));
+
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    hash.Append(bytes[i].ToString("x2"));
+                }
+            }
+            string ref_id = hash.ToString();
+
+            return ref_id;
         }
 
     }

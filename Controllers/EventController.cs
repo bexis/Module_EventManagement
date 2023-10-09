@@ -2,18 +2,13 @@
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using Telerik.Web.Mvc;
-using BExIS.Security.Entities.Subjects;
 using BExIS.Security.Entities.Objects;
 using Vaiona.Web.Mvc.Models;
-using Vaiona.Model;
 using Vaiona.Web.Extensions;
 using BExIS.Emm.Services.Event;
-using BExIS.IO;
 using System.IO;
 using System.Xml;
 using BExIS.Emm.Entities.Event;
-using System.Text;
 using BExIS.Dlm.Services.MetadataStructure;
 using BExIS.Dlm.Entities.MetadataStructure;
 using BExIS.Xml.Helpers;
@@ -24,48 +19,50 @@ using BExIS.Security.Services.Subjects;
 using BExIS.Security.Services.Authorization;
 using BExIS.Security.Services.Objects;
 using BExIS.Security.Entities.Authorization;
+using Vaiona.Persistence.Api;
+using System.Xml.Linq;
+using Newtonsoft.Json;
 
 namespace BExIS.Modules.EMM.UI.Controllers
 {
     public class EventController : Controller
     {
-
         public ActionResult EventManager()
         {
-
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Manage Events", this.Session.GetTenant());
 
             using (EventManager eManger = new EventManager())
+            using (var eventRegistrationManager = new EventRegistrationManager())
             {
 
                 List<EventModel> model = new List<EventModel>();
                 List<Event> data = eManger.GetAllEvents().ToList();
 
-                data.ToList().ForEach(r => model.Add(new EventModel(r)));
+                foreach (Event e in data)
+                {
+                    EventModel m = new EventModel(e);
+                    List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(e.Id);
+                    if (eventRegistrations.Count > 0)
+                        m.InUse = true;
+                    else
+                        m.InUse = false;
+
+                    model.Add(m);
+                }
+
+                //data.ToList().ForEach(r => model.Add(new EventModel(r)));
 
                 return View("EventManager", model);
             }
         }
 
-        [GridAction]
-        public ActionResult AllEvents()
-        {
-            using (EventManager eManger = new EventManager())
-            {
-                List<EventModel> model = new List<EventModel>();
-                List<Event> data = eManger.GetAllEvents().ToList();
-
-                data.ToList().ForEach(r => model.Add(new EventModel(r)));
-
-                return View("EventManager", new GridModel<EventModel> { Data = model });
-            }
-
-        }
 
         #region Create, Edit Delete ans Save Event
 
         public ActionResult Create()
         {
+            ViewBag.Title = PresentationModel.GetViewTitleForTenant("Create Event", this.Session.GetTenant());
+
             EventModel model = new EventModel();
             model.MetadataStructureList = GetMetadataStructureList();
             return View("EditEvent", model);
@@ -91,6 +88,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
 
             return RedirectToAction("EventManager");
+        }
+
+        public ActionResult GetMetadataNodes(long id)
+        {
+            List<SearchMetadataNode> list = GetAllXPathsOfSimpleAttributes(id);
+
+            return Json(JsonConvert.SerializeObject(list), JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -141,7 +145,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                     if (model.Id == 0)
                     {
-                        Event newEvent = eManager.CreateEvent(model.Name, model.EventDate, model.ImportantInformation, model.Location, model.MailInformation, model.SelectedEventLanguage, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.WaitingList,model.WaitingListLimitation, model.EditAllowed, model.Closed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, ms, null);
+                        Event newEvent = eManager.CreateEvent(model.Name, model.EventDate, model.ImportantInformation, model.Location, model.MailInformation, model.SelectedEventLanguage, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.WaitingList,model.WaitingListLimitation, model.EditAllowed, model.Closed, model.LogInPassword, model.XPathToEmail, model.XPathToFirstName, model.XPathToLastName, model.EmailBCC, model.EmailCC, model.EmailReply, ms, null);
 
                         newEvent = SaveFile(file, newEvent, eManager);
                         eManager.UpdateEvent(newEvent);
@@ -186,7 +190,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         e.EditAllowed = model.EditAllowed;
                         e.Closed = model.Closed;
                         e.LogInPassword = model.LogInPassword;
-                        e.LogInPassword = model.LogInPassword;
+                        e.XPathToEmail = model.XPathToEmail;
+                        e.XPathToFirstName = model.XPathToFirstName;
+                        e.XPathToLastName = model.XPathToLastName;
                         e.EmailCC = model.EmailCC;
                         e.EmailBCC = model.EmailBCC;
                         e.EmailReply = model.EmailReply;
@@ -205,16 +211,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         }
 
-        //public ActionResult DownloadSchemaFile(long id)
-        //{
-        //    EventManager eManager = new EventManager();
-        //    Event e = eManager.GetEventById(id);
-
-        //    byte[] bytes = Encoding.Default.GetBytes(e.Schema.OuterXml);
-
-        //    return File(bytes, "application/octet-stream", e.SchemaFileName);
-        //}
-
         #endregion
 
 
@@ -224,8 +220,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
         {
             string filename = "ext.js";
             string path = Path.Combine(AppConfiguration.DataPath, "MetadataStructures", e.MetadataStructure.Id.ToString(), filename);
-
-
 
             if (System.IO.File.Exists(path) && file != null && file.ContentLength > 0)
             {
@@ -262,7 +256,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
             XmlDatasetHelper xmlDatasetHelper = new XmlDatasetHelper();
             try
             {
-
                 IEnumerable<MetadataStructure> metadataStructureList = metadataStructureManager.Repo.Get();
 
                 List<ListItem> temp = new List<ListItem>();
@@ -286,6 +279,31 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
         }
 
-        #endregion
+        public List<SearchMetadataNode> GetAllXPathsOfSimpleAttributes(long metadataStrutureId)
+        {
+            List<SearchMetadataNode> list = new List<SearchMetadataNode>();
+
+            using (IUnitOfWork unitOfWork = this.GetUnitOfWork())
+            {
+
+                    string title = unitOfWork.GetReadOnlyRepository<MetadataStructure>().Get(metadataStrutureId).Name;
+
+                    XmlMetadataWriter xmlMetadatWriter = new XmlMetadataWriter(XmlNodeMode.xPath);
+                    XDocument metadataXml = xmlMetadatWriter.CreateMetadataXml(metadataStrutureId);
+
+                    List<XElement> elements = metadataXml.Root.Descendants().Where(e => e.HasElements.Equals(false)).ToList();
+
+                    foreach (XElement element in elements)
+                    {
+                        list.Add(
+                          new SearchMetadataNode(title, XExtentsions.GetAbsoluteXPath(element).Substring(1))
+                          );
+                    }
+                }
+
+                return list;
+            }
+
+            #endregion
+        }
     }
-}
