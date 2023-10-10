@@ -22,14 +22,10 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 using System.Xml;
 using System.Xml.Linq;
-using Telerik.Web.Mvc;
 using Vaiona.Persistence.Api;
 using Vaiona.Utils.Cfg;
 using Vaiona.Web.Extensions;
@@ -61,13 +57,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
         }
 
         #region Register to Event
-
-        [GridAction]
-        public ActionResult AvailableEvents(string ref_id)
-        {
-            List<EventRegistrationModel> model = GetAvailableEvents(ref_id);
-            return View("AvailableEventsList", new GridModel<EventRegistrationModel> { Data = model });
-        }
 
         private List<EventRegistrationModel> GetAvailableEvents(string ref_id = "")
         {

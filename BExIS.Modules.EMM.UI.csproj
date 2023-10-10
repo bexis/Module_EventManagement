@@ -196,6 +196,7 @@
     <Content Include="Views\EventRegistration\_logInToEvent.cshtml" />
     <Content Include="Views\EventRegistrationResult\_selectEvent.cshtml" />
     <None Include="packages.config" />
+    <None Include="Properties\PublishProfiles\BexisServer_2010-testsite.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <Content Include="Views\EventRegistration\MetadataEditor.cshtml" />
     <Content Include="Views\EventRegistration\_metadataAttributeView.cshtml" />
@@ -240,9 +241,9 @@
       <Project>{8B2EC2B0-6870-456B-BE2D-B0FB4EA68D83}</Project>
       <Name>BExIS.IO.DataType.DisplayPattern</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Components\IO\BExIS.Io.Transform.Output\BExIS.Io.Transform.Output.csproj">
+    <ProjectReference Include="..\..\..\..\Components\IO\BExIS.Io.Transform.Output\BExIS.IO.Transform.Output.csproj">
       <Project>{455ec826-9a92-40ff-bd3b-388c288955ce}</Project>
-      <Name>BExIS.Io.Transform.Output</Name>
+      <Name>BExIS.IO.Transform.Output</Name>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Components\IO\BExIS.IO.Transform.Validation\BExIS.IO.Transform.Validation.csproj">
