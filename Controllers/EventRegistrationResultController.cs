@@ -128,7 +128,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             string dataPath = AppConfiguration.DataPath;
             string storePath = Path.Combine(dataPath, "EMM", "Temp", filename + ".csv");
 
-            System.IO.File.WriteAllLines(storePath, lines);
+            System.IO.File.WriteAllLines(storePath, lines, new UTF8Encoding(true));
 
             return File(storePath, MimeMapping.GetMimeMapping(eventName + ".csv"), Path.GetFileName(storePath));
         }
