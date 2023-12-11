@@ -92,9 +92,15 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         public ActionResult GetMetadataNodes(long id)
         {
-            List<SearchMetadataNode> list = GetAllXPathsOfSimpleAttributes(id);
+            if(id != 0)
+            {
+                List<SearchMetadataNode> list = GetAllXPathsOfSimpleAttributes(id);
 
-            return Json(JsonConvert.SerializeObject(list), JsonRequestBehavior.AllowGet);
+                return Json(JsonConvert.SerializeObject(list), JsonRequestBehavior.AllowGet);
+            }
+            else
+                return new EmptyResult();
+                
         }
 
         [HttpPost]
@@ -259,7 +265,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 IEnumerable<MetadataStructure> metadataStructureList = metadataStructureManager.Repo.Get();
 
                 List<ListItem> temp = new List<ListItem>();
-
+                ListItem item = new ListItem(0, "");
+                temp.Add(item);
                 foreach (MetadataStructure metadataStructure in metadataStructureList)
                 {
                     if (xmlDatasetHelper.IsActive(metadataStructure.Id) &&
