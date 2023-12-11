@@ -114,6 +114,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
             if (model.Name == null)
                 ModelState.AddModelError("Name", "Name is required.");
 
+            if (model.Location == null)
+                ModelState.AddModelError("Location", "Location is required.");
+
             if (model.LogInPassword == null)
                 ModelState.AddModelError("LogInPassword", "Login password is required.");
 
