@@ -1,0 +1,23 @@
+{
+  "id": "emm",
+  "name": "Event management",
+  "description": "...",
+  "entries": [
+    {
+      "key": "help",
+      "title": "Help URL",
+      "value": "",
+      "type": "String",
+      "description": "URL to the manual. If empty, it links to the latest manual from BEXIS2"
+    },
+    {
+      "key": "EventAdminGroups",
+      "title": "Event admin groups",
+      "value": "beo, administrator",
+      "description": "",
+      "type": "String",
+      "options": []
+    }
+   
+  ]
+}

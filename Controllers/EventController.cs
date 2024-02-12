@@ -22,6 +22,7 @@ using BExIS.Security.Entities.Authorization;
 using Vaiona.Persistence.Api;
 using System.Xml.Linq;
 using Newtonsoft.Json;
+using Vaiona.Web.Mvc.Modularity;
 
 namespace BExIS.Modules.EMM.UI.Controllers
 {
@@ -165,7 +166,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         using (EntityPermissionManager pManager = new EntityPermissionManager())
                         {
                             Entity entityType = entityTypeManager.FindByName("Event");
-                            string[] eventAdminGroups = Helper.Settings.get("EventAdminGroups").ToString().Split(',');
+                            var settings = ModuleManager.GetModuleSettings("emm");
+                            string[] eventAdminGroups = settings.GetValueByKey("EventAdminGroups").ToString().Split(',');
+
                             if (eventAdminGroups != null && eventAdminGroups.Length > 0)
                             {
                                 foreach(var g in eventAdminGroups)
