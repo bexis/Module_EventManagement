@@ -177,8 +177,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                                     var group = groupManager.FindByNameAsync(g).Result;
                                     if (group != null)
                                     {
-                                        if (pManager.GetRights(group.Id, entityType.Id, newEvent.Id) == 0)
-                                            pManager.Create(group.Id, entityType.Id, newEvent.Id, fullRights);
+                                        if (pManager.GetRightsAsync(group.Id, entityType.Id, newEvent.Id).Result == 0)
+                                            pManager.CreateAsync(group.Id, entityType.Id, newEvent.Id, fullRights);
                                     }
 
                                 }

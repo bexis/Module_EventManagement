@@ -183,7 +183,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             {
                 var user = userManager.FindByNameAsync(HttpContext.User.Identity.Name).Result;
                 Entity entity = entityTypeManager.FindByName("Event");
-                model.UserHasRights = permissionManager.HasEffectiveRight(user.Name, entity.EntityType, id, RightType.Read);
+                model.UserHasRights = permissionManager.HasEffectiveRightsAsync(user.Name, entity.EntityType, id, RightType.Read).Result;
             }
 
             return View("EventRegistrationResults", model);
