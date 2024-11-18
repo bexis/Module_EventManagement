@@ -265,23 +265,23 @@
             var jsonData = JSON.parse(data);
                 jsonData.forEach(function (object) {
                     if ('@Model.XPathToEmail' == object.XPath) {
-                        $('#XPathToEmail').append('<option selected="selected" value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                        $('#XPathToEmail').append('<option selected="selected" value="' + object.xPath + '">' + object.displayName + '</option>');
                     }
                     else {
-                        $('#XPathToEmail').append('<option value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                        $('#XPathToEmail').append('<option value="' + object.xPath + '">' + object.displayName + '</option>');
                     }
 
                     if ('@Model.XPathToFirstName' == object.XPath) {
-                        $('#XPathToFirstName').append('<option selected="selected" value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                        $('#XPathToFirstName').append('<option selected="selected" value="' + object.xPath + '">' + object.displayName + '</option>');
                     }
                     else {
-                        $('#XPathToFirstName').append('<option value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                        $('#XPathToFirstName').append('<option value="' + object.xPath + '">' + object.displayName + '</option>');
                     }
                     if ('@Model.XPathToLastName' == object.XPath) {
-                        $('#XPathToLastName').append('<option selected="selected" value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                        $('#XPathToLastName').append('<option selected="selected" value="' + object.xPath + '">' + object.displayName + '</option>');
                     }
                     else {
-                        $('#XPathToLastName').append('<option value="' + object.XPath + '">' + object.DisplayName + '</option>');
+                        $('#XPathToLastName').append('<option value="' + object.xPath + '">' + object.displayName + '</option>');
                     }
                 });
             });
