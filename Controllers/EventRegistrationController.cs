@@ -383,7 +383,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                     if (model.Edit)
                     {
-                            if(model.RefId.Length > 0)
+                            if(model.RefId != null && model.RefId.Length > 0)
                             {
                                 List<EventRegistration> regs = erManager.GetRegistrationsByRefIdAndEvent(model.RefId, e.Id);
                                 EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
