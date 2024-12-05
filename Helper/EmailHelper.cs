@@ -107,41 +107,42 @@ namespace BExIS.Modules.EMM.UI.Helper
             body += emailStructure.bodyOpening + "<br/>" +
             details + "<br/><br/>";
             if (notificationType != "deleted")
-                body += emailStructure.bodyHintToLink + "<a href=\"" + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "\" >" +  url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "</a><br/><br/>";
+                body += emailStructure.bodyHintToLink + "<a href=\"" + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "\" >" + url + "/emm/EventRegistration/EventRegistration/?ref_id=" + ref_id + "</a><br/><br/>";
             body += emailStructure.bodyClosing + "<br/>" +
                  emailStructure.bodyClosingName;
 
-            var es = new EmailService();
-
-            List<string> ccMails = new List<string>();
-            if (!String.IsNullOrEmpty(e.EmailCC))
-                ccMails.AddRange(e.EmailCC.Split(',').ToList());
-
-
-            List<string> bccMails = new List<string>();
-            bccMails.Add(ConfigurationManager.AppSettings["SystemEmail"]);
-            if (!String.IsNullOrEmpty(e.EmailBCC))
-                bccMails.AddRange(e.EmailBCC.Split(',').ToList());
-
-            // If no explicit Reply to mail is set use the SystemEmail
-            string replyTo = "";
-            if (String.IsNullOrEmpty(e.EmailReply))
+            using (var es = new EmailService())
             {
-                replyTo = ConfigurationManager.AppSettings["SystemEmail"];
-            }
-            else
-            {
-                replyTo = e.EmailReply;
-            }
+                List<string> ccMails = new List<string>();
+                if (!String.IsNullOrEmpty(e.EmailCC))
+                    ccMails.AddRange(e.EmailCC.Split(',').ToList());
 
-            es.Send(
-                subject,
-                body,
-                new List<string> { email }, // to
-                ccMails, // CC 
-                bccMails, // Allways send BCC to SystemEmail + additional set 
-                new List<string> { replyTo }
-                );
+
+                List<string> bccMails = new List<string>();
+                bccMails.Add(ConfigurationManager.AppSettings["SystemEmail"]);
+                if (!String.IsNullOrEmpty(e.EmailBCC))
+                    bccMails.AddRange(e.EmailBCC.Split(',').ToList());
+
+                // If no explicit Reply to mail is set use the SystemEmail
+                string replyTo = "";
+                if (String.IsNullOrEmpty(e.EmailReply))
+                {
+                    replyTo = ConfigurationManager.AppSettings["SystemEmail"];
+                }
+                else
+                {
+                    replyTo = e.EmailReply;
+                }
+
+                es.Send(
+                    subject,
+                    body,
+                    new List<string> { email }, // to
+                    ccMails, // CC 
+                    bccMails, // Allways send BCC to SystemEmail + additional set 
+                    new List<string> { replyTo }
+                    );
+            }
         }
 
         public static string GetRefIdFromEmail(string email)

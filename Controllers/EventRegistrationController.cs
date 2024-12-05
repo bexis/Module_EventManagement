@@ -751,28 +751,29 @@ namespace BExIS.Modules.EMM.UI.Controllers
                  emailStructure.bodyClosingName;
 
 
-            var es = new EmailService();
-
-            // If no explicit Reply to mail is set use the SystemEmail
-            string replyTo = "";
-            if (String.IsNullOrEmpty(e.EmailReply))
+            using (var es = new EmailService())
             {
-                replyTo = ConfigurationManager.AppSettings["SystemEmail"];
-            }
-            else
-            {
-                replyTo = e.EmailReply;
-            }
 
-            es.Send(
-                subject,
-                body,
-                new List<string> { email }, // to
-                new List<string> { e.EmailCC }, // CC 
-                new List<string> { ConfigurationManager.AppSettings["SystemEmail"], e.EmailBCC }, // Allways send BCC to SystemEmail + additional set 
-                new List<string> { replyTo }
-                );
+                // If no explicit Reply to mail is set use the SystemEmail
+                string replyTo = "";
+                if (String.IsNullOrEmpty(e.EmailReply))
+                {
+                    replyTo = ConfigurationManager.AppSettings["SystemEmail"];
+                }
+                else
+                {
+                    replyTo = e.EmailReply;
+                }
 
+                es.Send(
+                    subject,
+                    body,
+                    new List<string> { email }, // to
+                    new List<string> { e.EmailCC }, // CC 
+                    new List<string> { ConfigurationManager.AppSettings["SystemEmail"], e.EmailBCC }, // Allways send BCC to SystemEmail + additional set 
+                    new List<string> { replyTo }
+                    );
+            }
         }
 
         public ActionResult Save()
