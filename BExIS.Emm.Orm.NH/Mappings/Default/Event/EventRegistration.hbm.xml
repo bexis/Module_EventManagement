@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="BExIS.Emm.Entities" namespace="BExIS.Emm.Entities.Event">
+  <class xmlns="urn:nhibernate-mapping-2.2" name="EventRegistration" table="emm_EventRegistrations">
+
+    <!-- Mapping BaseEntity properties -->
+
+    <id name="Id" type="Int64">
+      <column name="Id" />
+      <generator class="native" />
+    </id>
+
+    <version name="VersionNo" type="Int32">
+      <column name="VersionNo" />
+    </version>
+
+    <property name="Extra" type="System.Xml.XmlDocument, System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+      <column name="Extra" not-null="false" sql-type="xml" />
+    </property>
+
+
+    <!-- Mapping Entity properties -->
+
+    <!--<property name="Data" type="System.Xml.XmlDocument, System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+      <column name="Data" sql-type="xml" />
+    </property>-->
+
+	  <property name="Data" type="StringClob">
+		  <column name="Data" sql-type="jsonb"/>
+	  </property>
+
+    <property name="Deleted" type="Boolean">
+      <column name="Deleted" />
+    </property>
+
+    <property name="Token" type="String">
+      <column name="Token" />
+    </property>
+    
+     <property name="WaitingList" type="Boolean">
+      <column name="WaitingList" />
+    </property>
+    
+    <property name="InsertDate" type="Date">
+      <column name="InsertDate" />
+    </property>
+
+    <!-- Mapping Entity Associations -->
+
+    <many-to-one name="Person" class="BExIS.Security.Entities.Subjects.User" column="Person"/>
+
+    <many-to-one name="Event" class="BExIS.Emm.Entities.Event.Event" lazy="false" column="Event"/>
+
+
+  </class>
+</hibernate-mapping>
+

@@ -1,0 +1,2133 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BExIS.Dlm.Entities</name>
+    </assembly>
+    <members>
+        <member name="T:BExIS.Dlm.Entities.Administration.ResearchPlan">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Administration.ResearchPlan.Title">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Administration.ResearchPlan.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Administration.ResearchPlan.Datasets">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Administration.ResearchPlan.DataStructures">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Common.BaseUsage.MinCardinality">
+             <summary>
+            
+             </summary>
+             <remarks> Min cardinality 0 is interpreted as optional usage, Min can not be negative. not supported in NH </remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Common.BaseUsage.MaxCardinality">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Common.BaseUsage.Label">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Common.BaseUsage.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Common.BaseUsage.DefaultValue">
+            <summary>
+            The actual data type of the value is defined by the DataAttribute.DataType.
+            So developer should take care and convert this value to proper type before assigning it to parameter values
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Common.BaseUsage.FixedValue">
+            <summary>
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Common.BaseUsage.MissingValue">
+            <summary>
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Common.BaseUsage.IsValueOptional">
+            <summary>
+            Indicates whether the value of the variable/parameter is optional.
+            </summary>
+            <remarks>Setting this propery affects the minimum cardinality.</remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Common.BaseUsage.OrderNo">
+            <summary>
+            Indicates the order of the usage in its context, e.g., variable order in a data structure.
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.AggregateFunction">
+            <summary>
+            This entity lets define various processing functions that can be applied on variables. for example, temperature can be processed by Min, Max, Average, etc.
+            </summary>
+            <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.AggregateFunction.Name">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.AggregateFunction.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.AggregateFunction.DataContainers">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.AggregateFunction.#ctor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param>NA</param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.Classifier">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Classifier.Name">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Classifier.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Classifier.Parent">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Classifier.Children">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.Constraint">
+            <summary>
+            The base class for all concrete constraint types. It provides various attributes needed for all the constraint sub types. Among them the cultureId is a means
+            to define different constraints on a single data attribute based on the culture.
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Constraint.Provider">
+            <summary>
+            Indicates whether the constraint is defined internally or should be populated by accessing an external provider.
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Constraint.ConstraintSelectionPredicate">
+            <summary>
+            If the constraint is defined internaly/externally, the provider is supposed to have all the information needed to access the external source in order to obtain the required constraint attributes.
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Constraint.CultureId">
+            <summary>
+            the culture the constraint applies to. i.e., a Regex to match a taxon name in German may differ from its equivalent in English, ...
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Constraint.Name">
+            <summary>
+            A free form name of the constraint
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Constraint.Description">
+            <summary>
+            A free form description of the constraint
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Constraint.Negated">
+            <summary>
+            determines whether the constraint or its negation should be evaluated. e.g., the input should be evaluated for being in a range or outside of it.
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Constraint.Context">
+            <summary>
+            provides a piece of  information for grouping, categorizing, or distinguishing for purposes. Like fast validation, detailed validation, validation via the UI or API, etc.
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Constraint.MessageTemplate">
+            <summary>
+            The message to be conveyed to the user in case of the constraint break.
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Constraint.NegatedMessageTemplate">
+            <summary>
+            The message to be conveyed to the user in case of the negated constraint break.
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Constraint.DataContainer">
+            <summary>
+            The <see cref="P:BExIS.Dlm.Entities.DataStructure.Constraint.DataContainer"/> the constraint applies on.
+            </summary>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.Constraint.IsSatisfied(System.Object,System.Object)">
+            <summary>
+            The method checks whether the input <paramref name="data"/> satisfies the constraint. To be implemented by concrete sub-classes.
+            </summary>
+            <param name="data">the data to be evaluated</param>
+            <param name="auxiliary">An optional data item needed by some of the constraints. In most cases not used, but in comparison</param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:BExIS.Dlm.Entities.DataStructure.Constraint.ErrorMessage" -->
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Constraint.FormalDescription">
+            <summary>
+            The formal human readable translation of the constraint.
+            </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.DomainConstraint">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DomainConstraint.XmlDomainItems">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DomainConstraint.Items">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DomainConstraint.ErrorMessage">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.DomainConstraint.#ctor">
+            <summary>
+            set the default message and the negated message
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+            <param>NA</param>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.DomainConstraint.IsSatisfied(System.Object,System.Object)">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param name="data"></param>
+             <param name="auxiliary"></param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.DomainItem">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DomainItem.Key">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DomainItem.Value">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.PatternConstraint">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.PatternConstraint.MatchingPhrase">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.PatternConstraint.CaseSensitive">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.PatternConstraint.ErrorMessage">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.PatternConstraint.#ctor">
+            <summary>
+            set the default message and the negated message
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+            <param>NA</param>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.PatternConstraint.IsSatisfied(System.Object,System.Object)">
+            <summary>
+            checks whether the input parameter matches the MatchingPhrase
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+            <param name="data">is the input data in STRING format</param>
+            <param name="auxiliary"></param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.RangeConstraint">
+            <summary>
+            checks whether the value is inside/ outside of the specified range, not/including the boundaries.
+            The range constraint usually applies to numeric data types, but in case of string it can be used as string length check. The data type
+            of the provided value can be determined by the DataContainer.DataType....
+            </summary>
+            <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.RangeConstraint.Lowerbound">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.RangeConstraint.Upperbound">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.RangeConstraint.LowerboundIncluded">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.RangeConstraint.UpperboundIncluded">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.RangeConstraint.ErrorMessage">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.RangeConstraint.#ctor">
+            <summary>
+            set the default message and the negated message
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+            <param></param>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.RangeConstraint.IsSatisfied(System.Object,System.Object)">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param name="data"></param>
+             <param name="auxiliary"></param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.ComparisonConstraint">
+            <summary>
+            compares the input value to a reference/ target one using a specified comparison operator.
+            The reference object can be an object or the value of a variable/ parameter in the same tuple
+            </summary>
+            <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ComparisonConstraint.Operator">
+            <summary>
+            The comparison operator, it is always a binary operator capable of comparing its left side to the right and return true or false.
+            valid operators depend on the data type, so the UI should show proper operators based on the data attribute's data type during the constraint definition.
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ComparisonConstraint.TargetType">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ComparisonConstraint.Target">
+            <summary>
+            the target is used in the right side of the comparison operator
+            If the target type is:
+            Value: the target is the string representation of the value that should be compared to the input. the evaluation method should convert it to the container's data type before use.
+            Parameter: the target shows the Id of the parameter in the current type that its value should be used in the comparison
+            Variable: the target shows the Id of the variable in the current type that its value should be used in the comparison
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ComparisonConstraint.OffsetType">
+            <summary>
+            indicate whether the offset value is absolute or percentage
+            in some cases the right hand side of the operator should be compared to the left having an offset. for example the project end date should be at least 100 days after its start date.
+            Or the value of variable v1 can not be greater than 17% of the values of variable v2.
+            Offset type can be absolute or ratio. Absolute offsets are added to the right hand side and ratios are multiplied to the right hand side before the comparison to take place
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ComparisonConstraint.OffsetValue">
+            <summary>
+            The value of the offset to be taken into account in the comparison according to <seealso cref="!:ComparisonOffsetTye"/>
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ComparisonConstraint.ErrorMessage">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.ComparisonConstraint.#ctor">
+            <summary>
+            set the default message and the negated message
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+            <param></param>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.ComparisonConstraint.IsSatisfied(System.Object,System.Object)">
+            <summary>
+            problem: the constraint needs the target value to compare it, if it is a variable or parameter the constraint has no clue / responsibility to access its value
+            solution: the caller must use the TargetType and Target properties to access proper variable/ parameter and obtain their values then pass the value as auxiliary data.
+            the function just compares data to auxiliary according to the operator
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+            <param name="data"></param>
+            <param name="auxiliary"></param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.ConstraintProviderSource">
+            <summary>
+            Constraints can obtain the definition of their function from their internal attributes or from an external source.
+            In case of internal, the definition of the constraint is inside the constraint, but If it is external, the constraint is defined somewhere else like a database, and model just contains its identifier and access method.
+            This is a good option for integration of variable values with external systems. or variables that their values changes over time
+            </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.ComparisonOperator">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.ComparisonTargetType">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.ComparisonOffsetType">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.ConversionMethod">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ConversionMethod.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ConversionMethod.Formula">
+             <summary>
+            
+             </summary>
+             <remarks> 100*x => Target = 100*Source </remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ConversionMethod.Source">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ConversionMethod.Target">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.DataContainerType">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.MeasurementScale">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.DataContainer">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.Name">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.ShortName">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.IsMultiValue">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.IsBuiltIn">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.Scope">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.ContainerType">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.MeasurementScale">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.EntitySelectionPredicate">
+             <summary>
+            
+             </summary>
+             <remarks> only if Type == ReferenceType </remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.Self">
+            <summary>
+            This is a workaround according to NHibernate's Lazy loading proxy creation!
+            It should not be mapped!
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.DataType">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.Unit">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.Methodology">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.Constraints">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.ExtendedProperties">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.GlobalizationInfos">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataContainer.AggregateFunctions">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.DataContainer.#ctor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param>NA</param>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.DataContainer.ValidateDomainValues(System.Object)">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param name="data"></param>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.DataContainer.ValidateValidatores(System.Object)">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param name="data"></param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.DataStructure">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataStructure.Name">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataStructure.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataStructure.XsdFileName">
+            <summary>
+            this is used to validate xml representation of datasets, version sensitive
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataStructure.XslFileName">
+            <summary>
+            used in UI to show the belonging datasets using proper transformation, version sensitive
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataStructure.ConfigurationInfo">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataStructure.Self">
+            <summary>
+            This is a workaround according to NHibernate's Lazy loading proxy creation!
+            It should not be mapped!
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataStructure.Datasets">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataStructure.Views">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataStructure.ResearchPlans">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.DataStructureCategory">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.DataType">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataType.Name">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataType.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataType.SystemType">
+             <summary>
+            
+             </summary>
+             <remarks> System.Int32, etc </remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataType.DataContainers">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DataType.ApplicableUnits">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.DataType.#ctor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param>NA</param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.DatasetView">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DatasetView.Name">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DatasetView.ContentSelectionCriterion">
+            <summary>
+            to select which tuples are visible trough the view
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DatasetView.ContainerSelectionCriterion">
+            <summary>
+            to select which variables or parameters are visisble through the view
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DatasetView.Dataset">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.DatasetView.DataStructures">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Dimension.Specification">
+            <summary>
+            The specification in terms of LxMyTzPmEn. LMTPE are fundamental dimensions, xyzmn are +/- integer showing the power of their lefthand side dimension
+            L(+1)M(+1,-1)T(-2) for acceleration, L0M0T+1 for time
+            </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.ExtendedProperty">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ExtendedProperty.Name">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ExtendedProperty.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ExtendedProperty.DataContainer">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.ExtendedProperty.#ctor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param>NA</param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.GlobalizationInfo">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.GlobalizationInfo.CultureId">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.GlobalizationInfo.DisplayName">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.GlobalizationInfo.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.GlobalizationInfo.DataContainer">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.Methodology">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Methodology.AppliedStandards">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Methodology.Procedure">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Methodology.Tolerance">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Methodology.Tools">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Methodology.DataContainers">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.Methodology.#ctor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param>NA</param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.ObtainingMethod">
+            <summary>
+            Name and descroption, and etc. of methods of obtaining data
+            like: Measurement, Observation, Processing, Simulation, Interpretation and Description
+            </summary>
+            <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ObtainingMethod.Name">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.ObtainingMethod.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.StructuredDataStructure">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.StructuredDataStructure.IndexerType">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.StructuredDataStructure.Variables">
+             <summary>
+            
+             </summary>
+             <remarks> StructuredDataStructure is the controller of this association </remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.StructuredDataStructure.Indexer">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:BExIS.Dlm.Entities.DataStructure.StructuredDataStructure.TemplatePaths" -->
+        <member name="M:BExIS.Dlm.Entities.DataStructure.StructuredDataStructure.#ctor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param>NA</param>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.StructuredDataStructure.#ctor(BExIS.Dlm.Entities.DataStructure.DataStructureCategory)">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param name="indexerType"></param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.MeasurementSystem">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.Unit">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Unit.Name">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Unit.Abbreviation">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Unit.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Unit.MeasurementSystem">
+             <summary>
+            
+             </summary>
+             <remarks> Metric, Imperial, etc </remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Unit.Dimension">
+             <summary>
+            
+             </summary>
+             <remarks> L: Length, M: Mass, A: Area, L(0)T(-1) </remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Unit.DataContainers">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Unit.ConversionsIamTheSource">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Unit.ConversionsIamTheTarget">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Unit.AssociatedDataTypes">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Unit.ExternalLink">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.DataStructure.Unit.#ctor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param>NA</param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.UnStructuredDataStructure">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.Parameter">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Parameter.Variable">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.DataStructure.Variable">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Variable.DataType">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.Variable.Unit">
+            <summary>
+            This is the unit directly associated with the variable. At the variable creation time, it is possible to attach the
+            variable to the unit of its associated data container or to another unit that its dimension is equal to the dimension of the
+            unit of the data container.
+            </summary>
+            <remarks>If the data attribute's unit changes, the validity of the variable's unit should be evaluated again.</remarks>
+            <remarks>If the variable's unit is going to be changed, the compatibility to the data container's unit's dimension should be preserved.</remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.DataStructure.VariableInstance.DataStructure">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.Amendment">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.Amendment.Tuple">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.ContentDescriptor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.ContentDescriptor.OrderNo">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.ContentDescriptor.MimeType">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.ContentDescriptor.Name">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.ContentDescriptor.URI">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.ContentDescriptor.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.ContentDescriptor.FileSize">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.ContentDescriptor.DatasetVersion">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.DatasetVersionStatus">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.ChangeDescription">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.Timestamp">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.Metadata">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.XmlExtendedPropertyValues">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.Status">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.VersionType">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.VersionName">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.VersionDescription">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.PublicAccess">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.PublicAccessDate">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.Dataset">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.Tag">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.Show">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.PriliminaryTuples">
+            <summary>
+            There is a need for the tuples to be managed smarter inside any version, in order to:
+            1: reduce the amount of tuple duplication
+            2: be able to find out changes among versions e.g., deleted tuples, added tuples, changed ones
+            3: be able to find out what had changed in a specific version
+            for these reasons, its better to not have the tuples loaded by the data access layer at first.
+            PriliminaryTuples are those added or edited by this version. they may change over time
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.ContentDescriptors">
+            <summary>
+            At least one for unstructured data
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DatasetVersion.ExtendedPropertyValues">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.Data.DatasetVersion.#ctor">
+            it is here for the automatic object creation by the persistence layer. Programmers SHOULD use the other constructor that takes a Dataset as a parameter
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param></param>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.Data.DatasetVersion.#ctor(BExIS.Dlm.Entities.Data.Dataset)">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param name="dataset"></param>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.Data.DatasetVersion.Materialize(System.Boolean)">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param></param>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.Data.DatasetVersion.Dematerialize(System.Boolean)">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param></param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.DataValue">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DataValue.Value">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DataValue.SamplingTime">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DataValue.ResultTime">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DataValue.ObtainingMethod">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DataValue.Note">
+            <summary>
+            any free note. especially in case of ObtainingMethod == Processing or Simulation, the process, formula or simulation model can be described here
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.Name">
+            <summary>
+            Name of the Entity Template
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.Description">
+            <summary>
+            Description of the Entity Template
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.EntityType">
+            <summary>
+            Entity
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.Activated">
+            <summary>
+            Entity
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.MetadataStructure">
+             <summary>
+            Metadata Structure
+             </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.JsonMetadataFields">
+            <summary>
+            List of available Datatructures
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.MetadataInvalidSaveMode">
+            <summary>
+            should the user be able to save the metadata if not alle mandatory are filled correct
+            if true - also not valid metadat will be stored
+            if false -  only valid metadata will be stored
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.HasDatastructure">
+            <summary>
+            should the user be able to save the metadata if not alle mandatory are filled correct
+            if true - also not valid metadat will be stored
+            if false -  only valid metadata will be stored
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.JsonDatastructureList">
+            <summary>
+            List of available Datatructures
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.JsonAllowedFileTypes">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.AllowedFileTypes">
+            
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.JsonDisabledHooks">
+            <summary>
+            list of hidden hooks from ui
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.JsonNotificationGroups">
+            <summary>
+            add this groups to the notifications
+            when a email is sended to the owner or admin send also to this groups
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.EntityTemplate.JsonPermissionGroups">
+            <summary>
+            add this groups to the permissions
+            when a email is sended to the owner or admin send also to this groups
+            </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.ExtendedPropertyValue">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.ExtendedPropertyValue.ExtendedPropertyId">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.ExtendedPropertyValue.DatasetVersion">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.ExtendedPropertyValue.ExtendedProperty">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.ParameterValue">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.ParameterValue.ParameterId">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.ParameterValue.VariableValue">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.ParameterValue.Parameter">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.DataTupleVersion">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DataTupleVersion.TupleType">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DataTupleVersion.Index">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DataTupleVersion.ActingDatasetVersion">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DataTupleVersion.OriginalTuple">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.VariableValue">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.VariableValue.Tuple">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.VariableValue.VariableId">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.VariableValue.ParameterValues">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.VariableValue.Variable">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.Data.VariableValue.#ctor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param>NA</param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.DatasetStatus">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.DatasetStateInfo">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.Dataset">
+            <summary>
+            The dataset points to many versions, but those versions do not have the effective complete tuples because of the design of the database. In order to have a complete version of
+            the dataset, the DatasetManager.GetDatasetLatestVersion or GetDatasetVersion should be called.
+            </summary>
+            <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.Dataset.Status">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.Dataset.LastCheckIOTimestamp">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.Dataset.CheckOutUser">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.Dataset.DataStructure">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.Dataset.MetadataStructure">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.Dataset.Versions">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.Dataset.ResearchPlan">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.Dataset.EntityTemplate">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.Dataset.Views">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.Data.Dataset.#ctor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param></param>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.Data.Dataset.#ctor(BExIS.Dlm.Entities.Data.EntityTemplate,BExIS.Dlm.Entities.DataStructure.DataStructure)">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param name="dataStructure"></param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.AbstractTuple">
+            <summary>
+            Its to overcome an inheritance issue with NH: when TupleVersion is derived from DataTuple all queries on DataTuple return versions too.
+            </summary>
+            <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.AbstractTuple.OrderNo">
+            <summary>
+            indicates the order of the associated tuple in the version
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.AbstractTuple.TupleAction">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.AbstractTuple.Timestamp">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.AbstractTuple.XmlAmendments">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.AbstractTuple.JsonVariableValues">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.AbstractTuple.Values">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.AbstractTuple.TupleType">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.AbstractTuple.Index">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.AbstractTuple.DatasetVersion">
+            <summary>
+            inverse map
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.AbstractTuple.VariableValues">
+            <summary>
+            Map from and to XmlVariableValues. Do not map to persistence data directly
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.AbstractTuple.Amendments">
+            <summary>
+            Do not map to persistence data directly. Materialize after load
+            </summary>
+            <remarks></remarks>
+            <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.TupleAction">
+            <summary>
+            In order to show what had happened to each tuple, a record of the action applied to them is maintained in the version they belong to.
+            </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.DataTupleType">
+             <summary>
+            
+             </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Data.DataTuple">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DataTuple.TupleType">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Data.DataTuple.Index">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.Data.DataTuple.#ctor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param>NA</param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.MetadataStructure.MetadataParameterUsage">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataParameterUsage.Master">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataParameterUsage.Member">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.MetadataStructure.MetadataNestedAttributeUsage">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataNestedAttributeUsage.Master">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataNestedAttributeUsage.Member">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.MetadataStructure.MetadataAttribute">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataAttribute.UsedIn">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.MetadataStructure.MetadataAttribute.#ctor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param></param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.MetadataStructure.MetadataAttributeUsage">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataAttributeUsage.MetadataPackage">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataAttributeUsage.MetadataAttribute">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.MetadataStructure.MetadataPackage">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataPackage.Name">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataPackage.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataPackage.IsEnabled">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataPackage.UsedIn">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataPackage.MetadataAttributeUsages">
+             <summary>
+            
+             </summary>
+             <remarks> needs to preserve the order </remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.MetadataStructure.MetadataPackage.#ctor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param>NA</param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.MetadataStructure.MetadataPackageUsage">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataPackageUsage.MetadataStructure">
+             <summary>
+            
+             </summary>
+             <remarks> intentionally used the full name. otherwise is not shown in the class diagram. </remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataPackageUsage.MetadataPackage">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.MetadataStructure.MetadataStructure">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataStructure.Name">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataStructure.Description">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataStructure.XsdFileName">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataStructure.XslFileName">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataStructure.Parent">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataStructure.Children">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataStructure.MetadataPackageUsages">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.MetadataStructure.MetadataStructure.Datasets">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+        </member>
+        <member name="M:BExIS.Dlm.Entities.MetadataStructure.MetadataStructure.#ctor">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+             <seealso cref="!:"/>
+             <param>NA</param>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Metadata.Metadata">
+             <summary>
+            
+             </summary>
+             <remarks></remarks>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Party.PartyRelationship">
+            <summary>
+            this.PartyRelationshipType.PartyTypePairs.SourcePartyType MUST CONTAIN this.SourceParty.PartyRelationshipType
+            AND
+            this.PartyRelationshipType.PartyTypePairs.AllowedAtrget MUST CONTAIN this.TargetParty.PartyRelationshipType
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Party.PartyRelationship.Scope">
+            <summary>
+            Any restriction on the relationship not captured by the other attributes. For example: Person 1 is the coauthor of Person 2 in the scope of Paper 1
+            </summary>
+        </member>
+        <member name="T:BExIS.Dlm.Entities.Party.PartyRelationshipType">
+            <summary>
+            RelationshipTypes are described from the source point of view. The sources are the higher level or the container entities.
+            For example, A Project HIRES a person, so the relationship would be HIRES or Employs. When a consortium is created it HOLDS at least two other organizations.
+            The type of the organizations allowed to be HOLD are determined by the PartyRelationshipType, ...
+            PartyRelationshipType can have cardinality to restrict the number of allowed 2nd parties IN RELATIONSHIP with any given 1st party.
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Party.PartyRelationshipType.IndicatesHierarchy">
+            <summary>
+            If true, the the source party type is considered to be the parent of the target party type, hence the same for the associated parties in the linked relationship
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Party.PartyRelationshipType.MinCardinality">
+            <summary>
+            Minimum numbers of parties of the target type that must be asscoated to a party of the source type
+            </summary>
+        </member>
+        <member name="P:BExIS.Dlm.Entities.Party.PartyRelationshipType.MaxCardinality">
+            <summary>
+            Maximum numbers of parties of the target type that can be asscoated to a party of the source type
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,12 @@
+C:\_work\_bexisV3\Core\Console\BExIS.Web.Shell\Areas\EMM\Orm\BExIS.Emm.Orm.NH\bin\Debug\BExIS.Emm.Orm.NH.dll
+C:\_work\_bexisV3\Core\Console\BExIS.Web.Shell\Areas\EMM\Orm\BExIS.Emm.Orm.NH\bin\Debug\BExIS.Emm.Orm.NH.pdb
+C:\_work\_bexisV3\Core\Console\BExIS.Web.Shell\Areas\EMM\Orm\BExIS.Emm.Orm.NH\obj\Debug\BExIS.Emm.Orm.NH.csproj.AssemblyReference.cache
+C:\_work\_bexisV3\Core\Console\BExIS.Web.Shell\Areas\EMM\Orm\BExIS.Emm.Orm.NH\obj\Debug\BExIS.Emm.Orm.NH.csproj.CoreCompileInputs.cache
+C:\_work\_bexisV3\Core\Console\BExIS.Web.Shell\Areas\EMM\Orm\BExIS.Emm.Orm.NH\obj\Debug\BExIS.Emm.Orm.NH.dll
+C:\_work\_bexisV3\Core\Console\BExIS.Web.Shell\Areas\EMM\Orm\BExIS.Emm.Orm.NH\obj\Debug\BExIS.Emm.Orm.NH.pdb
+C:\_work\_bexisV3\Core\Console\BExIS.Web.Shell\Areas\EMM\BExIS.Emm.Orm.NH\obj\Debug\BExIS.Emm.Orm.NH.dll
+C:\_work\_bexisV3\Core\Console\BExIS.Web.Shell\Areas\EMM\BExIS.Emm.Orm.NH\obj\Debug\BExIS.Emm.Orm.NH.pdb
+C:\_work\_bexisV3\Core\Console\BExIS.Web.Shell\Areas\EMM\BExIS.Emm.Orm.NH\bin\Debug\BExIS.Emm.Orm.NH.dll
+C:\_work\_bexisV3\Core\Console\BExIS.Web.Shell\Areas\EMM\BExIS.Emm.Orm.NH\bin\Debug\BExIS.Emm.Orm.NH.pdb
+C:\_work\_bexisV3\Core\Console\BExIS.Web.Shell\Areas\EMM\BExIS.Emm.Orm.NH\obj\Debug\BExIS.Emm.Orm.NH.csproj.AssemblyReference.cache
+C:\_work\_bexisV3\Core\Console\BExIS.Web.Shell\Areas\EMM\BExIS.Emm.Orm.NH\obj\Debug\BExIS.Emm.Orm.NH.csproj.CoreCompileInputs.cache
