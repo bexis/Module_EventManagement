@@ -9,6 +9,17 @@ export const getEvents = async () => {
     
     const res = await Api.get(url);
 
-    let result = await res.data;
-       return result;
+    
+    return res.data;
+}
+
+export const getEventById = async (id) => {
+  
+    //setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
+    let url = "/EMM/Event/GetEventById/" + id;
+    
+    const res = await Api.get(url);
+
+    
+       return res.data;
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ReadEntryModel } from '../models/eventModels';
+	import { ReadEntryModel } from '../models/eventregistrationModel';
 	import {
 		TextInput,
 		CodeEditor,

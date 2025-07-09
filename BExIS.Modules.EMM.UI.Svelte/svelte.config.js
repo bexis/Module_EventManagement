@@ -11,8 +11,8 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter({
-			pages: '../BExIS.Modules.EMM/Scripts/svelte', // ../BExIS.Modules.Dcm.UI/Scripts/svelte
-			assets: '../BExIS.Modules.EMM/Scripts/svelte', // ../BExIS.Modules.Dcm.UI/Scripts/svelte
+			pages: '../BExIS.Modules.DQM/Scripts/svelte', // ../BExIS.Modules.Dcm.UI/Scripts/svelte
+			assets: '../BExIS.Modules.DQM/Scripts/svelte', // ../BExIS.Modules.Dcm.UI/Scripts/svelte
 			fallback: null,
 			precompress: true,
 			preprocess: true,
@@ -20,7 +20,7 @@ const config = {
 		}),
 		paths: {
 			relative: true,
-			base: process.env.NODE_ENV === 'production' ? '/emm' : '' // add module id here,
+			base: process.env.NODE_ENV === 'production' ? '/dqm' : '' // add module id here,
 		},
 
 		alias: {
