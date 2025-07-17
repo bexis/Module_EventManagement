@@ -89,7 +89,10 @@ namespace BExIS.Modules.EMM.UI.Models
             DeleteAccess = true;
             EditAccess = true;
             ParticipantsLimitation = 0;
+            JsonsKeys = new List<string>();
         }
+
+      
 
         public EventModel(Event eEvent)
         {
@@ -108,6 +111,11 @@ namespace BExIS.Modules.EMM.UI.Models
             WaitingListLimitation = eEvent.WaitingListLimitation;
             Closed = eEvent.Closed;
             JsonFile = eEvent.Data;
+            EmailCC = eEvent.EmailCC;
+            EmailBCC = eEvent.EmailBCC;
+            EmailReply = eEvent.EmailReply;
+            JsonsKeys = new List<string>() { "English", "Deutsch" };
+
 
             JsonKeyEmail = eEvent.JsonKeyEmail;
             JsonKeyFirstName = eEvent.JsonKeyFirstName;
@@ -121,9 +129,6 @@ namespace BExIS.Modules.EMM.UI.Models
             EditAllowed = eEvent.EditAllowed;
             LogInPassword = eEvent.LogInPassword;
 
-            //EmailBCC = eEvent.EmailBCC;
-            //EmailCC = eEvent.EmailCC;
-            //EmailReply = eEvent.EmailReply;
 
             JavaScriptPath = eEvent.JavaScriptPath;
 
@@ -132,6 +137,27 @@ namespace BExIS.Modules.EMM.UI.Models
             EditAccess = true;
 
 
+        }
+    }
+
+    public class EventListModel
+    {
+        public long Id { get; set; }
+        public string Name { get; set; }    
+        public string Deadline { get; set; }    
+        public string Participants { get; set; }
+
+        public string StartDate { get; set; }
+
+        public bool InUse { get; set; }
+
+        public EventListModel(Event e)
+        {
+            Id = e.Id;
+            Name = e.Name;
+            Deadline = e.Deadline.ToString("dd.MM.yyyy");
+            StartDate = e.StartDate.ToString("dd.MM.yyyy");
+            Participants = e.ParticipantsLimitation == 0 ? "no limitation" : e.ParticipantsLimitation.ToString();
         }
     }
 

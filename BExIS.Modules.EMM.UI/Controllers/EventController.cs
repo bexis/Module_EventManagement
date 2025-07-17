@@ -43,18 +43,19 @@ namespace BExIS.Modules.EMM.UI.Controllers
         }
 
         [JsonNetFilter]
+        [HttpGet]
         public JsonResult GetEvents()
         {
             using (EventManager eManger = new EventManager())
             using (var eventRegistrationManager = new EventRegistrationManager())
             {
 
-                List<EventModel> model = new List<EventModel>();
+                List<EventListModel> model = new List<EventListModel>();
                 List<Event> data = eManger.GetAllEvents().ToList();
 
                 foreach (Event e in data)
                 {
-                    EventModel m = new EventModel(e);
+                    EventListModel m = new EventListModel(e);
                     List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(e.Id);
                     if (eventRegistrations.Count > 0)
                         m.InUse = true;
@@ -70,35 +71,113 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         #region Create, Edit Delete ans Save Event
 
-        public ActionResult Create()
+        [JsonNetFilter]
+        [HttpPost]
+        public JsonResult Create(EventModel model)
         {
-            ViewBag.Title = PresentationModel.GetViewTitleForTenant("Create Event", this.Session.GetTenant());
+            if (model == null) return Json(false);
 
-            EventModel model = new EventModel();
+            using (EventManager eManager = new EventManager())
+            {
+                if (model.Id == 0)
+                {
+                    Event newEvent = eManager.CreateEvent(model.JsonFile, model.Name, model.EventDate, model.ImportantInformation, model.Location, model.MailInformation, model.SelectedEventLanguage, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.WaitingList, model.WaitingListLimitation, model.EditAllowed, model.Closed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, model.JsonKeyEmail, model.JsonKeyFirstName, model.JsonKeyLastName, null);
 
-            return View("EditEvent", model);
+                    eManager.UpdateEvent(newEvent);
+
+                    //add security
+                    using (var groupManager = new GroupManager())
+                    using (var entityTypeManager = new EntityManager())
+                    using (EntityPermissionManager pManager = new EntityPermissionManager())
+                    {
+                        Entity entityType = entityTypeManager.FindByName("Event");
+                        var settings = ModuleManager.GetModuleSettings("emm");
+                        string[] eventAdminGroups = settings.GetValueByKey("EventAdminGroups").ToString().Split(',');
+
+                        if (eventAdminGroups != null && eventAdminGroups.Length > 0)
+                        {
+                            foreach (var g in eventAdminGroups)
+                            {
+                                int fullRights = (int)RightType.Read + (int)RightType.Write + (int)RightType.Delete + (int)RightType.Grant;
+                                var group = groupManager.FindByNameAsync(g).Result;
+                                if (group != null)
+                                {
+                                    if (pManager.GetRightsAsync(group.Id, entityType.Id, newEvent.Id).Result == 0)
+                                        pManager.CreateAsync(group.Id, entityType.Id, newEvent.Id, fullRights);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Json(new { success = true, id = 0 });
         }
 
-        public ActionResult Edit(long id)
+
+        [JsonNetFilter]
+        [HttpPost]
+        public JsonResult Update(EventModel model)
         {
-            using (EventManager eManger = new EventManager())
+            if (model == null) return Json(false);
+            if(model.Id != 0)
             {
-                EventModel model = new EventModel(eManger.GetEventById(id));
+                using (EventManager eManager = new EventManager())
+                {
+                    Event e = eManager.GetEventById(model.Id);
+                    e.Name = model.Name;
+                    e.EventDate = model.EventDate;
+                    e.ImportantInformation = model.ImportantInformation;
+                    e.MailInformation = model.MailInformation;
+                    e.Location = model.Location;
+                    e.EventLanguage = model.SelectedEventLanguage;
+                    e.StartDate = model.StartDate;
+                    e.Deadline = model.Deadline;
+                    e.ParticipantsLimitation = model.ParticipantsLimitation;
+                    e.WaitingList = model.WaitingList;
+                    e.WaitingListLimitation = model.WaitingListLimitation;
+                    e.EditAllowed = model.EditAllowed;
+                    e.Closed = model.Closed;
+                    e.LogInPassword = model.LogInPassword;
+                    e.JsonKeyEmail = model.JsonKeyEmail;
+                    e.JsonKeyFirstName = model.JsonKeyFirstName;
+                    e.JsonKeyLastName = model.JsonKeyLastName;
+                    e.EmailCC = model.EmailCC;
+                    e.EmailBCC = model.EmailBCC;
+                    e.EmailReply = model.EmailReply;
 
-                model.EditMode = true;
+                    eManager.UpdateEvent(e);
 
-                return View("EditEvent", model);
+                }
+               
+            }
+            return Json(new { success = true, id = model.Id });
+        }
+
+
+        [JsonNetFilter]
+        [HttpGet]
+        public JsonResult Get(long id)
+        {
+            using (EventManager eManager = new EventManager())
+            {
+                Event e = eManager.GetEventById(id);
+                EventModel model = new EventModel(e);
+
+                return Json(model, JsonRequestBehavior.AllowGet);
             }
         }
 
-        public ActionResult Delete(long id)
+        [JsonNetFilter]
+        [HttpPost]
+        public JsonResult Delete(long id)
         {
             using (EventManager eManger = new EventManager())
             {
                 eManger.DeleteEvent(eManger.GetEventById(id));
             }
 
-            return RedirectToAction("EventManager");
+            return Json(new { success = true, id = id });
         }
 
         [HttpPost]

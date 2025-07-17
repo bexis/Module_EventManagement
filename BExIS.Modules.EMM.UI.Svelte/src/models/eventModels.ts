@@ -2,40 +2,41 @@
 export interface EventListItem {
 	id: number;
 	name: string;
-	participantsLimitation: number;
-	abbreviation: string;
-	startDate: Date;
-	endDate: Date;
-	allowEdit: boolean;
+	participants: string;
+	startDate: string;
+	deadline: string;
+	editAllowed: boolean;
+	inUse: boolean;
+
 }
 
 export interface EditEvent {
-	Id: number;
-	Name: string;
-	EventDate: string;
-	ImportantInformation: string;
-	Location: string;
-	MailInformation: string;
-	SelectedEventLanguage: string;
-	JsonFile: File;
-	StartDate: string;
-	Deadline: string;
-	ParticipantsLimitation: number;
-	WaitingList: boolean;
-	WaitingListLimitation: number;
-	EditAllowed: boolean;
-	Closed: boolean;
-	LogInPassword: string;
-	EmailBCC: string;
-	EmailCC: string;
-	EmailReply: string;
-	JavaScriptPath: string;
-	InUse: boolean;
-	EditAccess: string;
-	JsonsKeys:string[];
-	JsonKeyEmail:string;
-	JsonKeyFirstName:string;
-	JsonKeyLastName:string;
+	id: number;
+	name: string;
+	eventDate: string;
+	importantInformation: string;
+	location: string;
+	mailInformation: string;
+	selectedEventLanguage: string;
+	jsonFile: string;
+	startDate: string;
+	deadline: string;
+	participantsLimitation: number;
+	waitingList: boolean;
+	waitingListLimitation: number;
+	editAllowed: boolean;
+	closed: boolean;
+	logInPassword: string;
+	emailBCC: string;
+	emailCC: string;
+	emailReply: string;
+	javaScriptPath: string;
+	inUse: boolean;
+	editAccess: string;
+	jsonsKeys:string[];
+	jsonKeyEmail:string;
+	jsonKeyFirstName:string;
+	jsonKeyLastName:string;
 }
 
 

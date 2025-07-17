@@ -137,7 +137,7 @@
     </property>
 
 	 <property name="Data" type="StringClob">
-		 <column name="Data" sql-type="jsonb"/>
+		 <column name="Data" not-null="false"/>
 	 </property>
 	  
     <!-- Mapping Entity Associations -->

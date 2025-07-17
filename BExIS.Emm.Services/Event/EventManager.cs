@@ -1,4 +1,5 @@
 ﻿using BExIS.Dlm.Entities.MetadataStructure;
+using Newtonsoft.Json;
 using System;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -96,7 +97,7 @@ namespace BExIS.Emm.Services.Event
             newEvent.EmailCC = emailCC;
             newEvent.EmailReply = emailReply;
             newEvent.JavaScriptPath = javaScriptPath;
-            newEvent.Data = data;
+            newEvent.Data =data; 
            
 
             using (IUnitOfWork uow = this.GetUnitOfWork())
