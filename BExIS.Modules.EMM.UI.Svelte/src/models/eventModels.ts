@@ -6,7 +6,9 @@ export interface EventListItem {
 	startDate: string;
 	deadline: string;
 	editAllowed: boolean;
+	alreadyRegistered: boolean;
 	inUse: boolean;
+	deleted: boolean;
 
 }
 

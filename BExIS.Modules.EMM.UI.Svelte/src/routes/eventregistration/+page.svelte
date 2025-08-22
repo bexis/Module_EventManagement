@@ -1,43 +1,72 @@
 <script lang="ts">
 import { onMount } from 'svelte';
-import * as  eventModels from '../../models/eventModels';
+import type { SvelteComponent } from 'svelte';
+import * as eventregistrationModel from '../../models/eventModels';
 import {
-		Page,
-		Table,
-		ErrorMessage,
-		helpStore,
-		TablePlaceholder,
-		notificationStore,
-		notificationType,
-		pageContentLayoutType
-	} from '@bexis2/bexis2-core-ui';
-    import * as dataCaller  from '../../services/eventCaller';
-    import { writable, type Writable } from 'svelte/store';
-    import TableOption from '../components/tableOptions.svelte';
+  Page,
+  Table,
+  ErrorMessage,
+  helpStore,
+  TablePlaceholder,
+  notificationStore,
+  notificationType,
+  pageContentLayoutType
+} from '@bexis2/bexis2-core-ui';
+import * as dataCaller from '../../services/eventRegistrationCaller';
+import { writable } from 'svelte/store';
+import type { TableConfig } from '@bexis2/bexis2-core-ui';
+import { goto } from '$app/navigation';
+import tableAction from '../../components/tableAction.svelte';
 
-    let e: eventModels.EventListItem[] = [];
-	let event: eventModels.EventListItem;
-    const tableStore = writable<any[]>([]);
-    $: events = e;
-	$: tableStore.set(e);
+let tableStore = writable<eventregistrationModel.EventListItem[]>([]);
 
-    async function reload() {
-		e = await dataCaller.getEvents();
-	}
+function handleTableAction(e: CustomEvent<{ row: any }>) {
+  const {  row } = e.detail; 
 
+  if (row) {
+
+    //ToDo: call passwort before
+    goto('/eventregistration/create', { state: { id: row.id } });
+    
+  }
+}
+
+
+
+
+let table: TableConfig<eventregistrationModel.EventListItem> = {
+  id: 'metadatatable',
+  data: tableStore,
+  optionsComponent: tableAction as unknown as typeof SvelteComponent
+//   columns: {
+// 			name: {
+// 				header: 'Name'
+// 			},
+// 			deadline: {
+// 				header: 'Deadline'
+				
+// 			},
+// 			participants: {
+// 				header: 'Participants'
+// 			}
+// 		}
+};
+
+onMount(async () => {
+  const data = await dataCaller.getEvents();
+  tableStore.set(Array.isArray(data) ? data : []);
+});
+
+async function reload() {
+  const newData = await dataCaller.getEvents();
+  tableStore.set(Array.isArray(newData) ? newData : []);
+}
 </script>
 
 <Page help={true} title="Manage Events">
-
-<div class="table table-compact w-full">
-    <Table
-			config={{
-					id: 'Events',
-					data: tableStore,
-					optionsComponent: TableOption
-                    }}
-					
-			/>
-</div>
-
+  <div class="table table-compact w-full">
+    <Table config={table} id="event-table" class="w-full" 
+  on:action={e => handleTableAction(e)}
+/>
+  </div>
 </Page>

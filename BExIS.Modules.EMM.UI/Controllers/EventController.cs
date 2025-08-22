@@ -6,22 +6,12 @@ using BExIS.Security.Entities.Objects;
 using Vaiona.Web.Mvc.Models;
 using Vaiona.Web.Extensions;
 using BExIS.Emm.Services.Event;
-using System.IO;
-using System.Xml;
 using BExIS.Emm.Entities.Event;
-using BExIS.Dlm.Services.MetadataStructure;
-using BExIS.Dlm.Entities.MetadataStructure;
-using BExIS.Xml.Helpers;
-using Vaiona.Utils.Cfg;
-using System;
 using BExIS.Modules.EMM.UI.Models;
 using BExIS.Security.Services.Subjects;
 using BExIS.Security.Services.Authorization;
 using BExIS.Security.Services.Objects;
 using BExIS.Security.Entities.Authorization;
-using Vaiona.Persistence.Api;
-using System.Xml.Linq;
-using Newtonsoft.Json;
 using Vaiona.Web.Mvc.Modularity;
 using BExIS.App.Bootstrap.Attributes;
 using BExIS.UI.Helpers;
@@ -145,6 +135,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     e.EmailCC = model.EmailCC;
                     e.EmailBCC = model.EmailBCC;
                     e.EmailReply = model.EmailReply;
+                    e.Data = model.JsonFile;
 
                     eManager.UpdateEvent(e);
 
@@ -180,155 +171,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return Json(new { success = true, id = id });
         }
 
-        [HttpPost]
-        public ActionResult Save(EventModel model, HttpPostedFileBase file)
-        {
-            /** Event Validation -------------------------------- **/
-
-            if (model.Name == null)
-                ModelState.AddModelError("Name", "Name is required.");
-
-            if (model.Location == null)
-                ModelState.AddModelError("Location", "Location is required.");
-
-            if (model.LogInPassword == null)
-                ModelState.AddModelError("LogInPassword", "Login password is required.");
-
-            if (model.StartDate > model.Deadline)
-                ModelState.AddModelError("StartDate", "Start date needs to be before deadline.");
-
-            if (model.EventDate == null)
-                ModelState.AddModelError("EventDate", "Event time period is required.");
-
-            if (model.SelectedEventLanguage == null)
-                ModelState.AddModelError("EventLanguage", "Event language is required.");
-
-            if (model.ImportantInformation == null)
-                ModelState.AddModelError("ImportantInformation", "Important information is required.");
-            
-            if(model.ParticipantsLimitation == 0 && model.WaitingList == true)
-                ModelState.AddModelError("WaitingList", "You don't need a waiting list if there is no participants limitation.");
-
-            if (model.WaitingListLimitation > 0 && model.WaitingList == false)
-                ModelState.AddModelError("WaitingListLimitation", "You don't need a waiting list limitation if you dont use the waiting list.");
-
-
-            //check if schema file is uploaded
-            //if (attachments ==null &&model.Id == 0)
-            //    ModelState.AddModelError("Schema", "Schema is required.");
-
-            /** Event Validation End -------------------------------- **/
-
-            if (ModelState.IsValid)
-            {
-                using (EventManager eManager = new EventManager())
-                {
-                    if (model.Id == 0)
-                    {
-                        Event newEvent = eManager.CreateEvent(model.JsonFile, model.Name, model.EventDate, model.ImportantInformation, model.Location, model.MailInformation, model.SelectedEventLanguage, model.StartDate, model.Deadline, model.ParticipantsLimitation, model.WaitingList,model.WaitingListLimitation, model.EditAllowed, model.Closed, model.LogInPassword, model.EmailBCC, model.EmailCC, model.EmailReply, model.JsonKeyEmail, model.JsonKeyFirstName, model.JsonKeyLastName, null);
-
-                        eManager.UpdateEvent(newEvent);
-
-                        //add security
-                        using (var groupManager = new GroupManager())
-                        using (var entityTypeManager = new EntityManager())
-                        using (EntityPermissionManager pManager = new EntityPermissionManager())
-                        {
-                            Entity entityType = entityTypeManager.FindByName("Event");
-                            var settings = ModuleManager.GetModuleSettings("emm");
-                            string[] eventAdminGroups = settings.GetValueByKey("EventAdminGroups").ToString().Split(',');
-
-                            if (eventAdminGroups != null && eventAdminGroups.Length > 0)
-                            {
-                                foreach(var g in eventAdminGroups)
-                                {
-                                    int fullRights = (int)RightType.Read + (int)RightType.Write + (int)RightType.Delete + (int)RightType.Grant;
-                                    var group = groupManager.FindByNameAsync(g).Result;
-                                    if (group != null)
-                                    {
-                                        if (pManager.GetRightsAsync(group.Id, entityType.Id, newEvent.Id).Result == 0)
-                                            pManager.CreateAsync(group.Id, entityType.Id, newEvent.Id, fullRights);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Event e = eManager.GetEventById(model.Id);
-                        e.Name = model.Name;
-                        e.EventDate = model.EventDate;
-                        e.ImportantInformation = model.ImportantInformation;
-                        e.MailInformation = model.MailInformation;
-                        e.Location = model.Location;
-                        e.EventLanguage = model.SelectedEventLanguage;
-                        e.StartDate = model.StartDate;
-                        e.Deadline = model.Deadline;
-                        e.ParticipantsLimitation = model.ParticipantsLimitation;
-                        e.WaitingList = model.WaitingList;
-                        e.WaitingListLimitation = model.WaitingListLimitation;
-                        e.EditAllowed = model.EditAllowed;
-                        e.Closed = model.Closed;
-                        e.LogInPassword = model.LogInPassword;
-                        e.JsonKeyEmail = model.JsonKeyEmail;
-                        e.JsonKeyFirstName = model.JsonKeyFirstName;
-                        e.JsonKeyLastName = model.JsonKeyLastName;
-                        e.EmailCC = model.EmailCC;
-                        e.EmailBCC = model.EmailBCC;
-                        e.EmailReply = model.EmailReply;
-
-                        eManager.UpdateEvent(e);
-                    }
-
-                    return RedirectToAction("EventManager");
-                }
-            }
-            else
-                //model.MetadataStructureList = GetMetadataStructureList();
-                return View("EditEvent", model);
-
-        }
-
         #endregion
 
-
-        #region helpers
-
-        //private Event SaveFile(HttpPostedFileBase file, Event e, EventManager eManager)
-        //{
-        //    string filename = "ext.js";
-        //    string path = Path.Combine(AppConfiguration.DataPath, "MetadataStructures", e.MetadataStructure.Id.ToString(), filename);
-
-        //    if (System.IO.File.Exists(path) && file != null && file.ContentLength > 0)
-        //    {
-        //        var deletedFilePath = Path.Combine(AppConfiguration.DataPath, "EMM\\Deleted JS Files");
-        //        BExIS.IO.FileHelper.CreateDicrectoriesIfNotExist(deletedFilePath);
-
-        //        var des = deletedFilePath + "\\" + Path.GetFileName(path);
-
-        //        // Check if file already exists in the "Deleted Files" folder and rename the file if yes.
-        //        if (System.IO.File.Exists(des))
-        //        {
-        //            des = deletedFilePath + "\\" + new Random().Next(1, 1000) + "_" + Path.GetFileName(path);
-        //        }
-
-        //        System.IO.File.Move(path, des);
-        //    }
-
-        //    if (file != null && file.ContentLength > 0)
-        //    {
-        //        try
-        //        {
-        //            file.SaveAs(path);
-        //            e.JavaScriptPath = path;
-        //        }
-        //        catch { }
-        //    }
-
-        //    return e;
-        //}
-
-
-            #endregion
         }
     }

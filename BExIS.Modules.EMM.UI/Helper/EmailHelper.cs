@@ -72,26 +72,31 @@ namespace BExIS.Modules.EMM.UI.Helper
 
             string details = "";
             //read xml file and format email output
-            JsonEventModel model = (JsonEventModel)JsonConvert.DeserializeObject(data);
+            JsonEventModel model = JsonConvert.DeserializeObject<JsonEventModel>(data);
+            last_name = model.Registration[1].Entries.Where(a=>a.Key == emailStructure.lableLastname).FirstOrDefault()?.Value;
+            first_name = model.Registration[1].Entries.Where(a => a.Key == emailStructure.lableFirstName).FirstOrDefault()?.Value;
             string displayNameRoot = "";
 
-            displayNameRoot = model.Name;
-            details = details + "<br/><b>" + displayNameRoot + "</b><br/><br/>";
-            foreach (Entry entry in model.Entries)
+            foreach (var section in model.Registration)
             {
-                   details = details + "<b>" + entry.Title + "</b>: " + entry.Value + "<br/>";
+                displayNameRoot = section.Title;
+                details = details + "<br/><b>" + displayNameRoot + "</b><br/><br/>";
+                foreach (Entry entry in section.Entries)
+                {
+                    details = details + "<b>" + entry.Title + "</b>: " + entry.Value + "<br/>";
+                }
             }
 
-            string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
+                string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
 
-             mail_message + "<br/>";
+                 mail_message + "<br/>";
 
-            if (!String.IsNullOrEmpty(e.MailInformation))
-            {
-                body += e.MailInformation + "<br/>" +
-                "<br/>";
-            }
-
+                if (!String.IsNullOrEmpty(e.MailInformation))
+                {
+                    body += e.MailInformation + "<br/>" +
+                    "<br/>";
+                }
+            
             body += emailStructure.bodyOpening + "<br/>" +
             details + "<br/><br/>";
             if (notificationType != "deleted")

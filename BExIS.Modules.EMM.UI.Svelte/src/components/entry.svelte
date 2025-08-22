@@ -62,7 +62,7 @@
 		<div id={entry.key} on:mouseover={() => helpStore.show(entry.key)}>
 			<MultiSelect
 				id={entry.key}
-				title={entry.key}
+				title={entry.title}
 				source={entry.options}
 				bind:target={entry.value}
 				isMulti={false}
@@ -71,8 +71,7 @@
 	{:else if entry.type.toLowerCase() === 'string'}
 		<TextInput
 			id={entry.key}
-			placeholder={entry.key}
-			label="{entry.title} (key: {entry.key})"
+			label="{entry.title}"
 			bind:value={entry.value}
 			on:input
 			help={true}
@@ -80,7 +79,7 @@
 	{:else if entry.type.toLowerCase().includes('int')}
 		<NumberInput
 			id={entry.key}
-			label="{entry.title} (key: {entry.key})"
+			label="{entry.title}"
 			bind:value={entry.value}
 			on:input
 			help={true}
@@ -88,13 +87,13 @@
 	{:else if entry.type.toLowerCase() === 'boolean'}
 		<div id={entry.key} on:mouseover={() => helpStore.show(entry.key)}>
 			<SlideToggle active="bg-primary-500" name="slider-label" size="sm" bind:checked={entry.value}
-				>{entry.title} (key: {entry.key})</SlideToggle
+				>{entry.title})</SlideToggle
 			>
 		</div>
 	{:else if entry.type.toLowerCase() === 'json'}
 		<div id={entry.key} on:mouseover={() => helpStore.show(entry.key)}>
 			<CodeEditor
-				title="{entry.title} (key: {entry.key})"
+				title="{entry.title}"
 				id={entry.key}
 				initialValue={initialJSONValue}
 				actions={false}

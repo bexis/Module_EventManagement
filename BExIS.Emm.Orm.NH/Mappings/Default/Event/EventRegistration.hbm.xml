@@ -23,9 +23,8 @@
     <!--<property name="Data" type="System.Xml.XmlDocument, System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
       <column name="Data" sql-type="xml" />
     </property>-->
-
 	  <property name="Data" type="StringClob">
-		  <column name="Data" sql-type="jsonb"/>
+		  <column name="Data" not-null="false"/>
 	  </property>
 
     <property name="Deleted" type="Boolean">

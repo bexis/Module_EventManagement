@@ -12,72 +12,105 @@ using Vaiona.Utils.Cfg;
 
 namespace BExIS.Modules.EMM.UI.Models
 {
+    public class EventRegListModel
+    {
+        public long Id { get; set; }
+        public string Name { get; set; }
+        public string Deadline { get; set; }
+        public string Participants { get; set; }
+        //public bool EditAllowed { get; set; }
+        //public bool AlreadyRegistered { get; set; } 
 
-    /// <summary>
-    /// The EventRegistrationModel represent all information which are needed to handel a event registration.
-    /// </summary>
-    /// <remarks></remarks>
+        public bool Closed { get; set; }
+        //public bool Deleted { get; set; }
+
+        public EventRegListModel(Event e)
+        {
+            Id = e.Id;
+            Name = e.Name;
+            Deadline = e.Deadline.ToString("dd.MM.yyyy");
+            //EditAllowed = e.EditAllowed;
+            Closed = e.Closed;
+            Participants = e.ParticipantsLimitation == 0 ? "no limitation" : e.ParticipantsLimitation.ToString();
+        }
+    }
+
     public class EventRegistrationModel
     {
-        public EventModel Event { get; set; }
-
-        /// <summary>
-        /// Number of participants limitation
-        /// </summary>
-        public string Participants { get; set; }
-
-        /// <summary>
-        /// Number of already registered participants
-        /// </summary>
-        public int NumberOfRegistration { get; set; }
-
-        /// <summary>
-        /// Number of already registered participants on waiting list
-        /// </summary>
-        public int NrOfRegistrationWaitingList { get; set; }
-
-        /// <summary>
-        /// edit allowed by user
-        /// </summary>
-        public bool EditAllowed { get; set; }
-
-        /// <summary>
-        /// user already registered, this will find out via user email
-        /// </summary>
-        public bool AlreadyRegistered { get; set; }
-
-        /// <summary>
-        /// is registration deleted by user
-        /// </summary>
-        public bool Deleted { get; set; }
-
-        /// <summary>
-        ///true if ParticipantsLimitation and WaitingListLimitation is reached
-        /// </summary>
-        public bool Closed { get; set; }
-
-        /// <summary>
-        ///Already registered RefId
-        /// </summary>
-        public string AlreadyRegisteredRefId { get; set; }
-
-        /// <summary>
-        ///
-        /// </summary>
-        //public string Message { get; set; } 
+        public long EventId { get; set; }
+        public string JsonFile { get; set; }
 
         public EventRegistrationModel()
-        {
-            Event = new EventModel();
-        }
-
-        public EventRegistrationModel(Event e)
-        {
-            Event = new EventModel(e);
-            EditAllowed = e.EditAllowed;
+        {           
 
         }
     }
+
+    ///// <summary>
+    ///// Old-> deletd if new works!!!! The EventRegistrationModel represent all information which are needed to handel a event registration.
+    ///// </summary>
+    ///// <remarks></remarks>
+    //public class EventRegistrationModel
+    //{
+    //    public EventModel Event { get; set; }
+
+    //    /// <summary>
+    //    /// Number of participants limitation
+    //    /// </summary>
+    //    public string Participants { get; set; }
+
+    //    /// <summary>
+    //    /// Number of already registered participants
+    //    /// </summary>
+    //    public int NumberOfRegistration { get; set; }
+
+    //    /// <summary>
+    //    /// Number of already registered participants on waiting list
+    //    /// </summary>
+    //    public int NrOfRegistrationWaitingList { get; set; }
+
+    //    /// <summary>
+    //    /// edit allowed by user
+    //    /// </summary>
+    //    public bool EditAllowed { get; set; }
+
+    //    /// <summary>
+    //    /// user already registered, this will find out via user email
+    //    /// </summary>
+    //    public bool AlreadyRegistered { get; set; }
+
+    //    /// <summary>
+    //    /// is registration deleted by user
+    //    /// </summary>
+    //    public bool Deleted { get; set; }
+
+    //    /// <summary>
+    //    ///true if ParticipantsLimitation and WaitingListLimitation is reached
+    //    /// </summary>
+    //    public bool Closed { get; set; }
+
+    //    /// <summary>
+    //    ///Already registered RefId
+    //    /// </summary>
+    //    public string AlreadyRegisteredRefId { get; set; }
+
+    //    /// <summary>
+    //    ///
+    //    /// </summary>
+    //    //public string Message { get; set; } 
+
+    //    public EventRegistrationModel()
+    //    {
+    //        Event = new EventModel();
+    //    }
+
+    //    public EventRegistrationModel(Event e)
+    //    {
+    //        Event = new EventModel(e);
+    //        EditAllowed = e.EditAllowed;
+
+    //    }
+    //}
 
     public class DefaultEventInformation
     {
@@ -91,14 +124,14 @@ namespace BExIS.Modules.EMM.UI.Models
 
         public string Eventid { get; set; }
 
-        public long RegistrationId    { get; set; }
+        public long RegistrationId { get; set; }
 
         //public string XPathToEmail { get; set; }
         //public string XPathToFirstName { get; set; }
         //public string XPathToLastName { get; set; }
 
         public string Email { get; set; }
-        public string LastName  { get; set; }
+        public string LastName { get; set; }
         public string FirstName { get; set; }
 
         public string Data { get; set; }
@@ -110,27 +143,27 @@ namespace BExIS.Modules.EMM.UI.Models
 
     }
 
-    public class UpdateEventModel
-    {
-        [JsonProperty("description")]
-        public string Description { get; set; }
+    //public class UpdateEventModel
+    //{
+    //    [JsonProperty("description")]
+    //    public string Description { get; set; }
 
-        [JsonProperty("entries")]
-        public List<Entry> Entries { get; set; }
+    //    [JsonProperty("entries")]
+    //    public List<Entry> Entries { get; set; }
 
-        [JsonProperty("name")]
-        public string Name { get; set; }
+    //    [JsonProperty("name")]
+    //    public string Name { get; set; }
 
-        public static UpdateEventModel Convert(JsonEventModel eventModel)
-        {
-            return new UpdateEventModel()
-            {
-                Name = eventModel.Name,
-                Description = eventModel.Description,
-                Entries = eventModel.Entries
-            };
-        }
-    }
+    //    public static UpdateEventModel Convert(JsonEventModel eventModel)
+    //    {
+    //        return new UpdateEventModel()
+    //        {
+    //            Name = eventModel.Name,
+    //            Description = eventModel.Description,
+    //            Entries = eventModel.Entries
+    //        };
+    //    }
+    //}
 
     public class LogInToEventModel
     {

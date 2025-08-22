@@ -233,7 +233,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             EmailStructure emailStructure = new EmailStructure();
             emailStructure = EmailHelper.ReadFile(e.EventLanguage);
-            string email = model.Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
+            string email = model.Registration[1].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
             string ref_id = EmailHelper.GetRefIdFromEmail(email);
             string url = Request.Url.GetLeftPart(UriPartial.Authority);
             EmailHelper.SendEmailNotification("resend", email, ref_id, data, e, url);
@@ -249,9 +249,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
             emailStructure = EmailHelper.ReadFile(e.EventLanguage);
 
             JsonEventModel model = (JsonEventModel)JsonConvert.DeserializeObject(data);
-            string first_name = model.Entries.Where(a => a.Title == emailStructure.lableFirstName).FirstOrDefault().Value;  
-            string last_name = model.Entries.Where(a => a.Title == emailStructure.lableLastname).FirstOrDefault().Value;
-            string email = model.Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
+            string first_name = model.Registration[1].Entries.Where(a => a.Title == emailStructure.lableFirstName).FirstOrDefault().Value;  
+            string last_name = model.Registration[1].Entries.Where(a => a.Title == emailStructure.lableLastname).FirstOrDefault().Value;
+            string email = model.Registration[1].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
 
             string url = Request.Url.GetLeftPart(UriPartial.Authority);
 
@@ -399,7 +399,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                     EmailStructure emailStructure = new EmailStructure();
                     emailStructure = EmailHelper.ReadFile(reg.Event.EventLanguage);
-                    email = model.Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
+                    email = model.Registration[1].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
                     
                 }
 
@@ -433,7 +433,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                         EmailStructure emailStructure = new EmailStructure();
                         emailStructure = EmailHelper.ReadFile(reg.Event.EventLanguage);
-                        email = model.Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
+                        email = model.Registration[1].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
                     }
 
 
@@ -468,14 +468,14 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 if (eventRegistrations.Count != 0)
                 {
                    
-                    results = CreateDataTableColums(results,model.Entries);
+                    results = CreateDataTableColums(results, model.Registration[1].Entries);
                 }
 
                 foreach (EventRegistration er in eventRegistrations)
                 {
                     JsonEventModel m = (JsonEventModel)JsonConvert.DeserializeObject(er.Data);
-                    if (eventRegistrations.Count != 0)
-                        results.Rows.Add(AddDataRow(m.Entries, results, er.Deleted.ToString(), er.Id));
+                    //if (eventRegistrations.Count != 0)
+                    //    results.Rows.Add(AddDataRow(m.Entries, results, er.Deleted.ToString(), er.Id));
 
                 }
             }
@@ -497,13 +497,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 if (eventRegistrations.Count != 0)
                 {
                     JsonEventModel model = (JsonEventModel)JsonConvert.DeserializeObject(eventRegistrations[0].Data);
-                    results = CreateDataTableColums(results, model.Entries);
+                    //results = CreateDataTableColums(results, model.Entries);
                 }
 
                 foreach (EventRegistration er in eventRegistrations)
                 {
                     JsonEventModel model = (JsonEventModel)JsonConvert.DeserializeObject(er.Data);
-                    results.Rows.Add(AddDataRow(model.Entries, results, er.Deleted.ToString(), er.Id));
+                    //results.Rows.Add(AddDataRow(model.Entries, results, er.Deleted.ToString(), er.Id));
                 }
             }
 
