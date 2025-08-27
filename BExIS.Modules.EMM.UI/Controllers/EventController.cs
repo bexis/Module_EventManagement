@@ -47,10 +47,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 {
                     EventListModel m = new EventListModel(e);
                     List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(e.Id);
-                    if (eventRegistrations.Count > 0)
-                        m.InUse = true;
-                    else
-                        m.InUse = false;
+                    //if (eventRegistrations.Count > 0)
+                    //    m.InUse = true;
+                    //else
+                    //    m.InUse = false;
 
                     model.Add(m);
                 }

@@ -9,7 +9,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2A701141-381E-4AD0-A446-094E4D22BEE4}</ProjectGuid>
+    <ProjectGuid>{74D74928-8394-4518-9A59-EB8885EDC747}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BExIS.Emm.Entities</RootNamespace>
@@ -61,7 +61,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

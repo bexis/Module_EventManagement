@@ -9,7 +9,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5FAAAFDE-9073-40EF-98D9-DCABBBE7032F}</ProjectGuid>
+    <ProjectGuid>{BD1F7D58-86D9-4EA9-8955-DC8FD918306C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BExIS.Emm.Orm.NH</RootNamespace>
@@ -63,7 +63,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-   
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

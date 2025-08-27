@@ -1,37 +1,21 @@
 ﻿using BExIS.App.Bootstrap.Attributes;
 using BExIS.Dcm.CreateDatasetWizard;
-using BExIS.Dcm.Wizard;
-using BExIS.Dlm.Entities.Common;
-using BExIS.Dlm.Entities.MetadataStructure;
-using BExIS.Dlm.Services.MetadataStructure;
-using BExIS.Dlm.Services.Party;
-using BExIS.Dlm.Services.TypeSystem;
 using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
-using BExIS.IO.Transform.Validation.Exceptions;
 using BExIS.Modules.EMM.UI.Helper;
-using BExIS.Modules.EMM.UI.Helpers;
 using BExIS.Modules.EMM.UI.Models;
 using BExIS.Security.Entities.Subjects;
 using BExIS.Security.Services.Subjects;
 using BExIS.Security.Services.Utilities;
 using BExIS.Utils.Data.MetadataStructure;
-using BExIS.Xml.Helpers;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Web;
-using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Xml;
-using Vaiona.Web.Extensions;
-using Vaiona.Web.Mvc.Models;
 
 
 
@@ -123,16 +107,24 @@ namespace BExIS.Modules.EMM.UI.Controllers
             using (EventManager eManager = new EventManager())
             {
                 var e = eManager.GetEventById(id);
-                JsonEventModel model = JsonConvert.DeserializeObject<JsonEventModel>(e.Data);
+                EventRegistrationLoadModel model = new EventRegistrationLoadModel();
+                model.Name = e.Name;
+                model.Date = e.EventDate;
+                model.Location = e.Location;
+                model.Language = e.EventLanguage;
+                model.ImportantInformation = e.ImportantInformation;
+                model.JsonFile = e.Data;
 
-                model.Registration[0].Entries.Where(a => a.Key == "name").FirstOrDefault().Value = e.Name;
-                model.Registration[0].Entries.Where(a => a.Key == "date").FirstOrDefault().Value = e.EventDate;
-                model.Registration[0].Entries.Where(a => a.Key == "location").FirstOrDefault().Value = e.Location;
-                model.Registration[0].Entries.Where(a => a.Key == "language").FirstOrDefault().Value = e.EventLanguage;
-                model.Registration[0].Entries.Where(a => a.Key == "importantInformation").FirstOrDefault().Value = e.ImportantInformation;
-                var json = JsonConvert.SerializeObject(e.Data);
+                //JsonEventModel model = JsonConvert.DeserializeObject<JsonEventModel>(e.Data);
 
-                return Json(json, JsonRequestBehavior.AllowGet);
+                //model.Registration[0].Entries.Where(a => a.Key == "name").FirstOrDefault().Value = e.Name;
+                //model.Registration[0].Entries.Where(a => a.Key == "date").FirstOrDefault().Value = e.EventDate;
+                //model.Registration[0].Entries.Where(a => a.Key == "location").FirstOrDefault().Value = e.Location;
+                //model.Registration[0].Entries.Where(a => a.Key == "language").FirstOrDefault().Value = e.EventLanguage;
+                //model.Registration[0].Entries.Where(a => a.Key == "importantInformation").FirstOrDefault().Value = e.ImportantInformation;
+                //var json = JsonConvert.SerializeObject(model);
+
+                return Json(model, JsonRequestBehavior.AllowGet);
             } 
         }
 

@@ -12,7 +12,7 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0E5F4B53-398A-4634-9921-03B9CACBE8E0}</ProjectGuid>
+    <ProjectGuid>{0293940A-E024-43F5-8473-EFAC9D609B0C}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -288,12 +288,11 @@
       <Name>BExIS.Dim.Helpers</Name>
     </ProjectReference>
     <ProjectReference Include="..\BExIS.Emm.Entities\BExIS.Emm.Entities.csproj">
-      <Project>{2a701141-381e-4ad0-a446-094e4d22bee4}</Project>
+      <Project>{74d74928-8394-4518-9a59-eb8885edc747}</Project>
       <Name>BExIS.Emm.Entities</Name>
-      <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\BExIS.Emm.Services\BExIS.Emm.Services.csproj">
-      <Project>{0a9199f6-3cd0-4eee-9ebd-5d4ae7916c9d}</Project>
+      <Project>{003e707f-b2b1-4a0b-8d16-5cd45e3a9e9d}</Project>
       <Name>BExIS.Emm.Services</Name>
     </ProjectReference>
   </ItemGroup>

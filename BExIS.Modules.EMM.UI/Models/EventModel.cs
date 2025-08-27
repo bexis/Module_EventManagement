@@ -42,7 +42,7 @@ namespace BExIS.Modules.EMM.UI.Models
         public int ParticipantsLimitation { get; set; }
 
         [DisplayName("Allow waiting list")]
-        public bool WaitingList { get; set;  }
+        public bool WaitingList { get; set; }
 
         [DisplayName("Waiting list limitation")]
         public int WaitingListLimitation { get; set; }
@@ -92,7 +92,7 @@ namespace BExIS.Modules.EMM.UI.Models
             JsonsKeys = new List<string>();
         }
 
-      
+
 
         public EventModel(Event eEvent)
         {
@@ -129,6 +129,9 @@ namespace BExIS.Modules.EMM.UI.Models
             EditAllowed = eEvent.EditAllowed;
             LogInPassword = eEvent.LogInPassword;
 
+            //EmailBCC = eEvent.EmailBCC;
+            //EmailCC = eEvent.EmailCC;
+            //EmailReply = eEvent.EmailReply;
 
             JavaScriptPath = eEvent.JavaScriptPath;
 

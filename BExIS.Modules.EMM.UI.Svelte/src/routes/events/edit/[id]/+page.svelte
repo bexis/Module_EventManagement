@@ -4,6 +4,7 @@
   import EventForm from '../../../../components/EventForm.svelte';
   import type { EditEvent } from '../../../../models/eventModels';
   import * as dataCaller from '../../../../services/eventCaller';
+      import { goto } from '$app/navigation';
  
 
   let event: EditEvent = {
@@ -47,10 +48,16 @@
   loading = true;
   const loadedEvent = await dataCaller.getEvent(eventId);
   console.log('API Response:', loadedEvent);
+
   if (loadedEvent) {
     // Einzelne Properties zuweisen, damit Svelte die Änderung erkennt
    event = { ...loadedEvent };
-    console.log('Geladenes Event:', event);
+    if (event.startDate) {
+    event.startDate = new Date(event.startDate).toISOString().slice(0, 10);
+  }
+  if (event.deadline) {
+    event.deadline = new Date(event.deadline).toISOString().slice(0, 10);
+  }
     target = languages.find(l => l.text === event.selectedEventLanguage) ?? languages[0];
   }
   loading = false;
@@ -66,7 +73,9 @@
       event.jsonFile = await selectedFile.text();
     }
     await dataCaller.updateEvent(event);
-    // ... weitere Logik ...
+   
+
+    goto('/events');
   }
 </script>
 

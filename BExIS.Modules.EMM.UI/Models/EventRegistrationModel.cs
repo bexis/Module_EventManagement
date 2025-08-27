@@ -46,6 +46,16 @@ namespace BExIS.Modules.EMM.UI.Models
         }
     }
 
+    public class EventRegistrationLoadModel
+    {
+        public string Name { get; set; }
+        public string Date { get; set; }
+        public string Location { get; set; }
+        public string Language { get; set; }
+        public string ImportantInformation { get; set; }
+        public string JsonFile { get; set; }
+    }
+
     ///// <summary>
     ///// Old-> deletd if new works!!!! The EventRegistrationModel represent all information which are needed to handel a event registration.
     ///// </summary>

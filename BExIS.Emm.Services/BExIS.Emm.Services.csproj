@@ -9,7 +9,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0A9199F6-3CD0-4EEE-9EBD-5D4AE7916C9D}</ProjectGuid>
+    <ProjectGuid>{003E707F-B2B1-4A0B-8D16-5CD45E3A9E9D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BExIS.Emm.Services</RootNamespace>
@@ -83,7 +83,7 @@
       <Name>BExIS.Security.Entities</Name>
     </ProjectReference>
     <ProjectReference Include="..\BExIS.Emm.Entities\BExIS.Emm.Entities.csproj">
-      <Project>{2a701141-381e-4ad0-a446-094e4d22bee4}</Project>
+      <Project>{74d74928-8394-4518-9a59-eb8885edc747}</Project>
       <Name>BExIS.Emm.Entities</Name>
     </ProjectReference>
   </ItemGroup>

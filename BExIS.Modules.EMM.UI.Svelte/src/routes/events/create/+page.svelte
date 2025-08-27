@@ -2,6 +2,8 @@
   import EventForm from '../../../components/EventForm.svelte';
   import type { EditEvent } from '../../../models/eventModels';
   import * as dataCaller from '../../../services/eventCaller';
+  import { goto } from '$app/navigation';
+  import { notificationStore, notificationType } from '@bexis2/bexis2-core-ui';
   // ... weitere Imports und Logik ...
 let event: EditEvent = {
   id: 0,
@@ -38,17 +40,20 @@ let event: EditEvent = {
 
   function onFileChange(file: File) {
     selectedFile = file;
-    event.JsonFile = null;
+    event.jsonFile = null;
   }
 
   async function handleSubmit() {
     if (selectedFile) {
-      event.JsonFile = await selectedFile.text();
+      event.jsonFile = await selectedFile.text();
     }
     dataCaller.saveEvent(event)
       .then(() => {
-        // Handle success, e.g., navigate to event list or show a success message
-        console.log('Event saved successfully');
+        notificationStore.showNotification({
+          notificationType: notificationType.success,
+          message: `Event "${event.name}" saved successfully.`
+        });
+        goto('/events');
       })
       .catch((error) => {
         // Handle error, e.g., show an error message
