@@ -19,7 +19,7 @@ namespace BExIS.Modules.EMM.UI.Models
         public string Deadline { get; set; }
         public string Participants { get; set; }
         //public bool EditAllowed { get; set; }
-        //public bool AlreadyRegistered { get; set; } 
+        public bool AlreadyRegistered { get; set; } 
 
         public bool Closed { get; set; }
         //public bool Deleted { get; set; }
@@ -31,6 +31,7 @@ namespace BExIS.Modules.EMM.UI.Models
             Deadline = e.Deadline.ToString("dd.MM.yyyy");
             //EditAllowed = e.EditAllowed;
             Closed = e.Closed;
+            AlreadyRegistered = false;
             Participants = e.ParticipantsLimitation == 0 ? "no limitation" : e.ParticipantsLimitation.ToString();
         }
     }

@@ -120,7 +120,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     e.ImportantInformation = model.ImportantInformation;
                     e.MailInformation = model.MailInformation;
                     e.Location = model.Location;
-                    e.EventLanguage = model.SelectedEventLanguage;
+                    //e.EventLanguage = model.SelectedEventLanguage;
+                    e.EventLanguage = "English";
                     e.StartDate = model.StartDate;
                     e.Deadline = model.Deadline;
                     e.ParticipantsLimitation = model.ParticipantsLimitation;

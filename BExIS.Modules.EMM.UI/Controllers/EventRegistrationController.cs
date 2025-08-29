@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Security.Policy;
 using System.Web.Mvc;
 using System.Xml;
 
@@ -47,7 +48,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 using (EventRegistrationManager erManager = new EventRegistrationManager())
                 {
-                    User user = subManager.Subjects.Where(a => a.Name == HttpContext.User.Identity.Name).FirstOrDefault() as User;
+                    User user = subManager.Subjects.Where(a => a.Name == "epetzold").FirstOrDefault() as User;
 
                     foreach (Event e in allEvents)
                     {
@@ -76,13 +77,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
                                 EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
                                 if (reg != null)
                                 {
-                                    //model.AlreadyRegistered = true;
+                                    model.AlreadyRegistered = true;
                                     //model.Deleted = reg.Deleted;
                                 }
                                 //else there are only one or more deleted registrations and the user is not registered
                                 else
                                 {
-                                    //model.AlreadyRegistered = false;
+                                    model.AlreadyRegistered = false;
                                     //model.Deleted = true;
                                 }
                             }
@@ -199,15 +200,67 @@ namespace BExIS.Modules.EMM.UI.Controllers
         }
 
         [JsonNetFilter]
-        [HttpPost]
-        public JsonResult Edit(long id)
+        [HttpGet]
+        public JsonResult Get(long id)
         {
+            using (EventManager eManager = new EventManager())
+            using (EventRegistrationManager eventRegistrationManager = new EventRegistrationManager())
+            using (SubjectManager subManager = new SubjectManager())
+            {
+                var e = eManager.GetEventById(id);
+                User user = subManager.Subjects.Where(a => a.Name == "epetzold").FirstOrDefault() as User;
+                var reg = eventRegistrationManager.GetRegistrationByUserAndEvent(user.Id, id).FirstOrDefault();
+               
+                EventRegistrationLoadModel model = new EventRegistrationLoadModel();
+                model.Name = e.Name;
+                model.Date = e.EventDate;
+                model.Location = e.Location;
+                model.Language = e.EventLanguage;
+                model.ImportantInformation = e.ImportantInformation;
+                model.JsonFile = reg.Data;
+
+                return Json(model, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [JsonNetFilter]
+        [HttpPost]
+        public JsonResult Edit(EventRegistrationModel model)
+        {
+            using (EventManager eManager = new EventManager())
             using (EventRegistrationManager erManager = new EventRegistrationManager())
             using (SubjectManager subManager = new SubjectManager())
             {
-                var reg = erManager.GetRegistrationById(id);
+                //string data = JsonConvert.SerializeObject(model.JsonFile);
+                JObject obj = JObject.Parse(model.JsonFile);
 
-                return Json(reg.Data, JsonRequestBehavior.AllowGet);
+                // Check for logged in user
+                User user = subManager.Subjects.Where(a => a.Name == "epetzold").FirstOrDefault() as User;
+
+                var e = eManager.EventRepo.Get(model.EventId);
+                var reg = erManager.GetRegistrationByUserAndEvent(user.Id, model.EventId).FirstOrDefault();
+                if (reg != null)
+                {
+
+                    // get email adress from XML && get ref_id based on email adress
+                    EmailStructure emailStructure = new EmailStructure();
+                    emailStructure = EmailHelper.ReadFile(e.EventLanguage);
+                    var email = obj
+                                .Descendants()                      // alle JTokens im Baum
+                                .OfType<JObject>()                   // nur Objekte
+                                .FirstOrDefault(o => (string)o["key"] == emailStructure.lableEmail.ToLower())?["value"]
+                                ?.ToString();
+
+                    reg.Data = model.JsonFile;
+                    erManager.UpdateEventRegistration(reg);
+
+                    string url = Request.Url.GetLeftPart(UriPartial.Authority);
+                    EmailHelper.SendEmailNotification("updated", email, reg.Token, model.JsonFile, e, url);
+
+                    return Json(new { success = true, id = 0 });
+                }
+                else
+                    return Json(new { success = false, id = 0 });
             }
         }
 

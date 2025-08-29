@@ -43,6 +43,7 @@
   // Event-ID aus URL holen
   import { get } from 'svelte/store';
   let eventId = get(page).params.id;
+  $: target = languages.find(l => l.text === event.selectedEventLanguage) ?? languages[0];
 
  onMount(async () => {
   loading = true;
@@ -50,16 +51,18 @@
   console.log('API Response:', loadedEvent);
 
   if (loadedEvent) {
-    // Einzelne Properties zuweisen, damit Svelte die Änderung erkennt
-   event = { ...loadedEvent };
-    if (event.startDate) {
+  event = { ...loadedEvent };
+  if (event.startDate) {
     event.startDate = new Date(event.startDate).toISOString().slice(0, 10);
   }
   if (event.deadline) {
     event.deadline = new Date(event.deadline).toISOString().slice(0, 10);
   }
-    target = languages.find(l => l.text === event.selectedEventLanguage) ?? languages[0];
+  if (!event.selectedEventLanguage || event.selectedEventLanguage === null) {
+    event.selectedEventLanguage = languages[0].text;
   }
+  target = languages.find(l => l.text === event.selectedEventLanguage) ?? languages[0];
+}
   loading = false;
 });
 

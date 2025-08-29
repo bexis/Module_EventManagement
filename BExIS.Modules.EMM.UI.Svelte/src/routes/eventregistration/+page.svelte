@@ -20,36 +20,43 @@ import tableAction from '../../components/tableAction.svelte';
 
 let tableStore = writable<eventregistrationModel.EventListItem[]>([]);
 
-function handleTableAction(e: CustomEvent<{ row: any }>) {
-  const {  row } = e.detail; 
+function handleTableAction(e: CustomEvent<{ type?: string, row: any }>) {
+  const { type, row } = e.detail;
+  if (!row) return;
 
-  if (row) {
-
-    //ToDo: call passwort before
+  if (type === 'EDIT') {
+    goto(`/eventregistration/edit/${row.id}`);
+  } else if (type === 'DELETE') {
+    if (confirm(`Really delete registration for "${row.name}"?`)) {
+      // delete-Logik hier einbauen
+      // await dataCaller.deleteRegistration(row.id);
+      reload();
+    }
+  } else {
+    // Standard: REGISTER
     goto('/eventregistration/create', { state: { id: row.id } });
-    
   }
 }
-
-
-
 
 let table: TableConfig<eventregistrationModel.EventListItem> = {
   id: 'metadatatable',
   data: tableStore,
-  optionsComponent: tableAction as unknown as typeof SvelteComponent
-//   columns: {
-// 			name: {
-// 				header: 'Name'
-// 			},
-// 			deadline: {
-// 				header: 'Deadline'
+  optionsComponent: tableAction as unknown as typeof SvelteComponent,
+  columns: {
+			name: {
+				header: 'Name'
+			},
+			deadline: {
+				header: 'Deadline'
 				
-// 			},
-// 			participants: {
-// 				header: 'Participants'
-// 			}
-// 		}
+			},
+			participants: {
+				header: 'Participants'
+			},
+      alreadyRegistered: {
+        exclude: true
+      }
+		}
 };
 
 onMount(async () => {
