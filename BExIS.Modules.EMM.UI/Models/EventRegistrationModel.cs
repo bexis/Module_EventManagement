@@ -1,6 +1,7 @@
 ﻿using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -40,6 +41,7 @@ namespace BExIS.Modules.EMM.UI.Models
     {
         public long EventId { get; set; }
         public string JsonFile { get; set; }
+
 
         public EventRegistrationModel()
         {           

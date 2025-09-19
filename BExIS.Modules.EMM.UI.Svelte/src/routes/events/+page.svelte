@@ -5,11 +5,6 @@ import * as eventregistrationModel from '../../models/eventModels';
 import {
   Page,
   Table,
-  ErrorMessage,
-  helpStore,
-  TablePlaceholder,
-  notificationStore,
-  notificationType,
   pageContentLayoutType
 } from '@bexis2/bexis2-core-ui';
 import * as dataCaller from '../../services/eventCaller';
@@ -78,8 +73,6 @@ async function reload() {
 
 
   <div class="table table-compact w-full">
-    <Table config={table} id="event-table" class="w-full" 
-  on:action={e => handleTableAction(e)}
-/>
+    <Table config={table}  on:action={e => handleTableAction(e)}/>
   </div>
 </Page>

@@ -68,7 +68,7 @@
 
   function onFileChange(file: File) {
     selectedFile = file;
-    event.jsonFile = null;
+    event.jsonFile = '';
   }
 
   async function handleSubmit() {
@@ -84,14 +84,13 @@
 
 {#if !loading}
   <EventForm
-    {event}
-    {languages}
-    {target}
-    {selectedFile}
-    {loading}
-    onFileChange={onFileChange}
-    onSubmit={handleSubmit}
-  />
+  {event}
+      {languages}
+  {selectedFile}
+  {loading}
+  onFileChange={onFileChange}
+  onSubmit={handleSubmit}
+/>
 {:else}
   <p>Lade Eventdaten ...</p>
 {/if}

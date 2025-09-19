@@ -19,22 +19,50 @@ import { goto } from '$app/navigation';
 import tableAction from '../../components/tableAction.svelte';
 
 let tableStore = writable<eventregistrationModel.EventListItem[]>([]);
+let showPasswordModal = false;
+let passwordInput = '';
+let pendingRow: { id: number; [key: string]: any } | null = null;
+let passwordError = '';
+
+
+async function reload() {
+  const newData = await dataCaller.getEvents();
+  tableStore.set(Array.isArray(newData) ? newData : []);
+}
 
 function handleTableAction(e: CustomEvent<{ type?: string, row: any }>) {
   const { type, row } = e.detail;
   if (!row) return;
 
-  if (type === 'EDIT') {
+  if (type === 'REGISTER') {
+  pendingRow = row;
+  showPasswordModal = true;
+  passwordInput = '';
+  passwordError = '';
+  return;
+}
+  else  if  (type === 'EDIT') {
     goto(`/eventregistration/edit/${row.id}`);
   } else if (type === 'DELETE') {
     if (confirm(`Really delete registration for "${row.name}"?`)) {
-      // delete-Logik hier einbauen
-      // await dataCaller.deleteRegistration(row.id);
+
+      dataCaller.deleteEventRegistration(row.id);
       reload();
     }
-  } else {
-    // Standard: REGISTER
-    goto('/eventregistration/create', { state: { id: row.id } });
+  }
+}
+
+
+async function checkPassword() {
+  // Beispiel: Passwort ist "demo"
+  if(pendingRow) {
+    let pass = await dataCaller.getEventRegistrationPassword(pendingRow.id);
+    if (passwordInput === pass) {
+      showPasswordModal = false;
+      goto('/eventregistration/create', { state: { id: pendingRow.id } });
+    } else {
+      passwordError = 'Wrong password!';
+    }
   }
 }
 
@@ -64,16 +92,36 @@ onMount(async () => {
   tableStore.set(Array.isArray(data) ? data : []);
 });
 
-async function reload() {
-  const newData = await dataCaller.getEvents();
-  tableStore.set(Array.isArray(newData) ? newData : []);
-}
+
 </script>
 
 <Page help={true} title="Manage Events">
   <div class="table table-compact w-full">
-    <Table config={table} id="event-table" class="w-full" 
+    <Table config={table} 
   on:action={e => handleTableAction(e)}
 />
   </div>
+
+  {#if showPasswordModal}
+  <div class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded shadow-lg w-80">
+      <h2 class="text-lg font-bold mb-2">Enter password</h2>
+      <input
+        type="password"
+        class="input input-bordered w-full mb-2"
+        bind:value={passwordInput}
+        placeholder="Password"
+        on:keydown={(e) => e.key === 'Enter' && checkPassword()}
+      />
+      {#if passwordError}
+        <div class="text-red-600 text-sm mb-2">{passwordError}</div>
+      {/if}
+      <div class="flex justify-end gap-2">
+        <button class="btn" on:click={() => { showPasswordModal = false; }}>Cancel</button>
+        <button class="btn btn-primary" on:click={checkPassword}>OK</button>
+      </div>
+    </div>
+  </div>
+{/if}
+
 </Page>

@@ -40,7 +40,7 @@ let event: EditEvent = {
 
   function onFileChange(file: File) {
     selectedFile = file;
-    event.jsonFile = null;
+    event.jsonFile = "";
   }
 
   async function handleSubmit() {
@@ -65,7 +65,6 @@ let event: EditEvent = {
 <EventForm
   {event}
   {languages}
-  {target}
   {selectedFile}
   {loading}
   onFileChange={onFileChange}
