@@ -85,7 +85,7 @@
 {#if !loading}
   <EventForm
   {event}
-      {languages}
+  {languages}
   {selectedFile}
   {loading}
   onFileChange={onFileChange}

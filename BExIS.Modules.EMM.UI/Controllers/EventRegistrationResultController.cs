@@ -1,4 +1,5 @@
-﻿using BExIS.Dcm.CreateDatasetWizard;
+﻿using BExIS.App.Bootstrap.Attributes;
+using BExIS.Dcm.CreateDatasetWizard;
 using BExIS.Dcm.Wizard;
 using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
@@ -13,7 +14,9 @@ using BExIS.Security.Services.Objects;
 using BExIS.Security.Services.Subjects;
 using BExIS.Security.Services.Utilities;
 using BExIS.Xml.Helpers;
+using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -41,34 +44,190 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         #region Show Event Registration Results
 
-        public ActionResult Show()
+        //public ActionResult Show()
+        //{
+        //    ViewBag.Title = PresentationModel.GetViewTitleForTenant(" Show Reservation", this.Session.GetTenant());
+        //    EventRegistrationResultModel model = new EventRegistrationResultModel();
+        //    model.Results = new DataTable();
+        //    return View("EventRegistrationResults", model);
+        //}
+
+
+
+        [JsonNetFilter]
+        [HttpGet]
+        public JsonResult GetEvents()
         {
-            ViewBag.Title = PresentationModel.GetViewTitleForTenant(" Show Reservation", this.Session.GetTenant());
-            EventRegistrationResultModel model = new EventRegistrationResultModel();
-            model.Results = new DataTable();
-            return View("EventRegistrationResults", model);
+            using (EventManager eManger = new EventManager())
+            {
+                List<Event> allEvents = eManger.GetAllEvents().ToList();
+
+                List<EventResultListModel> availableEvents = new List<EventResultListModel>();
+
+                allEvents.ForEach(e => availableEvents.Add(new EventResultListModel(e)));
+
+                return Json(availableEvents, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+
+        [JsonNetFilter]
+        [HttpGet]
+        public JsonResult GetEventRegistrations(long id)
+        {
+            using (EventManager eManger = new EventManager())
+            using (EventRegistrationManager eventRegistrationManager = new EventRegistrationManager())
+            {
+                var e = eManger.GetEventById(id);
+
+                var registrations = eventRegistrationManager.GetAllRegistrationsByEvent(id).Select(r => r.Data);
+                var merged = mergeForTable(registrations);
+
+                EventRegistrationsModel model = new EventRegistrationsModel();
+                model.EventId = id;
+                model.JsonFiles = merged;
+
+                return Json(model, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [JsonNetFilter]
+        [HttpGet]
+        public JsonResult Delete(long id)
+        {
+             using (EventRegistrationManager erManager = new EventRegistrationManager())
+             using (var eventManager = new EventManager())
+             using (UserManager userManager = new UserManager())
+             {
+                EventRegistration reg = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
+                if (reg != null)
+                {
+                    reg.Deleted = true;
+                    erManager.UpdateEventRegistration(reg);
+                    MoveFromWaitingList(reg.Event.Id);
+                }
+
+                string url = Request.Url.GetLeftPart(UriPartial.Authority);
+                string email = "";
+
+                if (reg.Person != null)
+                {
+                    User user = userManager.FindByIdAsync(reg.Person.Id).Result;
+                    email = user.Email;
+                }
+                else
+                {
+                    JsonEventModel model = (JsonEventModel)JsonConvert.DeserializeObject(reg.Data);
+
+                    EmailStructure emailStructure = new EmailStructure();
+                    emailStructure = EmailHelper.ReadFile(reg.Event.EventLanguage);
+                    email = model.Registration[1].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
+                }
+
+                EmailHelper.SendEmailNotification("deleted", email, "", reg.Data, reg.Event, url);
+            }
+
+            return Json(new { success = true, id = id });
         }
 
         /// <summary>
         /// delete event with all registrations
         /// </summary>
         /// <param name="id">event id</param>
-        /// <returns>csv file</returns>
-        public ActionResult Delete(string id)
+        /// <returns></returns>
+        [JsonNetFilter]
+        [HttpGet]
+        public JsonResult DeleteAll(long id)
         {
-            long eventId = Convert.ToInt64(id);
-            using (var eventRegistrationManager = new EventRegistrationManager())
-            using (var eventManager = new EventManager())
-            { 
-                //delete first all registrations
-                List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(eventId);
-                eventRegistrations.ForEach(a => eventRegistrationManager.DeleteEventRegistration(a));
+            using (EventManager eManger = new EventManager())
+            using (EventRegistrationManager eventRegistrationManager = new EventRegistrationManager())
+            {
+                var e = eManger.GetEventById(id);
 
-                eventManager.DeleteEvent(eventManager.GetEventById(eventId));
+                var registrations = eventRegistrationManager.GetAllRegistrationsByEvent(id);
+                registrations.ForEach(a => eventRegistrationManager.DeleteEventRegistration(a));
+                eManger.DeleteEvent(eManger.GetEventById(id));
+
+                return Json(new { success = true, id = id });
             }
-          
-            return RedirectToAction("Show");
         }
+
+        [JsonNetFilter]
+        [HttpGet]
+        public JsonResult ResendNotification(long id, long eventId)
+        {
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
+            using (EventManager eventManager = new EventManager())
+            {
+                var registration = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
+
+                var e = eventManager.GetEventById(eventId);
+                Resend(registration.Data, e);
+            }
+
+            return Json(new { success = true, id = id });
+        }
+
+
+
+        private string mergeForTable(IEnumerable<string> jsons)
+        {
+            if (jsons == null) throw new ArgumentNullException(nameof(jsons));
+
+            var items = new List<JObject>();
+
+            foreach (var s in jsons)
+            {
+                if (string.IsNullOrWhiteSpace(s)) continue;
+
+                var token = JToken.Parse(s); // erkennt Objekt vs. Array
+                switch (token)
+                {
+                    case JObject obj:
+                        items.Add(obj);
+                        break;
+                    case JArray arr:
+                        foreach (var t in arr.OfType<JObject>())
+                            items.Add(t);
+                        break;
+                    default:
+                        // Primitive o.ä. ignorieren; alternativ: Ausnahme werfen
+                        break;
+                }
+            }
+
+            // Spalten vereinheitlichen (Union aller Property-Namen)
+            var allProps = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var o in items)
+                foreach (var p in o.Properties()) allProps.Add(p.Name);
+
+            foreach (var o in items)
+                foreach (var name in allProps)
+                    if (o[name] == null) o[name] = JValue.CreateNull();
+
+            // Als flaches Array für die UI zurückgeben
+            return new JArray(items).ToString(Newtonsoft.Json.Formatting.None);
+        }
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         /// <summary>
         /// clear, that means delete all registrations from one event
@@ -211,19 +370,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return RedirectToAction("OnSelectTreeViewItem", new { id = eventId });
         }
 
-        public ActionResult ResendNotification(long id, long eventId)
-        {
-            using (EventRegistrationManager erManager = new EventRegistrationManager())
-            using (EventManager eventManager = new EventManager())
-            {
-                var registration = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
-
-                var e = eventManager.GetEventById(eventId);
-                Resend(registration.Data, e);
-            }
-
-            return RedirectToAction("OnSelectTreeViewItem", new { id = eventId });
-        }
+      
 
         private void Resend(string data, Event e)
         {
@@ -288,85 +435,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     );
             }
         }
-
-        #endregion
-
-        #region edit event registration
-
-        //public ActionResult LoadForm(long id, long eventid)
-        //{
-        //    using (EventManager eManager = new EventManager())
-        //    {
-        //        Event e = eManager.EventRepo.Get(eventid);
-
-        //        //add default value to session
-        //        DefaultEventInformation defaultEventInformation = new DefaultEventInformation();
-        //        defaultEventInformation.EventName = e.Name;
-        //        defaultEventInformation.Eventid = e.Id.ToString();
-        //        if (!String.IsNullOrEmpty(e.EventDate))
-        //            defaultEventInformation.Date = e.EventDate;
-        //        if (!String.IsNullOrEmpty(e.EventLanguage))
-        //               defaultEventInformation.Language = e.EventLanguage;
-
-        //        if (!String.IsNullOrEmpty(e.ImportantInformation))
-        //            defaultEventInformation.ImportantInformation = e.ImportantInformation;
-
-        //        Session["DefaultEventInformation"] = defaultEventInformation;
-
-        //        //CreateTaskmanager taskManager = new CreateTaskmanager();
-        //        if (TaskManager == null)
-        //            TaskManager = new CreateTaskmanager();
-
-        //        TaskManager.AddToBus(CreateTaskmanager.METADATASTRUCTURE_ID, e.MetadataStructure.Id);
-        //        TaskManager.AddToBus(CreateTaskmanager.ENTITY_ID, e.Id);
-                
-        //        using (EventRegistrationManager erManager = new EventRegistrationManager())
-        //        {
-
-        //            EventRegistration reg = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
-        //            XmlNodeReader xmlNodeReader = new XmlNodeReader(reg.Data);
-        //            TaskManager.AddToBus(CreateTaskmanager.METADATA_XML, reg.Data);
-        //            xmlNodeReader.Dispose();
-        //            }
-
-        //        }
-
-        //        TaskManager.AddToBus(CreateTaskmanager.SAVE_WITH_ERRORS, false);
-
-        //        TaskManager.AddToBus(CreateTaskmanager.NO_IMPORT_ACTION, true);
-        //        TaskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_TITLE, "Event registration");
-        //        TaskManager.AddToBus(CreateTaskmanager.INFO_ON_TOP_DESCRIPTION, "<p><b>help</b></p>");
-
-
-        //        Session["EventRegistrationTaskmanager"] = TaskManager;
-
-        //        setAdditionalFunctions();
-
-        //    return new EmptyResult();
-
-        // }
-        //private void setAdditionalFunctions()
-        //{
-        //    CreateTaskmanager taskManager = (CreateTaskmanager)Session["EventRegistrationTaskmanager"];
-
-
-        //    ActionInfo submitAction = new ActionInfo();
-        //    submitAction.ActionName = "Save";
-        //    submitAction.ControllerName = "EventRegistration";
-        //    submitAction.AreaName = "EMM";
-
-        //    ActionInfo cancelAction = new ActionInfo();
-        //    cancelAction.ActionName = "Cancel";
-        //    cancelAction.ControllerName = "EventRegistration";
-        //    cancelAction.AreaName = "EMM";
-
-        //    taskManager.Actions.Add(CreateTaskmanager.SUBMIT_ACTION, submitAction);
-        //    taskManager.Actions.Add(CreateTaskmanager.CANCEL_ACTION, cancelAction);
-
-        //    Session["EventRegistrationTaskmanager"] = taskManager;
-
-        //}
-
 
         #endregion
 
