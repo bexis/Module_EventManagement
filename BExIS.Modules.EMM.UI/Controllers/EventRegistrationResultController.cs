@@ -1,6 +1,7 @@
 ﻿using BExIS.App.Bootstrap.Attributes;
 using BExIS.Dcm.CreateDatasetWizard;
 using BExIS.Dcm.Wizard;
+using BExIS.Dim.Entities.Export.GBIF;
 using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
 using BExIS.IO.Transform.Output;
@@ -70,7 +71,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
             }
         }
 
-
         [JsonNetFilter]
         [HttpGet]
         public JsonResult GetEventRegistrations(long id)
@@ -80,7 +80,17 @@ namespace BExIS.Modules.EMM.UI.Controllers
             {
                 var e = eManger.GetEventById(id);
 
-                var registrations = eventRegistrationManager.GetAllRegistrationsByEvent(id).Select(r => r.Data);
+                var registrations = eventRegistrationManager
+                        .GetAllRegistrationsByEvent(id)
+                        .Select(r =>
+                            {
+                                var root = JObject.Parse(r.Data);
+
+                            // Neues Feld "id" auf Root-Ebene hinzufügen
+                            root["id"] = r.Id;
+
+                            return root.ToString(); // JSON mit Root-ID
+                            });
                 var merged = mergeForTable(registrations);
 
                 EventRegistrationsModel model = new EventRegistrationsModel();
@@ -88,6 +98,31 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 model.JsonFiles = merged;
 
                 return Json(model, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [JsonNetFilter]
+        [HttpGet]
+        public JsonResult GetWaitingListRegistrations(long id)
+        {
+            using (EventManager eManger = new EventManager())
+            using (EventRegistrationManager eventRegistrationManager = new EventRegistrationManager())
+            {
+                var e = eManger.GetEventById(id);
+                var registrations = eventRegistrationManager.GetAllWaitingListRegsByEvent(id).Select(r => r.Data);
+                if (registrations.Count() > 0)
+                {
+                    var merged = mergeForTable(registrations);
+                    EventRegistrationsModel model = new EventRegistrationsModel();
+                    model.EventId = id;
+                    model.JsonFiles = merged;
+
+                    return Json(model, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Json(null, JsonRequestBehavior.AllowGet);
+                }
             }
         }
 
@@ -154,20 +189,79 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         [JsonNetFilter]
         [HttpGet]
-        public JsonResult ResendNotification(long id, long eventId)
+        public JsonResult ResendNotification(long id)
         {
             using (EventRegistrationManager erManager = new EventRegistrationManager())
             using (EventManager eventManager = new EventManager())
             {
                 var registration = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
 
-                var e = eventManager.GetEventById(eventId);
+                var e = eventManager.GetEventById(registration.Event.Id);
                 Resend(registration.Data, e);
             }
 
             return Json(new { success = true, id = id });
         }
 
+        [JsonNetFilter]
+        [HttpGet]
+        public JsonResult MoveFromWaitingList(long id, long eventId)
+        {
+            using (EventRegistrationManager erManager = new EventRegistrationManager())
+            using (EventManager eventManager = new EventManager())
+            {
+                var registration = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
+                if (registration.WaitingList == true)
+                    registration.WaitingList = false;
+
+                erManager.UpdateEventRegistration(registration);
+
+                var e = eventManager.GetEventById(eventId);
+                SendNotification(registration.Data, e);
+
+            }
+            return Json(new { success = true, id = id });
+        }
+
+        /// <summary>
+        /// clear, that means delete all registrations from one event
+        /// </summary>
+        /// <param name="id">event id</param>
+        /// <returns></returns>
+        [JsonNetFilter]
+        [HttpGet]
+        public JsonResult Clear(long id)
+        {
+            using (var eventRegistrationManager = new EventRegistrationManager())
+            using (var eventManager = new EventManager())
+            {
+                //delete first all registrations
+                List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(eventId);
+                eventRegistrations.ForEach(a => eventRegistrationManager.DeleteEventRegistration(a));
+
+                var e = eventManager.GetEventById(id);
+                if (e.Closed == true)
+                {
+                    e.Closed = false;
+                    eventManager.UpdateEvent(e);
+                }
+            }
+
+            return Json(new { success = true, id = id });
+        }
+
+        private void Resend(string data, Event e)
+        {
+
+            var model = JsonConvert.DeserializeObject<Dictionary<string, List<Registration>>>(data)["registration"];
+
+            EmailStructure emailStructure = new EmailStructure();
+            emailStructure = EmailHelper.ReadFile(e.EventLanguage);
+            string email = model[0].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
+            string ref_id = EmailHelper.GetRefIdFromEmail(email);
+            string url = Request.Url.GetLeftPart(UriPartial.Authority);
+            EmailHelper.SendEmailNotification("resend", email, ref_id, data, e, url);
+        }
 
 
         private string mergeForTable(IEnumerable<string> jsons)
@@ -208,185 +302,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
             // Als flaches Array für die UI zurückgeben
             return new JArray(items).ToString(Newtonsoft.Json.Formatting.None);
         }
-
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /// <summary>
-        /// clear, that means delete all registrations from one event
-        /// </summary>
-        /// <param name="id">event id</param>
-        /// <returns>csv file</returns>
-        public ActionResult Clear(string id)
-        {
-            long eventId = Convert.ToInt64(id);
-            using (var eventRegistrationManager = new EventRegistrationManager())
-            using (var eventManager = new EventManager())
-            {
-                //delete first all registrations
-                List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(eventId);
-                eventRegistrations.ForEach(a => eventRegistrationManager.DeleteEventRegistration(a));
-
-                var e = eventManager.GetEventById(eventId);
-                if(e.Closed == true)
-                {
-                    e.Closed = false;
-                    eventManager.UpdateEvent(e);
-                }
-            }
-
-            return RedirectToAction("Show");
-        }
-
-        /// <summary>
-        /// export as comma seperatred csv
-        /// </summary>
-        /// <param name="id">event id</param>
-        /// <returns>csv file</returns>
-        public ActionResult Export(string id)
-        {
-            DataTable dataTable = GetEventResults(long.Parse(id));
-
-            var lines = new List<string>();
-            string[] columnNames = dataTable.Columns
-                    .Cast<DataColumn>()
-                    .Select(column => column.ColumnName)
-                    .ToArray();
-
-            var header = string.Join(",", columnNames.Select(name => $"\"{name}\""));
-            lines.Add(header);
-
-            var valueLines = dataTable.AsEnumerable()
-                .Select(row => string.Join(",", row.ItemArray.Select(val => $"\"{val}\"")));
-
-            lines.AddRange(valueLines);
-
-            string eventName;
-
-            using (EventManager eventManager = new EventManager())
-            {
-                eventName = eventManager.GetEventById(long.Parse(id)).Name;
-            }
-            //remove invaid chars in eventname for filename
-            string filename = string.Join("_", eventName.Split(Path.GetInvalidFileNameChars()));
-
-            string dataPath = AppConfiguration.DataPath;
-            string storePath = Path.Combine(dataPath, "EMM", "Temp", filename + ".csv");
-
-            System.IO.File.WriteAllLines(storePath, lines, new UTF8Encoding(true));
-
-            return File(storePath, MimeMapping.GetMimeMapping(eventName + ".csv"), Path.GetFileName(storePath));
-        }
-
-        public ActionResult FillTree()
-        {
-            using (EventManager eManager = new EventManager())
-            {
-                List<Event> events = eManager.GetAllEvents().ToList();
-                List<EventRegistrationFilterModel> model = new List<EventRegistrationFilterModel>();
-
-                EventRegistrationFilterModel closed = new EventRegistrationFilterModel();
-                closed.Status = "closed";
-                closed.EventFilterItems = new List<EventFilterItem>();
-
-                EventRegistrationFilterModel open = new EventRegistrationFilterModel();
-                open.Status = "open";
-                open.EventFilterItems = new List<EventFilterItem>();
-
-                foreach (Event e in events)
-                {
-                    if (e.Deadline < DateTime.Now)
-                        closed.EventFilterItems.Add(new EventFilterItem(e));
-                    else
-                        open.EventFilterItems.Add(new EventFilterItem(e));
-                }
-
-                open.EventFilterItems = open.EventFilterItems.OrderBy(a => a.Id).ToList();
-                closed.EventFilterItems = closed.EventFilterItems.OrderBy(a => a.Id).ToList();
-                open.EventFilterItems = Enumerable.Reverse(open.EventFilterItems).ToList();
-                closed.EventFilterItems = Enumerable.Reverse(closed.EventFilterItems).ToList();
-
-                model.Add(open);
-                model.Add(closed);
-
-                return PartialView("_selectEvent", model);
-            }
-        }
-
-        public ActionResult OnSelectTreeViewItem(long id)
-        {
-            EventRegistrationResultModel model = new EventRegistrationResultModel();
-            model.Results = GetEventResults(id);
-            model.WaitingListResults =  GetWaitingListResults(id);
-            
-            model.EventId = id;
-
-            //check rights on event
-            using (var permissionManager = new EntityPermissionManager())
-            using (var entityTypeManager = new EntityManager())
-            using (var userManager = new UserManager())
-            {
-                var user = userManager.FindByNameAsync(HttpContext.User.Identity.Name).Result;
-                Entity entity = entityTypeManager.FindByName("Event");
-                model.UserHasRights = permissionManager.HasEffectiveRightsAsync(user.Name, entity.EntityType, id, RightType.Read).Result;
-            }
-
-            return View("EventRegistrationResults", model);
-        }
-
-        public ActionResult MoveFromWaitingList(long id, long eventId)
-        {
-            using (EventRegistrationManager erManager = new EventRegistrationManager())
-            using (EventManager eventManager = new EventManager())
-            {
-                var registration = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
-                if (registration.WaitingList == true)
-                    registration.WaitingList = false;
-
-                erManager.UpdateEventRegistration(registration);
-
-                var e = eventManager.GetEventById(eventId);
-                SendNotification(registration.Data, e);
-
-            }
-
-            return RedirectToAction("OnSelectTreeViewItem", new { id = eventId });
-        }
-
-      
-
-        private void Resend(string data, Event e)
-        {
-            // get email adress from XML && get ref_id based on email adress
-
-            JsonEventModel model = (JsonEventModel)JsonConvert.DeserializeObject(data);
-
-            EmailStructure emailStructure = new EmailStructure();
-            emailStructure = EmailHelper.ReadFile(e.EventLanguage);
-            string email = model.Registration[1].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
-            string ref_id = EmailHelper.GetRefIdFromEmail(email);
-            string url = Request.Url.GetLeftPart(UriPartial.Authority);
-            EmailHelper.SendEmailNotification("resend", email, ref_id, data, e, url);
-        }
-
-      
 
         private void SendNotification(string data, Event e)
         {
@@ -438,46 +353,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         #endregion
 
-        #region delete reg
-
-        public ActionResult DeleteRegistration(long id)
-        {
-            using (EventRegistrationManager erManager = new EventRegistrationManager())
-            using (UserManager userManager = new UserManager())
-            {
-                EventRegistration reg = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
-                if (reg != null)
-                {
-                    reg.Deleted = true;
-                    erManager.UpdateEventRegistration(reg);
-                    MoveFromWaitingList(reg.Event.Id);
-                }
-
-                string url = Request.Url.GetLeftPart(UriPartial.Authority);
-                string email = "";
-
-                if (reg.Person != null)
-                {
-                    User user = userManager.FindByIdAsync(reg.Person.Id).Result;
-                    email = user.Email;
-                }
-                else
-                {
-                    JsonEventModel model = (JsonEventModel)JsonConvert.DeserializeObject(reg.Data);
-
-                    EmailStructure emailStructure = new EmailStructure();
-                    emailStructure = EmailHelper.ReadFile(reg.Event.EventLanguage);
-                    email = model.Registration[1].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
-                    
-                }
-
-                EmailHelper.SendEmailNotification("deleted", email, "", reg.Data, reg.Event, url);
-            }
-
-            return RedirectToAction("Show");
-
-        }
-
         private void MoveFromWaitingList(long eventId)
         {
             string url = Request.Url.GetLeftPart(UriPartial.Authority);
@@ -517,115 +392,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 }
             }
         }
-
-
-        #endregion
-
-        #region Xml to DataTable
-
-        private DataTable GetEventResults(long eventId)
-        {
-            DataTable results = new DataTable();
-            results.Columns.Add("Id");
-            results.Columns.Add("Deleted");
-
-            using (EventRegistrationManager erManager = new EventRegistrationManager())
-            {
-                List<EventRegistration> eventRegistrations = erManager.GetAllRegistrationsByEvent(eventId);
-                JsonEventModel model = (JsonEventModel)JsonConvert.DeserializeObject(eventRegistrations[0].Data);
-                if (eventRegistrations.Count != 0)
-                {
-                   
-                    results = CreateDataTableColums(results, model.Registration[1].Entries);
-                }
-
-                foreach (EventRegistration er in eventRegistrations)
-                {
-                    JsonEventModel m = (JsonEventModel)JsonConvert.DeserializeObject(er.Data);
-                    //if (eventRegistrations.Count != 0)
-                    //    results.Rows.Add(AddDataRow(m.Entries, results, er.Deleted.ToString(), er.Id));
-
-                }
-            }
-
-            return results;
-        }
-
-        private DataTable GetWaitingListResults(long eventId)
-        {
-            DataTable results = new DataTable();
-            results.Columns.Add("Id");
-            results.Columns.Add("Deleted");
-            //results.Columns.Add("Action");
-
-            using (EventRegistrationManager erManager = new EventRegistrationManager())
-            {
-                List<EventRegistration> eventRegistrations = erManager.GetAllWaitingListRegsByEvent(eventId);
-
-                if (eventRegistrations.Count != 0)
-                {
-                    JsonEventModel model = (JsonEventModel)JsonConvert.DeserializeObject(eventRegistrations[0].Data);
-                    //results = CreateDataTableColums(results, model.Entries);
-                }
-
-                foreach (EventRegistration er in eventRegistrations)
-                {
-                    JsonEventModel model = (JsonEventModel)JsonConvert.DeserializeObject(er.Data);
-                    //results.Rows.Add(AddDataRow(model.Entries, results, er.Deleted.ToString(), er.Id));
-                }
-            }
-
-            return results;
-        }
-        //private DataTable GetEventRegistration(long eventId, XDocument data)
-        //{
-        //    DataTable results = new DataTable();
-
-        //    using (EventRegistrationManager erManager = new EventRegistrationManager())
-        //    {
-        //        XmlNodeReader xmlNodeReader = new XmlNodeReader(XmlMetadataWriter.ToXmlDocument(data));
-        //        results = CreateDataTableColums(results, XElement.Load(xmlNodeReader));
-        //        results.Rows.Add(AddDataRow(XElement.Load(xmlNodeReader), results));
-        //        xmlNodeReader.Dispose();
-        //    }
-        //    return results;
-        //}
-
-        private DataTable CreateDataTableColums(DataTable dataTable, List<Entry> entries)
-        {
-            DataTable dt = dataTable;
-            // build your DataTable
-            foreach (Entry e in entries)
-            {
-              
-                    DataColumn dc = new DataColumn();
-                    string colName = e.Title;
-                    dc.Caption = colName;
-                    dc.ColumnName = colName;
-                    dt.Columns.Add(dc); // add columns to your dt
-                
-            }
-
-            return dt;
-        }
-
-        private DataRow AddDataRow(List<Entry> entries, DataTable dt, string deleted, long id)
-        {
-            DataRow dr = dt.NewRow();
-            dr["Id"] = id;
-            dr["Deleted"] = deleted;
-            foreach (Entry e in entries)
-            {
-                    string value  = e.Value;
-                    value = HttpUtility.HtmlDecode(value);
-                    dr[e.Title] = value;  //add in the values
-            }
-
-            return dr;
-        }
-
-        #endregion
-
 
     }
 

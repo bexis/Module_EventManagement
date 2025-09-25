@@ -4,8 +4,7 @@ import type { SvelteComponent } from 'svelte';
 import * as eventModel from '../../models/eventModels';
 import {
   Page,
-  Table,
-  pageContentLayoutType
+  Table
 } from '@bexis2/bexis2-core-ui';
 import * as dataCaller from '../../services/eventResultCaller';
 import { writable } from 'svelte/store';
@@ -31,9 +30,16 @@ function handleShow(row) {
 }
 
 function handleDelete(row) {
-console.log('Delete row:', row.id);
-  if (confirm(`Event "${row.name}" wirklich löschen?`)) {
+  console.log('Delete row:', row.id);
+  if (confirm(`Really delete event: "${row.name}"?`)) {
     dataCaller.deleteEvent(row.id).then(() => reload());
+  }
+}
+
+function handleClear(row) {
+  console.log('Clear row:', row.id);
+  if (confirm(`Really clear event: "${row.name}"?`)) {
+    dataCaller.clearEvent(row.id).then(() => reload());
   }
 }
 
@@ -41,6 +47,7 @@ function handleTableAction(e: CustomEvent<{ type: string, row: any }>) {
   const { type, row } = e.detail;
   if (type === 'SHOW') handleShow(row);
   if (type === 'DELETE') handleDelete(row);
+  if (type === 'CLEAR') handleClear(row);
 }
 
 

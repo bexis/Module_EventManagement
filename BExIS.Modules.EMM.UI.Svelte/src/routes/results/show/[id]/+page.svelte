@@ -2,23 +2,27 @@
 import { onMount } from 'svelte';
 import type { SvelteComponent } from 'svelte';
 import { page } from '$app/stores';
-
-import * as eventModel from '../../../../models/eventModels';
 import {
   Page,
-  Table,
-  pageContentLayoutType
+  Table
 } from '@bexis2/bexis2-core-ui';
 import * as dataCaller from '../../../../services/eventResultCaller';
 import { writable } from 'svelte/store';
 import type { TableConfig } from '@bexis2/bexis2-core-ui';
 import { goto } from '$app/navigation';
 import tableActions from '../../../../components/tableActionsEventRegs.svelte';
-	import Fa from 'svelte-fa';
-	import { faPlus, faArrowLeft} from '@fortawesome/free-solid-svg-icons';
+import tableActionsWaitingList from '../../../../components/tableActionsWaitingList.svelte';
+import Fa from 'svelte-fa';
+import { faArrowLeft} from '@fortawesome/free-solid-svg-icons';
+import type { Columns } from '@bexis2/bexis2-core-ui';
 
 const tableStore = writable<any[]>([]);
-$: id = $page.params.id;
+$: id = Number($page.params.id);
+
+// Typdefinition für die Struktur der Daten
+interface RegistrationEntry { key: string; title: string; value: any; }
+interface RegistrationSection { entries: RegistrationEntry[]; }
+interface ParsedItem { registration?: RegistrationSection[]; [key: string]: any; }
 
 async function reload() {
   const newData = await dataCaller.getEvents();
@@ -31,15 +35,84 @@ let table= {
 		resizable: 'both',
 		rowHeight: 70,
 		exportable: true,
-        optionsComponent: tableActions as unknown as typeof SvelteComponent
+    optionsComponent: tableActions as unknown as typeof SvelteComponent
+	 } as TableConfig<(any)>;
+
+   let table2= {
+		 id: 'eventwaitinglistresults',
+		 data: writable<any[]>([]),
+		resizable: 'both',
+		rowHeight: 70,
+		exportable: true,
+    optionsComponent: tableActionsWaitingList as unknown as typeof SvelteComponent
 	 } as TableConfig<(any)>;
 
 onMount(async () => {
-  const data = await dataCaller.getEventResults(id);
-  let parsed = [];
-  if (data && data.jsonFiles) {
+  const regs = await dataCaller.getEventResults(id);
+  const waitingList = await  dataCaller.getEventWaitingListResults(id);
+  console.log("WaitingList0", waitingList);
+  if(waitingList)
+  {
+    console.log("WaitingList", waitingList);
+    let parsed: ParsedItem[] = [];
+    if (regs && regs.jsonFiles) {
+      try {
+        parsed = JSON.parse(regs.jsonFiles) as ParsedItem[];
+      } catch (e) {
+        console.error("Fehler beim Parsen von jsonFiles:", e);
+      }
+    }
+
+    // 1. Spaltennamen aus dem ersten Element extrahieren
+    let columns: { key: string, title: string }[] = [];
+    if (parsed.length > 0 && parsed[0].registration) {
+      parsed[0].registration.forEach(section => {
+        section.entries.forEach(entry => {
+          columns.push({ key: entry.key, title: entry.title });
+        });
+      });
+    }
+
+    // 2. Daten in flache Objekte umwandeln
+   const rows = parsed.map(item => {
+  const row: Record<string, any> = {};
+  (item.registration ?? []).forEach(section => {
+    section.entries.forEach(entry => {
+      row[entry.key] = entry.value;
+    });
+  });
+  // ID aus dem Ursprungsobjekt übernehmen
+  if (typeof item.id !== "undefined") {
+    row.id = item.id;
+  }
+  return row;
+});
+
+    // 3. TableConfig anpassen
+    table2.columns = columns.reduce((acc, col) => {
+      acc[col.key] = {
+        header: col.title,      // Titel der Spalte
+        // weitere Optionen nach Bedarf, z.B. sortable:
+        disableSorting: false
+      };
+      return acc;
+    }, {} as Columns);
+
+    table.columns = columns.reduce((acc, col) => {
+      acc[col.key] = {
+        header: col.title,
+        disableSorting: false
+      };
+      return acc;
+    }, {} as Columns);
+
+    table2.data.set(rows);
+  }
+   
+  let parsed: ParsedItem[] = [];
+  if (regs && regs.jsonFiles) {
     try {
-      parsed = JSON.parse(data.jsonFiles);
+      parsed = JSON.parse(regs.jsonFiles) as ParsedItem[];
     } catch (e) {
       console.error("Fehler beim Parsen von jsonFiles:", e);
     }
@@ -56,22 +129,29 @@ onMount(async () => {
   }
 
   // 2. Daten in flache Objekte umwandeln
-  const rows = parsed.map(item => {
-    const row: Record<string, any> = {};
-    item.registration.forEach(section => {
-      section.entries.forEach(entry => {
-        row[entry.key] = entry.value;
-      });
+const rows = parsed.map(item => {
+  const row: Record<string, any> = {};
+  (item.registration ?? []).forEach(section => {
+    section.entries.forEach(entry => {
+      row[entry.key] = entry.value;
     });
-    return row;
   });
+  // ID aus dem Ursprungsobjekt übernehmen
+  if (typeof item.id !== "undefined") {
+    row.id = item.id;
+  }
+  return row;
+});
 
   // 3. TableConfig anpassen
-  table.columns = columns.map(col => ({
-    field: col.key,
-    title: col.title,
-    sortable: true
-  }));
+  table.columns = columns.reduce((acc, col) => {
+    acc[col.key] = {
+      header: col.title,
+      disableSorting: false
+    };
+    return acc;
+  }, {} as Columns);
+
   table.data.set(rows);
 });
 
@@ -79,7 +159,8 @@ function handleTableAction(e: CustomEvent<{ type: string, row: any }>) {
   const { type, row } = e.detail;
   if (type === 'EDIT') goto(`/eventregistration/edit/${row.id}`);
   if (type === 'DELETE') handleDelete(row);
-  //if (type === 'RESEND') handleResend(row);
+  if (type === 'MOVE') handleMove(row);
+  if (type === 'RESEND') handleResend(row);
 }
 
 function handleDelete(row) {
@@ -89,6 +170,18 @@ console.log('Delete row:', row.id);
   }
 }
 
+function handleMove(row) {
+  console.log('Move row:', row.id);
+  if (confirm(`Event "${row.name}" wirklich verschieben?`)) {
+    dataCaller.moveEvent(row.id).then(() => reload());
+  }
+}
+
+function handleResend(row) {
+  console.log('Resend row:', row.id);
+  dataCaller.Resend(row.id, id).then(() => reload());
+}
+
 function back() {
 		goto("/results");
 	}
@@ -96,6 +189,9 @@ function back() {
 </script>
 
 <Page>
+  <div class="w-full max-w-7xl p-5 space-y-5 border-y border-solid border-surface-500">
+    <h1 class="h1">Event Results</h1>
+  </div>
   <div class="flex justify-start mb-4">
     <button
       title="back"
@@ -108,5 +204,9 @@ function back() {
 
    <div class="table table-compact w-full">
     <Table config={table}  on:action={e => handleTableAction(e)}/>
+  </div>
+  <div class="h3 h-9">Waiting List</div>
+   <div class="table table-compact w-full">
+    <Table config={table2}  on:action={e => handleTableAction(e)}/>
   </div>
 </Page>

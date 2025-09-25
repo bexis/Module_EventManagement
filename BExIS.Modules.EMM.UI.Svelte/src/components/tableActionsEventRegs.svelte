@@ -15,7 +15,7 @@
 		{
 			icon: faPen,
 			color: 'variant-filled-primary',
-			type: 'Edit'
+			type: 'EDIT'
 		},
 		{
 			icon: faTrash,
@@ -25,7 +25,7 @@
 		{
 			icon: faShareSquare,
 			color: 'variant-filled-secondary',
-			type: 'Resend'
+			type: 'RESEND'
 		}
 	];
 </script>
