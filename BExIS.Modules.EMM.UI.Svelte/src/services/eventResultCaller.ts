@@ -37,6 +37,19 @@ export const deleteEvent = async (id) => {
 	
     try {
         console.log("deleteEvent called with id:", id);
+		const response = await Api.get('/EMM/EventRegistrationResult/DeleteAll/' + id);
+		return response.data;
+	} catch (error) {
+		console.error(error);
+		throw error;
+	}
+}
+
+export const deleteRegistration = async (id) => {
+    setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
+	
+    try {
+        console.log("deleteRegistration called with id:", id);
 		const response = await Api.get('/EMM/EventRegistrationResult/Delete/' + id);
 		return response.data;
 	} catch (error) {
@@ -44,6 +57,7 @@ export const deleteEvent = async (id) => {
 		throw error;
 	}
 }
+
 
 export const moveEvent = async (id) => {
     setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');

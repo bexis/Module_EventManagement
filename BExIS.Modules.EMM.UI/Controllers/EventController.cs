@@ -20,18 +20,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 {
     public class EventController : Controller
     {
-        public ActionResult Index()
-        {
-            ViewBag.Title = PresentationModel.GetViewTitleForTenant("Manage Events", this.Session.GetTenant());
-            string module = "EMM";
-
-            ViewData["app"] = SvelteHelper.GetApp(module);
-            ViewData["start"] = SvelteHelper.GetStart(module);
-
-            return View();
-            
-        }
-
+       
         [JsonNetFilter]
         [HttpGet]
         public JsonResult GetEvents()
@@ -39,7 +28,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
             using (EventManager eManger = new EventManager())
             using (var eventRegistrationManager = new EventRegistrationManager())
             {
-
                 List<EventListModel> model = new List<EventListModel>();
                 List<Event> data = eManger.GetAllEvents().ToList();
 

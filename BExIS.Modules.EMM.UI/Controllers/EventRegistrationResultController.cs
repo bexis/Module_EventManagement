@@ -41,19 +41,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
     public class EventRegistrationResultController : Controller
     {
 
-        private CreateTaskmanager TaskManager;
-
         #region Show Event Registration Results
-
-        //public ActionResult Show()
-        //{
-        //    ViewBag.Title = PresentationModel.GetViewTitleForTenant(" Show Reservation", this.Session.GetTenant());
-        //    EventRegistrationResultModel model = new EventRegistrationResultModel();
-        //    model.Results = new DataTable();
-        //    return View("EventRegistrationResults", model);
-        //}
-
-
 
         [JsonNetFilter]
         [HttpGet]
@@ -180,10 +168,12 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 var e = eManger.GetEventById(id);
 
                 var registrations = eventRegistrationManager.GetAllRegistrationsByEvent(id);
-                registrations.ForEach(a => eventRegistrationManager.DeleteEventRegistration(a));
+                if(registrations.Count()> 0)
+                    registrations.ForEach(a => eventRegistrationManager.DeleteEventRegistration(a));
+
                 eManger.DeleteEvent(eManger.GetEventById(id));
 
-                return Json(new { success = true, id = id });
+                return Json(true, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -200,7 +190,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 Resend(registration.Data, e);
             }
 
-            return Json(new { success = true, id = id });
+            return Json(true, JsonRequestBehavior.AllowGet);
         }
 
         [JsonNetFilter]
@@ -220,7 +210,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 SendNotification(registration.Data, e);
 
             }
-            return Json(new { success = true, id = id });
+            return Json(true, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>
@@ -236,7 +226,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             using (var eventManager = new EventManager())
             {
                 //delete first all registrations
-                List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(eventId);
+                List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(id);
                 eventRegistrations.ForEach(a => eventRegistrationManager.DeleteEventRegistration(a));
 
                 var e = eventManager.GetEventById(id);
@@ -247,7 +237,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 }
             }
 
-            return Json(new { success = true, id = id });
+            return Json(true, JsonRequestBehavior.AllowGet);
         }
 
         private void Resend(string data, Event e)
@@ -394,5 +384,4 @@ namespace BExIS.Modules.EMM.UI.Controllers
         }
 
     }
-
 }

@@ -11,18 +11,18 @@ namespace BExIS.Modules.EMM.UI.Models
         public string Name { get; set; }
         public string Deadline { get; set; }
         public string Participants { get; set; }
-        //public bool EditAllowed { get; set; }
+        public bool EditAllowed { get; set; }
         public bool AlreadyRegistered { get; set; } 
-
+        public int NumberOfRegistration { get; set; }
         public bool Closed { get; set; }
-        //public bool Deleted { get; set; }
+        public bool Deleted { get; set; }
 
         public EventRegListModel(Event e)
         {
             Id = e.Id;
             Name = e.Name;
             Deadline = e.Deadline.ToString("dd.MM.yyyy");
-            //EditAllowed = e.EditAllowed;
+            EditAllowed = e.EditAllowed;
             Closed = e.Closed;
             AlreadyRegistered = false;
             Participants = e.ParticipantsLimitation == 0 ? "no limitation" : e.ParticipantsLimitation.ToString();

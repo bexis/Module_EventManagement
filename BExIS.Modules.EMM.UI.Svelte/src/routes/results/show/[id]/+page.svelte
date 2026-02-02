@@ -165,21 +165,21 @@ function handleTableAction(e: CustomEvent<{ type: string, row: any }>) {
 
 function handleDelete(row) {
 console.log('Delete row:', row.id);
-  if (confirm(`Event "${row.name}" wirklich löschen?`)) {
-    dataCaller.deleteEvent(row.id).then(() => reload());
+  if (confirm(`Really delete event registration: "${row.name}"?`)) {
+    dataCaller.deleteRegistration(row.id).then(() => reload());
   }
 }
 
 function handleMove(row) {
   console.log('Move row:', row.id);
-  if (confirm(`Event "${row.name}" wirklich verschieben?`)) {
+  if (confirm(`Really move event registration: "${row.name}"?`)) {
     dataCaller.moveEvent(row.id).then(() => reload());
   }
 }
 
 function handleResend(row) {
   console.log('Resend row:', row.id);
-  dataCaller.Resend(row.id, id).then(() => reload());
+  dataCaller.Resend(row.id).then(() => reload());
 }
 
 function back() {

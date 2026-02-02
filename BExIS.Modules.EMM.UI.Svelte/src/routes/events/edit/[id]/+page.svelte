@@ -71,6 +71,10 @@
     event.jsonFile = '';
   }
 
+    function onCancel() {
+    goto('/events');
+  }
+
   async function handleSubmit() {
     if (selectedFile) {
       event.jsonFile = await selectedFile.text();
@@ -90,6 +94,7 @@
   {loading}
   onFileChange={onFileChange}
   onSubmit={handleSubmit}
+   onCancel={onCancel}
 />
 {:else}
   <p>Lade Eventdaten ...</p>

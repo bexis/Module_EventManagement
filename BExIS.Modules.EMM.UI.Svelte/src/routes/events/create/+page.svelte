@@ -43,6 +43,10 @@ let event: EditEvent = {
     event.jsonFile = "";
   }
 
+  function onCancel() {
+    goto('/events');
+  }
+
   async function handleSubmit() {
     if (selectedFile) {
       event.jsonFile = await selectedFile.text();
@@ -69,4 +73,5 @@ let event: EditEvent = {
   {loading}
   onFileChange={onFileChange}
   onSubmit={handleSubmit}
+  onCancel={onCancel}
 />

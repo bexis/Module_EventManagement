@@ -1,4 +1,5 @@
 ﻿using BExIS.App.Bootstrap.Attributes;
+using BExIS.App.Bootstrap.Helpers;
 using BExIS.Dcm.CreateDatasetWizard;
 using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
@@ -35,7 +36,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         [JsonNetFilter]
         [HttpGet]
-        public JsonResult GetEvents()
+        public JsonResult GetEvents(string ref_id = "")
         {
             using (EventManager eManger = new EventManager())
             using (SubjectManager subManager = new SubjectManager())
@@ -46,7 +47,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 using (EventRegistrationManager erManager = new EventRegistrationManager())
                 {
-                    User user = subManager.Subjects.Where(a => a.Name == "epetzold").FirstOrDefault() as User;
+                    User user = BExISAuthorizeHelper.GetUserFromAuthorization(HttpContext);
 
                     foreach (Event e in allEvents)
                     {
@@ -54,16 +55,16 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         if (today >= e.StartDate)
                         {
                             EventRegListModel model = new EventRegListModel(e);
-                            //model.NumberOfRegistration = erManager.GetAllRegistrationsNotDeletedByEvent(e.Id).Count;
+                            model.NumberOfRegistration = erManager.GetAllRegistrationsNotDeletedByEvent(e.Id).Count;
                             //model.NrOfRegistrationWaitingList = erManager.GetAllWaitingListRegsByEvent(e.Id).Count;
 
                             List<EventRegistration> regs = new List<EventRegistration>();
 
-                            //if (ref_id.Length > 0)
-                            //{
-                            //    regs = erManager.GetRegistrationsByRefIdAndEvent(ref_id, e.Id);
-                            //}
-                            //else
+                            if (ref_id.Length > 0)
+                            {
+                                regs = erManager.GetRegistrationsByRefIdAndEvent(ref_id, e.Id);
+                            }
+                            else
                             if (user != null)
                             {
                                 regs = erManager.GetRegistrationByUserAndEvent(user.Id, e.Id);
@@ -76,7 +77,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                                 if (reg != null)
                                 {
                                     model.AlreadyRegistered = true;
-                                    //model.Deleted = reg.Deleted;
+                                    model.Deleted = reg.Deleted;
                                 }
                                 //else there are only one or more deleted registrations and the user is not registered
                                 else
@@ -85,6 +86,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                                     //model.Deleted = true;
                                 }
                             }
+
                             //model.AlreadyRegisteredRefId = ref_id;
 
 
@@ -158,7 +160,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 string url = Request.Url.GetLeftPart(UriPartial.Authority);
 
                 // Check for logged in user
-                User user = subManager.Subjects.Where(a => a.Name == "epetzold").FirstOrDefault() as User;
+                User user = BExISAuthorizeHelper.GetUserFromAuthorization(HttpContext);
 
                 CreateNewEventRegistration(e,data, user, email, notificationType, ref_id);
 
@@ -175,7 +177,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
             using (SubjectManager subManager = new SubjectManager())
             {
                 var e = eManager.GetEventById(id);
-                User user = subManager.Subjects.Where(a => a.Name == "epetzold").FirstOrDefault() as User;
+                User user = BExISAuthorizeHelper.GetUserFromAuthorization(HttpContext);
                 var reg = eventRegistrationManager.GetRegistrationByUserAndEvent(user.Id, id).FirstOrDefault();
                
                 EventRegistrationLoadModel model = new EventRegistrationLoadModel();
@@ -201,7 +203,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 JObject obj = JObject.Parse(data);
 
                 // Check for logged in user
-                User user = subManager.Subjects.Where(a => a.Name == "epetzold").FirstOrDefault() as User;
+                User user = BExISAuthorizeHelper.GetUserFromAuthorization(HttpContext);
 
                 var e = eManager.EventRepo.Get(model.EventId);
                 var reg = erManager.GetRegistrationByUserAndEvent(user.Id, model.EventId).FirstOrDefault();
@@ -243,7 +245,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 using (var eventManager = new EventManager())
                 {
                     //HttpContext.User.Identity.Name
-                    User user = subManager.Subjects.Where(a => a.Name == "epetzold").FirstOrDefault() as User;
+                    User user = BExISAuthorizeHelper.GetUserFromAuthorization(HttpContext);
                     if (user != null)
                     {
                         List<EventRegistration> regs = erManager.GetRegistrationByUserAndEvent(user.Id, id);

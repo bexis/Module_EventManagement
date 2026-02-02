@@ -15,11 +15,13 @@
 	</button>
 {:else}
   <div class="flex gap-2">
+    {#if row.editAllowed}
     <button title="edit"
       class="btn btn-sm variant-filled-secondary" 
       on:click|preventDefault={handleEdit}>
       Edit
     </button>
+    {/if}
     <button title="delete"
       class="btn btn-sm variant-filled-error"
       on:click|preventDefault={handleDelete}>

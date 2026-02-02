@@ -83,6 +83,9 @@ let table: TableConfig<eventregistrationModel.EventListItem> = {
 			},
       alreadyRegistered: {
         exclude: true
+      },
+      editAllowed: {
+        exclude: true
       }
 		}
 };

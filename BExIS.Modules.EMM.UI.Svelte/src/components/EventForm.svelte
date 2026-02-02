@@ -10,8 +10,9 @@
   export let loading: boolean = false;
   export let onFileChange: (file: File) => void = () => {};
   export let onSubmit: () => void = () => {};
+  export let onCancel: () => void = () => {};
   	import Fa from 'svelte-fa';
-	import { faSave } from '@fortawesome/free-solid-svg-icons';
+	import { faSave, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -134,10 +135,17 @@
       Closed
     </SlideToggle>
 
-    <div class="flex justify-end mt-4">
- <button class="btn variant-filled-primary h-9 w-16 shadow-md" type="submit">
-          <Fa icon={faSave} />
-        </button>
+    <div class="flex-none text-end">
+      <button
+        class="btn variant-filled-warning h-9 w-16 shadow-md"
+        type="button"
+        on:click={onCancel}
+      >  
+        <Fa icon={faXmark} />
+      </button>
+      <button class="btn variant-filled-primary h-9 w-16 shadow-md" type="submit">
+        <Fa icon={faSave} />
+      </button>
       
     </div>
 

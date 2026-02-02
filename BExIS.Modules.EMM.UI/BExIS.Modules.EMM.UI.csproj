@@ -192,6 +192,7 @@
     <None Include="packages.config" />
     <None Include="Properties\PublishProfiles\BexisServer_2030-testsite.pubxml" />
     <None Include="Properties\PublishProfiles\BexisServer_BE-Website.pubxml" />
+    <None Include="Properties\PublishProfiles\BexisServer_v4-ProdTestsite.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <Content Include="Views\EventRegistration\MetadataEditor.cshtml" />
     <Content Include="Views\EventRegistration\_metadataAttributeView.cshtml" />
