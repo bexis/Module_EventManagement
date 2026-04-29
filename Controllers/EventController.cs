@@ -28,6 +28,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
 {
     public class EventController : Controller
     {
+        private readonly GroupManager _groupManager;
+
+        public EventController(GroupManager groupManager)
+        {
+            _groupManager = groupManager;
+        }
+
         public ActionResult EventManager()
         {
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Manage Events", this.Session.GetTenant());
@@ -161,10 +168,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         eManager.UpdateEvent(newEvent);
 
                         //add security
-                        using (var groupManager = new GroupManager())
                         using (var entityTypeManager = new EntityManager())
-                        using (EntityPermissionManager pManager = new EntityPermissionManager())
                         {
+                            EntityPermissionManager pManager = new EntityPermissionManager();
                             Entity entityType = entityTypeManager.FindByName("Event");
                             var settings = ModuleManager.GetModuleSettings("emm");
                             string[] eventAdminGroups = settings.GetValueByKey("EventAdminGroups").ToString().Split(',');
@@ -174,7 +180,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                                 foreach(var g in eventAdminGroups)
                                 {
                                     int fullRights = (int)RightType.Read + (int)RightType.Write + (int)RightType.Delete + (int)RightType.Grant;
-                                    var group = groupManager.FindByNameAsync(g).Result;
+                                    var group = _groupManager.FindByNameAsync(g).Result;
                                     if (group != null)
                                     {
                                         if (pManager.GetRightsAsync(group.Id, entityType.Id, newEvent.Id).Result == 0)

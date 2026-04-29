@@ -33,6 +33,12 @@ namespace BExIS.Modules.EMM.UI.Controllers
 {
     public class EventRegistrationResultController : Controller
     {
+        private readonly UserManager _userManager;
+
+        public EventRegistrationResultController(UserManager userManager)
+        {
+            _userManager = userManager;
+        }
 
         private CreateTaskmanager TaskManager;
 
@@ -177,11 +183,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
             model.EventId = id;
 
             //check rights on event
-            using (var permissionManager = new EntityPermissionManager())
             using (var entityTypeManager = new EntityManager())
-            using (var userManager = new UserManager())
             {
-                var user = userManager.FindByNameAsync(HttpContext.User.Identity.Name).Result;
+                EntityPermissionManager permissionManager = new EntityPermissionManager();
+                var user = _userManager.FindByNameAsync(HttpContext.User.Identity.Name).Result;
                 Entity entity = entityTypeManager.FindByName("Event");
                 model.UserHasRights = permissionManager.HasEffectiveRightsAsync(user.Name, entity.EntityType, id, RightType.Read).Result;
             }
@@ -366,7 +371,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
         public ActionResult DeleteRegistration(long id)
         {
             using (EventRegistrationManager erManager = new EventRegistrationManager())
-            using (UserManager userManager = new UserManager())
             {
                 EventRegistration reg = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
                 if (reg != null)
@@ -381,7 +385,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 if (reg.Person != null)
                 {
-                    User user = userManager.FindByIdAsync(reg.Person.Id).Result;
+                    User user = _userManager.FindByIdAsync(reg.Person.Id).Result;
                     email = user.Email;
                 }
                 else
@@ -502,23 +506,48 @@ namespace BExIS.Modules.EMM.UI.Controllers
         //    return results;
         //}
 
+        private static string MakeUniqueColumnName(DataTable dt, string desiredName)
+        {
+            var baseName = string.IsNullOrWhiteSpace(desiredName) ? "Column" : desiredName.Trim();
+
+            if (!dt.Columns.Contains(baseName))
+                return baseName;
+
+            int i = 2;
+            string candidate;
+            do
+            {
+                candidate = $"{baseName}__{i}";
+                i++;
+            } while (dt.Columns.Contains(candidate));
+
+            return candidate;
+        }
+
+
         private DataTable CreateDataTableColums(DataTable dataTable, XElement x)
         {
-            DataTable dt = dataTable;
-            // build your DataTable
-            foreach (XElement xe in x.Descendants())
+            var dt = dataTable;
+
+            foreach (var xe in x.Descendants())
             {
                 if (!xe.HasElements)
                 {
-                    DataColumn dc = new DataColumn();
-                    string colName = xe.Name.ToString().Replace("Type", "");
-                    dc.Caption = colName;
-                    dc.ColumnName = colName;
-                    dt.Columns.Add(dc); // add columns to your dt
+                    var displayName = xe.Name.ToString().Replace("Type", "");
+                    var internalName = MakeUniqueColumnName(dt, displayName);
+
+                    var dc = new DataColumn
+                    {
+                        Caption = displayName,      // darf doppelt sein (UI)
+                        ColumnName = internalName   // MUSS eindeutig sein (DataTable)
+                    };
+
+                    dt.Columns.Add(dc);
                 }
             }
 
             return dt;
+        
         }
 
         private DataRow AddDataRow(XElement x, DataTable dt, string deleted, long id)
@@ -526,14 +555,37 @@ namespace BExIS.Modules.EMM.UI.Controllers
             DataRow dr = dt.NewRow();
             dr["Id"] = id;
             dr["Deleted"] = deleted;
+
+            // Zähler je Feldname (z.B. Category -> wie oft schon befüllt)
+            var usageCounter = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
             foreach (XElement xe in x.Descendants())
             {
                 if (!xe.HasElements)
                 {
-                    string value = xe.Value.Replace("\r\n", " ");
-                    value = value.Replace("\n", " ");
+                    string displayName = xe.Name.ToString().Replace("Type", "");
+                    string value = xe.Value.Replace("\r\n", " ").Replace("\n", " ");
                     value = HttpUtility.HtmlDecode(value);
-                    dr[xe.Name.ToString().Replace("Type", "")] = value;  //add in the values
+
+                    // wie oft kam dieses Feld schon?
+                    if (!usageCounter.ContainsKey(displayName))
+                        usageCounter[displayName] = 0;
+
+                    int index = usageCounter[displayName];
+
+                    // passende Spalte suchen (über Caption!)
+                    var matchingColumns = dt.Columns
+                                            .Cast<DataColumn>()
+                                            .Where(c => c.Caption.Equals(displayName, StringComparison.OrdinalIgnoreCase))
+                                            .ToList();
+
+                    if (index < matchingColumns.Count)
+                    {
+                        var targetColumn = matchingColumns[index];
+                        dr[targetColumn.ColumnName] = value;
+                        usageCounter[displayName]++;
+                    }
+                    // else: mehr Werte als Spalten -> bewusst ignorieren oder loggen
                 }
             }
 
@@ -541,6 +593,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
         }
 
         #endregion
+
 
 
     }
