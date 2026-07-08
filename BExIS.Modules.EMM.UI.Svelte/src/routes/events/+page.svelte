@@ -25,7 +25,7 @@ function handleTableAction(e: CustomEvent<{ type: string, row: any }>) {
 }
 
 function handleEdit(row) {
-  goto(`/events/edit/${row.id}`);
+  goto(`/emm/events/edit/${row.id}`);
 }
 
 function handleDelete(row) {
@@ -66,7 +66,7 @@ async function reload() {
             class="btn variant-filled-secondary shadow-md h-9 w-16"
             title="Create new Event"
             id="create"
-            on:click={() => goto('/events/create')}><Fa icon={faPlus} /></button>
+            on:click={() => goto('/emm/events/create')}><Fa icon={faPlus} /></button>
 			
 			</div>
 		</div>

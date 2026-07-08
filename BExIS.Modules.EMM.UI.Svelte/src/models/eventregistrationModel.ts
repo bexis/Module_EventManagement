@@ -80,6 +80,7 @@ export class ReadEntryModel {
 	type: string;
 	description: string;
 	options: string[];
+	required?: boolean;
 
 	constructor(json: any) {
 		this.key = json.key;
@@ -88,6 +89,7 @@ export class ReadEntryModel {
 		this.type = json.type;
 		this.description = json.description;
 		this.options = json.options;
+		this.required = json.required;
 	}
 }
 

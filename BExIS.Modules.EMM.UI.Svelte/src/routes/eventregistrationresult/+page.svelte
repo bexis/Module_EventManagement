@@ -26,7 +26,7 @@ async function reload() {
 }
 
 function handleShow(row) {
-  goto(`/results/show/${row.id}`);
+  goto(`/emm/eventregistrationresult/show/${row.id}`);
 }
 
 function handleDelete(row) {

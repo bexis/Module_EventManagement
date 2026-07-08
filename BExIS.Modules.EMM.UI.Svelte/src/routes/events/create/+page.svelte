@@ -44,7 +44,7 @@ let event: EditEvent = {
   }
 
   function onCancel() {
-    goto('/events');
+    goto('/emm/events');
   }
 
   async function handleSubmit() {
@@ -57,7 +57,7 @@ let event: EditEvent = {
           notificationType: notificationType.success,
           message: `Event "${event.name}" saved successfully.`
         });
-        goto('/events');
+        goto('/emm/events');
       })
       .catch((error) => {
         // Handle error, e.g., show an error message

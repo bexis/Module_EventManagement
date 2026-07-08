@@ -11,14 +11,54 @@ import { goto } from '$app/navigation';
 
  const eventId = Number($page.params.id);
 
-	async function handleSave(registrationData: any) {
-		await dataCaller.editEventRegistration({
-			eventId,
-			jsonFile: JSON.stringify(registrationData)
-		});
+let validationErrors: string[] = [];
 
-		goto('/emm/eventregistration');
+function isEmpty(value: any) {
+	return (
+		value === undefined ||
+		value === null ||
+		value === '' ||
+		(typeof value === 'string' && value.trim() === '') ||
+		(Array.isArray(value) && value.length === 0)
+	);
+}
+
+function collectValidationErrorsFromEntry(entry: any, errors: string[]) {
+	if (entry.required === true && isEmpty(entry.value)) {
+		errors.push(entry.key);
 	}
+
+	if (entry.type === 'EntryList' && Array.isArray(entry.value)) {
+		for (const childEntry of entry.value) {
+			collectValidationErrorsFromEntry(childEntry, errors);
+		}
+	}
+}
+
+function validateRegistration(registrationData: any): boolean {
+	const errors: string[] = [];
+
+	for (const group of registrationData.registration) {
+		for (const entry of group.entries) {
+			collectValidationErrorsFromEntry(entry, errors);
+		}
+	}
+
+	validationErrors = errors;
+
+	return errors.length === 0;
+}
+
+async function handleSave(registrationData: any) {
+	if (!validateRegistration(registrationData)) return;
+
+	await dataCaller.saveEventRegistration({
+		eventId,
+		jsonFile: JSON.stringify(registrationData)
+	});
+
+	goto('/emm/eventregistration');
+}
 
 	function handleCancel() {
 		goto('/emm/eventregistration');
@@ -68,7 +108,7 @@ import { goto } from '$app/navigation';
 						<h2 class="text-xl font-semibold mb-4">{group.title}</h2>
 
 						{#each group.entries as entry}
-							<Entry {entry} />
+							<Entry {entry} {validationErrors} />
 						{/each}
 					</div>
 				{/each}

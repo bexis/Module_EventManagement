@@ -72,7 +72,7 @@
   }
 
     function onCancel() {
-    goto('/events');
+    goto('/emm/events');
   }
 
   async function handleSubmit() {
@@ -82,7 +82,7 @@
     await dataCaller.updateEvent(event);
    
 
-    goto('/events');
+    goto('/emm/events');
   }
 </script>
 

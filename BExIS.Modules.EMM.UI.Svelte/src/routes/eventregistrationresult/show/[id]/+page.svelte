@@ -157,7 +157,7 @@ const rows = parsed.map(item => {
 
 function handleTableAction(e: CustomEvent<{ type: string, row: any }>) {
   const { type, row } = e.detail;
-  if (type === 'EDIT') goto(`/eventregistration/edit/${row.id}`);
+  if (type === 'EDIT') goto(`/emm/eventregistration/edit/${row.id}`);
   if (type === 'DELETE') handleDelete(row);
   if (type === 'MOVE') handleMove(row);
   if (type === 'RESEND') handleResend(row);
@@ -183,7 +183,7 @@ function handleResend(row) {
 }
 
 function back() {
-		goto("/results");
+		goto("/emm/eventregistrationresult");
 	}
 
 </script>
