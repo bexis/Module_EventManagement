@@ -42,7 +42,7 @@ function handleTableAction(e: CustomEvent<{ type?: string, row: any }>) {
   return;
 }
   else  if  (type === 'EDIT') {
-    goto(`/eventregistration/edit/${row.id}`);
+    goto(`/emm/eventregistration/edit/${row.id}`);
   } else if (type === 'DELETE') {
     if (confirm(`Really delete registration for "${row.name}"?`)) {
 
@@ -59,7 +59,7 @@ async function checkPassword() {
     let pass = await dataCaller.getEventRegistrationPassword(pendingRow.id);
     if (passwordInput === pass) {
       showPasswordModal = false;
-      goto('/eventregistration/create', { state: { id: pendingRow.id } });
+      goto('/emm/eventregistration/create', { state: { id: pendingRow.id } });
     } else {
       passwordError = 'Wrong password!';
     }
