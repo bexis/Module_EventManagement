@@ -8,6 +8,7 @@ using BExIS.Modules.EMM.UI.Models;
 using BExIS.Security.Entities.Subjects;
 using BExIS.Security.Services.Subjects;
 using BExIS.Security.Services.Utilities;
+using BExIS.UI.Helpers;
 using BExIS.Utils.Data.MetadataStructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -16,9 +17,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
-using System.Security.Policy;
+using Vaiona.Web.Extensions;
 using System.Web.Mvc;
 using System.Xml;
+using Vaiona.Web.Mvc.Models;
+
 
 
 
@@ -26,13 +29,38 @@ namespace BExIS.Modules.EMM.UI.Controllers
 {
     public class EventRegistrationController : Controller
     {
-        //public ActionResult EventRegistration(string ref_id = "")
-        //{
-        //    ViewBag.Title = PresentationModel.GetViewTitleForTenant("Event Registrations", this.Session.GetTenant());
 
-        //    List<EventRegistrationModel> model = GetAvailableEvents(ref_id);
-        //    return View("AvailableEventsList", model);
-        //}
+        public ActionResult Index()
+        {
+            ViewBag.Title = PresentationModel.GetViewTitleForTenant("Citation Tool", this.Session.GetTenant());
+            string module = "EMM";
+
+            ViewData["app"] = SvelteHelper.GetApp(module);
+            ViewData["start"] = SvelteHelper.GetStart(module);
+
+            return View();
+        }
+
+        public ActionResult Edit()
+        {
+            string module = "EMM";
+
+            ViewData["app"] = SvelteHelper.GetApp(module);
+            ViewData["start"] = SvelteHelper.GetStart(module);
+
+            return View();
+        }
+
+        public ActionResult Create()
+        {
+            string module = "EMM";
+
+            ViewData["app"] = SvelteHelper.GetApp(module);
+            ViewData["start"] = SvelteHelper.GetStart(module);
+
+            return View();
+        }
+
 
         [JsonNetFilter]
         [HttpGet]

@@ -15,17 +15,17 @@
 	
     <Export tag="menubar" id="EMMMenu" order="13"
             title="Events" description="EMM desc" icon=""
-            controller="Event" action="EventManager"
+            controller="Events" action=""
             extends="./menubarRoot" />
 
     <Export tag="menubar" id="eventRegistration" order="12"
             title="Event Registration" description="Register for events" icon=""
-            controller="EventRegistration" action="EventRegistration"
+            controller="EventRegistration" action=""
             extends="./menubarRoot/EMMMenu" />
 
     <Export tag="menubar" id="eventRegistration" order="13"
             title="Show Reservations" description="show reservations for events" icon=""
-            controller="EventRegistrationResult" action="Show"
+            controller="EventRegistrationResult" action=""
             extends="./menubarRoot/EMMMenu" />
 
     <!--<Export tag="menubar" id="eventManger" order="13"
@@ -35,7 +35,7 @@
   
     <Export tag="settings" id="mangeEvents" order="20"
             title="Manage Events" description="Manage events" icon=""
-            controller="Event" action="EventManager"
+            controller="Events" action=""
             extends="./settingsRoot" />
 
 

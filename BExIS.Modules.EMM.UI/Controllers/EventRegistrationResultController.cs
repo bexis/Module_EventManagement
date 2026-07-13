@@ -14,6 +14,7 @@ using BExIS.Security.Services.Authorization;
 using BExIS.Security.Services.Objects;
 using BExIS.Security.Services.Subjects;
 using BExIS.Security.Services.Utilities;
+using BExIS.UI.Helpers;
 using BExIS.Xml.Helpers;
 using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
@@ -40,6 +41,35 @@ namespace BExIS.Modules.EMM.UI.Controllers
 {
     public class EventRegistrationResultController : Controller
     {
+        private readonly UserManager _userManager;
+
+        public EventRegistrationResultController(UserManager userManager)
+        {
+            _userManager = userManager;
+        }
+
+        public ActionResult Index()
+        {
+            ViewBag.Title = PresentationModel.GetViewTitleForTenant("Citation Tool", this.Session.GetTenant());
+            string module = "EMM";
+
+            ViewData["app"] = SvelteHelper.GetApp(module);
+            ViewData["start"] = SvelteHelper.GetStart(module);
+
+            return View();
+        }
+
+        public ActionResult Show()
+        {
+            string module = "EMM";
+
+            ViewData["app"] = SvelteHelper.GetApp(module);
+            ViewData["start"] = SvelteHelper.GetStart(module);
+
+            return View();
+        }
+
+
 
         #region Show Event Registration Results
 
@@ -120,7 +150,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
         {
              using (EventRegistrationManager erManager = new EventRegistrationManager())
              using (var eventManager = new EventManager())
-             using (UserManager userManager = new UserManager())
              {
                 EventRegistration reg = erManager.EventRegistrationRepo.Get(a => a.Id == id).FirstOrDefault();
                 if (reg != null)
@@ -135,7 +164,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 if (reg.Person != null)
                 {
-                    User user = userManager.FindByIdAsync(reg.Person.Id).Result;
+                    User user = _userManager.FindByIdAsync(reg.Person.Id).Result;
                     email = user.Email;
                 }
                 else

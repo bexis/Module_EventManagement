@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using BExIS.Security.Entities.Objects;
 using Vaiona.Web.Mvc.Models;
@@ -18,9 +17,50 @@ using BExIS.UI.Helpers;
 
 namespace BExIS.Modules.EMM.UI.Controllers
 {
-    public class EventController : Controller
+    public class EventsController : Controller
     {
-       
+        private readonly GroupManager _groupManager;
+
+        public EventsController(GroupManager groupManager)
+        {
+            _groupManager = groupManager;
+
+        }
+
+        public ActionResult Index()
+        {
+            ViewBag.Title = PresentationModel.GetViewTitleForTenant("", this.Session.GetTenant());
+            string module = "EMM";
+
+            ViewData["app"] = SvelteHelper.GetApp(module);
+            ViewData["start"] = SvelteHelper.GetStart(module);
+
+            return View();
+        }
+
+        public ActionResult Edit()
+        {
+            string module = "EMM";
+
+            ViewData["app"] = SvelteHelper.GetApp(module);
+            ViewData["start"] = SvelteHelper.GetStart(module);
+
+            return View();
+        }
+
+        public ActionResult Create()
+        {
+            string module = "EMM";
+
+            ViewData["app"] = SvelteHelper.GetApp(module);
+            ViewData["start"] = SvelteHelper.GetStart(module);
+
+            return View();
+        }
+
+
+
+
         [JsonNetFilter]
         [HttpGet]
         public JsonResult GetEvents()
@@ -64,10 +104,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     eManager.UpdateEvent(newEvent);
 
                     //add security
-                    using (var groupManager = new GroupManager())
                     using (var entityTypeManager = new EntityManager())
-                    using (EntityPermissionManager pManager = new EntityPermissionManager())
                     {
+                        var pManager = new EntityPermissionManager();
                         Entity entityType = entityTypeManager.FindByName("Event");
                         var settings = ModuleManager.GetModuleSettings("emm");
                         string[] eventAdminGroups = settings.GetValueByKey("EventAdminGroups").ToString().Split(',');
@@ -77,7 +116,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             foreach (var g in eventAdminGroups)
                             {
                                 int fullRights = (int)RightType.Read + (int)RightType.Write + (int)RightType.Delete + (int)RightType.Grant;
-                                var group = groupManager.FindByNameAsync(g).Result;
+                                var group = _groupManager.FindByNameAsync(g).Result;
                                 if (group != null)
                                 {
                                     if (pManager.GetRightsAsync(group.Id, entityType.Id, newEvent.Id).Result == 0)
