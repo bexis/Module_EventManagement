@@ -26,7 +26,10 @@ async function reload() {
 }
 
 function handleShow(row) {
-  goto(`/emm/eventregistrationresult/show/${row.id}`);
+  goto('/emm/eventregistrationresult/show', {
+	state: {
+		id: row.id
+	}});
 }
 
 function handleDelete(row) {

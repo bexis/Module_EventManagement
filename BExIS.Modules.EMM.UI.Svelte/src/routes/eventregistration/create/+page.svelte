@@ -61,6 +61,10 @@ async function handleSave(registrationData: any) {
 	goto('/emm/eventregistration');
 }
 
+  function onCancel() {
+    goto('/emm/eventregistration');
+  }
+
 </script>
 
 <Page>
@@ -110,6 +114,9 @@ async function handleSave(registrationData: any) {
 				{/each}
 
 				<div class="py-5 text-right">
+				<button class="btn variant-filled-warning h-9 w-16 shadow-md" type="button" on:click={onCancel}> 
+						<Fa icon={faXmark} />
+					</button>
 					<button class="btn variant-filled-primary h-9 w-16 shadow-md" type="submit">
 						<Fa icon={faSave} />
 					</button>

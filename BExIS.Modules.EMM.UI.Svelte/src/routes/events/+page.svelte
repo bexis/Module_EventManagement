@@ -25,7 +25,10 @@ function handleTableAction(e: CustomEvent<{ type: string, row: any }>) {
 }
 
 function handleEdit(row) {
-  goto(`/emm/events/edit/${row.id}`);
+  goto('/emm/events/edit', {
+	state: {
+		id: row.id
+	}});
 }
 
 function handleDelete(row) {

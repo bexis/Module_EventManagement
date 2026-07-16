@@ -1,8 +1,15 @@
 <script lang="ts">
   import { TextInput, TextArea, NumberInput, DropdownKVP, DateInput } from '@bexis2/bexis2-core-ui';
   import { SlideToggle } from '@skeletonlabs/skeleton';
-    import type { EditEvent } from '../models/eventModels';
+  import type { EditEvent } from '../models/eventModels';
   import { Page, pageContentLayoutType, MultiSelect } from '@bexis2/bexis2-core-ui';
+  import { onMount, onDestroy } from 'svelte';
+  import { EditorState } from '@codemirror/state';
+  import { EditorView, basicSetup } from 'codemirror';
+  import { json } from '@codemirror/lang-json';
+  import Fa from 'svelte-fa';
+	import { faSave, faXmark } from '@fortawesome/free-solid-svg-icons';
+
   export let event: EditEvent;
   export let languages: { id: number; text: string }[] = [];
 
@@ -11,8 +18,166 @@
   export let onFileChange: (file: File) => void = () => {};
   export let onSubmit: () => void = () => {};
   export let onCancel: () => void = () => {};
-  	import Fa from 'svelte-fa';
-	import { faSave, faXmark } from '@fortawesome/free-solid-svg-icons';
+
+  let jsonEditorContainer: HTMLDivElement;
+  let jsonEditor: EditorView | null = null;
+  let jsonError = '';
+
+  
+
+ function getJsonString(): string {
+    if (!event.jsonFile) {
+      return '';
+    }
+
+    return typeof event.jsonFile === 'string'
+      ? event.jsonFile
+      : JSON.stringify(event.jsonFile, null, 2);
+  }
+
+function validateJson(value: string): void {
+    if (!value.trim()) {
+      jsonError = '';
+      return;
+    }
+
+    try {
+      JSON.parse(value);
+      jsonError = '';
+    } catch (error) {
+      jsonError =
+        error instanceof Error
+          ? `Ungültiges JSON: ${error.message}`
+          : 'Das JSON ist nicht gültig.';
+    }
+  }
+
+ function updateJsonEditor(value: string): void {
+    if (!jsonEditor) {
+      return;
+    }
+
+    const currentValue = jsonEditor.state.doc.toString();
+
+    if (currentValue === value) {
+      return;
+    }
+
+    jsonEditor.dispatch({
+      changes: {
+        from: 0,
+        to: jsonEditor.state.doc.length,
+        insert: value
+      }
+    });
+  }
+
+  async function handleFileChange(file: File): Promise<void> {
+    // Übergibt nur die ausgewählte Datei an die übergeordnete Seite.
+    onFileChange(file);
+
+    const fileContent = await file.text();
+
+    try {
+      const parsedJson = JSON.parse(fileContent);
+      const formattedJson = JSON.stringify(parsedJson, null, 2);
+
+      // WICHTIG:
+      // Der JSON-String wird direkt in event.jsonFile gespeichert.
+      event.jsonFile = formattedJson;
+
+      jsonError = '';
+
+      updateJsonEditor(formattedJson);
+    } catch (error) {
+      // Ungültiges JSON trotzdem anzeigen,
+      // damit es im Editor korrigiert werden kann.
+      event.jsonFile = fileContent;
+
+      jsonError =
+        error instanceof Error
+          ? `Ungültiges JSON: ${error.message}`
+          : 'Die ausgewählte Datei enthält kein gültiges JSON.';
+
+      updateJsonEditor(fileContent);
+    }
+  }
+
+   onMount(() => {
+    const initialJson = getJsonString();
+
+    validateJson(initialJson);
+
+    jsonEditor = new EditorView({
+      parent: jsonEditorContainer,
+
+      state: EditorState.create({
+        doc: initialJson,
+
+        extensions: [
+          basicSetup,
+          json(),
+          EditorView.lineWrapping,
+
+          // ==========================================
+          // WICHTIG:
+          // Jede Editoränderung wird direkt in
+          // event.jsonFile gespeichert.
+          // ==========================================
+          EditorView.updateListener.of((update) => {
+            if (!update.docChanged) {
+              return;
+            }
+
+            const value = update.state.doc.toString();
+
+            event.jsonFile = value;
+
+            validateJson(value);
+          }),
+
+          EditorView.theme({
+            '&': {
+              minHeight: '300px',
+              maxHeight: '500px',
+              border: '1px solid #d1d5db',
+              borderRadius: '0.375rem',
+              backgroundColor: '#f9fafb'
+            },
+
+            '&.cm-focused': {
+              outline: '2px solid #2563eb',
+              outlineOffset: '1px'
+            },
+
+            '.cm-scroller': {
+              minHeight: '300px',
+              maxHeight: '500px',
+              overflow: 'auto'
+            },
+
+            '.cm-content': {
+              fontFamily: 'Consolas, Monaco, "Courier New", monospace',
+              fontSize: '14px',
+              padding: '8px'
+            },
+
+            '.cm-gutters': {
+              backgroundColor: '#f3f4f6',
+              borderRight: '1px solid #d1d5db'
+            }
+          })
+        ]
+      })
+    });
+  });
+
+  onDestroy(() => {
+    if (jsonEditor) {
+      jsonEditor.destroy();
+      jsonEditor = null;
+    }
+  });
 
 
 
@@ -93,28 +258,52 @@
       bind:value={event.logInPassword}
     />
 
-    <label for="jsonfile">JSON File</label>
-    <input
-      id="jsonfile"
-      type="file"
-      accept=".json"
-      on:change={(e) => {
-        const input = e.target;
-        if (input && 'files' in input && input.files && input.files[0]) {
-          onFileChange(input.files[0]);
-        }
-      }}
-    />
-    {#if selectedFile}
-      <p>Datei ausgewählt: {selectedFile.name}</p>
-    {/if}
+     <div>
+        <label for="jsonfile">
+          JSON File
+        </label>
 
-    {#if event.jsonFile}
-      <div class="mt-2 p-2 border rounded bg-gray-50">
-        <strong>Aktuelles JSON:</strong>
-        <pre style="max-height: 300px; overflow:auto; background: #f8f8f8; border-radius: 4px; padding: 8px;">{typeof event.jsonFile === 'string' ? event.jsonFile : JSON.stringify(event.jsonFile, null, 2)}</pre>
+        <input
+          id="jsonfile"
+          type="file"
+          accept=".json,application/json"
+          on:change={(e) => {
+            const input = e.currentTarget;
+
+            if (input.files?.[0]) {
+              handleFileChange(input.files[0]);
+            }
+          }}
+        />
       </div>
-    {/if}
+
+      {#if selectedFile}
+        <p class="text-sm">
+          Datei ausgewählt:
+          <strong>{selectedFile.name}</strong>
+        </p>
+      {/if}
+
+     <div class="mt-2">
+        <div class="mb-2">
+          <strong>Aktuelles JSON:</strong>
+        </div>
+
+        <div
+          bind:this={jsonEditorContainer}
+          class="json-editor"
+        ></div>
+
+        {#if jsonError}
+          <p class="mt-2 text-sm text-red-600">
+            {jsonError}
+          </p>
+        {:else if event.jsonFile}
+          <p class="mt-2 text-sm text-green-600">
+            Das JSON ist gültig.
+          </p>
+        {/if}
+      </div>
 
     <TextInput
       label="CC email addresses (split by ,)"

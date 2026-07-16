@@ -76,31 +76,30 @@
 					source={entry.options}
 					bind:target={entry.value}
 					isMulti={false}
+					required={entry.required}
 				/>
 			</div>
 		{:else if entry.type.toLowerCase() === 'string'}
 			<TextInput
 				id={entry.key}
-				label={`${entry.title}${entry.required ? ' *' : ''}`}
+				label={entry.title}
 				bind:value={entry.value}
 				on:input
 				help={true}
+				required={entry.required}	
 			/>
 		{:else if entry.type.toLowerCase().includes('int')}
 			<NumberInput
 				id={entry.key}
-				label={`${entry.title}${entry.required ? ' *' : ''}`}
+				label={entry.title}
 				bind:value={entry.value}
 				on:input
 				help={true}
+				required={entry.required}
 			/>
 		{:else if entry.type.toLowerCase() === 'boolean'}
 			<div id={entry.key} on:mouseover={() => helpStore.show(entry.key)}>
-				<SlideToggle active="bg-primary-500" name="slider-label" size="sm" bind:checked={entry.value}>
-					{entry.title}
-					{#if entry.required}
-						<span class="text-red-600">*</span>
-					{/if}
+				<SlideToggle active="bg-primary-500" name="slider-label" size="sm" bind:checked={entry.value} required={entry.required}>
 				</SlideToggle>
 			</div>
 		{:else if entry.type.toLowerCase() === 'json'}
@@ -119,6 +118,7 @@
 					actions={false}
 					language="json"
 					toggle={false}
+					required={entry.required}
 					bind:value={JSONValue}
 					on:save={() => (entry.value = JSON.parse(JSONValue))}
 				/>

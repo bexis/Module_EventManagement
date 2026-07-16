@@ -42,7 +42,10 @@ function handleTableAction(e: CustomEvent<{ type?: string, row: any }>) {
   return;
 }
   else  if  (type === 'EDIT') {
-    goto(`/emm/eventregistration/edit/${row.id}`);
+  goto('/emm/eventregistration/edit', {
+	state: {
+		id: row.id
+	}});
   } else if (type === 'DELETE') {
     if (confirm(`Really delete registration for "${row.name}"?`)) {
 
@@ -93,6 +96,15 @@ let table: TableConfig<eventregistrationModel.EventListItem> = {
 onMount(async () => {
   const data = await dataCaller.getEvents();
   tableStore.set(Array.isArray(data) ? data : []);
+});
+
+const link = [...document.querySelectorAll('a')]
+	.find(a => a.textContent?.trim() === 'Event Registration');
+
+console.log({
+	attribute: link?.getAttribute('href'),
+	resolved: link?.href,
+	baseURI: document.baseURI
 });
 
 
