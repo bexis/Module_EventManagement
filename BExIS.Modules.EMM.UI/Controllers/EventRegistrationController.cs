@@ -1,6 +1,8 @@
 ﻿using BExIS.App.Bootstrap.Attributes;
 using BExIS.App.Bootstrap.Helpers;
 using BExIS.Dcm.CreateDatasetWizard;
+using BExIS.Dlm.Entities.Party;
+using BExIS.Dlm.Services.Party;
 using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
 using BExIS.Modules.EMM.UI.Helper;
@@ -17,9 +19,9 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
-using Vaiona.Web.Extensions;
 using System.Web.Mvc;
 using System.Xml;
+using Vaiona.Web.Extensions;
 using Vaiona.Web.Mvc.Models;
 
 
@@ -134,7 +136,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
         public JsonResult GetEventRegistrationJson(long id)
         {
             using (EventManager eManager = new EventManager())
+            using (PartyManager partyManager = new PartyManager())
             {
+                User user = BExISAuthorizeHelper.GetUserFromAuthorization(HttpContext);
+                var userParty = partyManager.GetPartyByUser(user.Id);
+
                 var e = eManager.GetEventById(id);
                 EventRegistrationLoadModel model = new EventRegistrationLoadModel();
                 model.Name = e.Name;
@@ -143,6 +149,36 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 model.Language = e.EventLanguage;
                 model.ImportantInformation = e.ImportantInformation;
                 model.JsonFile = e.Data;
+
+                if (userParty != null && !string.IsNullOrWhiteSpace(model.JsonFile))
+                {
+                    JObject json = JObject.Parse(model.JsonFile);
+
+                    foreach (JObject section in json["registration"])
+                    {
+                        foreach (JObject entry in section["entries"])
+                        {
+                            switch ((string)entry["key"])
+                            {
+                                case "firstName":
+                                    entry["value"] = userParty.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "FirstName").Select(v => v.Value).FirstOrDefault();
+                                    break;
+
+                                case "lastName":
+                                    entry["value"] = userParty.CustomAttributeValues.Where(b => b.CustomAttribute.Name == "LastName").Select(v => v.Value).FirstOrDefault();
+                                    break;
+
+                                case "email":
+                                    entry["value"] = user.Email;
+                                    break;
+                            }
+                        }
+                    }
+
+                    model.JsonFile = json.ToString();
+                }
+               
+               
 
                 return Json(model, JsonRequestBehavior.AllowGet);
             } 
