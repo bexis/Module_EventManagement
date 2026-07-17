@@ -39,19 +39,23 @@ function collectValidationErrorsFromEntry(entry: any, errors: string[]) {
 function validateRegistration(registrationData: any): boolean {
 	const errors: string[] = [];
 
-	for (const group of registrationData.registration) {
-		for (const entry of group.entries) {
+	for (const group of registrationData.registration ?? []) {
+		for (const entry of group.entries ?? []) {
 			collectValidationErrorsFromEntry(entry, errors);
 		}
 	}
 
-	validationErrors = errors;
+	validationErrors = [...errors];
 
 	return errors.length === 0;
 }
 
 async function handleSave(registrationData: any) {
-	if (!validateRegistration(registrationData)) return;
+	const isValid = validateRegistration(registrationData);
+
+	if (!isValid) {
+		return;
+	}
 
 	await dataCaller.saveEventRegistration({
 		eventId,
@@ -108,7 +112,7 @@ async function handleSave(registrationData: any) {
 						<h2 class="text-xl font-semibold mb-4">{group.title}</h2>
 
 						{#each group.entries as entry}
-							<Entry {entry} {validationErrors} />
+							<Entry bind:entry {validationErrors} />
 						{/each}
 					</div>
 				{/each}

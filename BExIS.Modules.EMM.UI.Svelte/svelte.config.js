@@ -2,7 +2,6 @@
 import adapter from '@sveltejs/adapter-static';
 
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import { build } from 'vite';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -11,8 +10,8 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter({
-			pages: '../BExIS.Modules.EMM.UI/Scripts/svelte', // ../BExIS.Modules.Dcm.UI/Scripts/svelte
-			assets: '../BExIS.Modules.EMM.UI/Scripts/svelte', // ../BExIS.Modules.Dcm.UI/Scripts/svelte
+			pages: '../BExIS.Modules.EMM.UI/Scripts/svelte', // ../BExIS.Modules.EMM.UI/Scripts/svelte
+			assets: '../BExIS.Modules.EMM.UI/Scripts/svelte', // ../BExIS.Modules.EMM.UI/Scripts/svelte
 			fallback: null,
 			precompress: true,
 			preprocess: true,

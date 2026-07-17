@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
 using System.Xml;
 using Vaiona.Web.Extensions;
@@ -139,7 +140,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
             using (PartyManager partyManager = new PartyManager())
             {
                 User user = BExISAuthorizeHelper.GetUserFromAuthorization(HttpContext);
-                var userParty = partyManager.GetPartyByUser(user.Id);
 
                 var e = eManager.GetEventById(id);
                 EventRegistrationLoadModel model = new EventRegistrationLoadModel();
@@ -150,8 +150,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 model.ImportantInformation = e.ImportantInformation;
                 model.JsonFile = e.Data;
 
-                if (userParty != null && !string.IsNullOrWhiteSpace(model.JsonFile))
+                if (user != null && !string.IsNullOrWhiteSpace(model.JsonFile))
                 {
+                    var userParty = partyManager.GetPartyByUser(user.Id);
                     JObject json = JObject.Parse(model.JsonFile);
 
                     foreach (JObject section in json["registration"])
@@ -234,16 +235,23 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         [JsonNetFilter]
         [HttpGet]
-        public JsonResult Get(long id)
+        public JsonResult Get(long id, string ref_id = null)
         {
             using (EventManager eManager = new EventManager())
             using (EventRegistrationManager eventRegistrationManager = new EventRegistrationManager())
             using (SubjectManager subManager = new SubjectManager())
             {
+                var reg = new EventRegistration();
                 var e = eManager.GetEventById(id);
                 User user = BExISAuthorizeHelper.GetUserFromAuthorization(HttpContext);
-                var reg = eventRegistrationManager.GetRegistrationByUserAndEvent(user.Id, id).FirstOrDefault();
-               
+                if(ref_id != null)
+                    reg = eventRegistrationManager.GetRegistrationsByRefIdAndEvent(ref_id, id).FirstOrDefault();
+
+                else if(user != null)
+                    reg = eventRegistrationManager.GetRegistrationByUserAndEvent(user.Id, id).FirstOrDefault();
+                else
+                    return Json(new { success = false, id = 0 });
+
                 EventRegistrationLoadModel model = new EventRegistrationLoadModel();
                 model.Name = e.Name;
                 model.Date = e.EventDate;

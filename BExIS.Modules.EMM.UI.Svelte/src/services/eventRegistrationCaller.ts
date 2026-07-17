@@ -38,10 +38,16 @@ export const saveEventRegistration = async (eventReg: EventRegistration) => {
     }
 };
 
-export const getEventRegistration = async (id: number) => {
-    //setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
+export const getEventRegistration = async (
+    id: number,
+    refId?: string
+) => {
     try {
-        const response = await Api.get(`/emm/EventRegistration/Get/${id}`);
+        const url = refId
+            ? `/emm/EventRegistration/Get/${id}?ref_id=${encodeURIComponent(refId)}`
+            : `/emm/EventRegistration/Get/${id}`;
+
+        const response = await Api.get(url);
         return response.data;
     } catch (error) {
         console.error(error);

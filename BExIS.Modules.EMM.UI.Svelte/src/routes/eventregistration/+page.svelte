@@ -42,10 +42,7 @@ function handleTableAction(e: CustomEvent<{ type?: string, row: any }>) {
   return;
 }
   else  if  (type === 'EDIT') {
-  goto('/emm/eventregistration/edit', {
-	state: {
-		id: row.id
-	}});
+ goto(`/emm/eventregistration/edit/?id=${row.id}`);
   } else if (type === 'DELETE') {
     if (confirm(`Really delete registration for "${row.name}"?`)) {
 

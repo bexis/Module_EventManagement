@@ -138,7 +138,7 @@ namespace BExIS.Emm.Services.Event
 
         public List<E.EventRegistration> GetRegistrationByUserAndEvent(long userId, long eventId)
         {
-            return EventRegistrationRepo.Query(a => a.Event.Id == eventId && a.Person.Id == userId).ToList();
+            return EventRegistrationRepo.Query(a => a.Event.Id == eventId && a.Person.Id == userId && a.Deleted == false).ToList();
         }
 
         public E.EventRegistration GetRegistrationByRefIdAndEvent(string ref_id, long eventId)
@@ -152,7 +152,7 @@ namespace BExIS.Emm.Services.Event
         }
         public List<E.EventRegistration> GetRegistrationsByRefIdAndEvent(string ref_id, long eventId)
         {
-            return EventRegistrationRepo.Query(a => a.Event.Id == eventId && a.Token == ref_id).ToList();
+            return EventRegistrationRepo.Query(a => a.Event.Id == eventId && a.Token == ref_id && a.Deleted == false).ToList();
         }
 
         public int GetNumerOfRegistrationsByEvent(long id)
