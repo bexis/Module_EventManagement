@@ -59,11 +59,11 @@ export const deleteRegistration = async (id) => {
 }
 
 
-export const moveEvent = async (id) => {
+export const moveEventRegistration = async (id) => {
     //setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
 	
     try {
-		const response = await Api.get('/EMM/EventRegistrationResult/MoveFromWaitingList' + id);
+		const response = await Api.get('/EMM/EventRegistrationResult/MoveFromWaitingList/' + id);
 		return response.data;
 	} catch (error) {
 		console.error(error);

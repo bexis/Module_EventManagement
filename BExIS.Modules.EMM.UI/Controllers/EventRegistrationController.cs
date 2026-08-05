@@ -1,7 +1,5 @@
 ﻿using BExIS.App.Bootstrap.Attributes;
 using BExIS.App.Bootstrap.Helpers;
-using BExIS.Dcm.CreateDatasetWizard;
-using BExIS.Dlm.Entities.Party;
 using BExIS.Dlm.Services.Party;
 using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
@@ -9,19 +7,14 @@ using BExIS.Modules.EMM.UI.Helper;
 using BExIS.Modules.EMM.UI.Models;
 using BExIS.Security.Entities.Subjects;
 using BExIS.Security.Services.Subjects;
-using BExIS.Security.Services.Utilities;
 using BExIS.UI.Helpers;
-using BExIS.Utils.Data.MetadataStructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
-using System.Xml;
 using Vaiona.Web.Extensions;
 using Vaiona.Web.Mvc.Models;
 
@@ -404,8 +397,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         private void MoveFromWaitingList(long eventId)
         {
-            string url = Request.Url.GetLeftPart(UriPartial.Authority);
-
             using (var erManager = new EventRegistrationManager())
             using (var eventManager = new EventManager())
             {
@@ -419,62 +410,30 @@ namespace BExIS.Modules.EMM.UI.Controllers
                     string email = "";
                     if (reg.Person != null)
                         email = reg.Person.Email;
-                    //else
-                    //    email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
+                    else
+                    {
+                        var model = JsonConvert.DeserializeObject<Dictionary<string, List<Registration>>>(reg.Data)["registration"];
+                        EmailStructure emailStructure = new EmailStructure();
+                        emailStructure = EmailHelper.ReadFile(e.EventLanguage);
+                        email = model[0].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
+                    }
 
-                    EmailHelper.SendEmailNotification("remove_from_waiting_list", email, "", reg.Data, reg.Event, url);
+                    string url = Request.Url.GetLeftPart(UriPartial.Authority);
+
+                    //change Sataus if event if there is again space on waiting list
+                    if ((countWaitingList <= e.WaitingListLimitation) && e.Closed == true)
+                    {
+                        e.Closed = false;
+                        eventManager.UpdateEvent(e);
+                    }
+
+                    EmailHelper.SendEmailNotification("remove_from_waiting_list", email, reg.Token, reg.Data, reg.Event, url);
 
                 }
             }
         }
 
-        private void SendWaitingListNotification(XmlDocument data, Event e)
-        {
-            // todo: add not allowed / log in info to mail
-
-            EmailStructure emailStructure = new EmailStructure();
-            emailStructure = EmailHelper.ReadFile(e.EventLanguage);
-
-            string first_name = data.GetElementsByTagName(emailStructure.lableFirstName)[0].InnerText;
-            string last_name = data.GetElementsByTagName(emailStructure.lableLastname)[0].InnerText;
-            string email = data.GetElementsByTagName(emailStructure.lableEmail)[0].InnerText;
-
-            string url = Request.Url.GetLeftPart(UriPartial.Authority);
-
-            string mail_message = "";
-            string subject = emailStructure.removeFromWaitingListSubject + e.Name;
-
-            string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
-                 emailStructure.removeFromWaitingList1 + "<br/><br/>" +
-                 emailStructure.bodyClosing + "<br/>" +
-                 emailStructure.bodyClosingName;
-
-
-            using (var es = new EmailService())
-            {
-
-                // If no explicit Reply to mail is set use the SystemEmail
-                string replyTo = "";
-                if (String.IsNullOrEmpty(e.EmailReply))
-                {
-                    replyTo = ConfigurationManager.AppSettings["SystemEmail"];
-                }
-                else
-                {
-                    replyTo = e.EmailReply;
-                }
-
-                es.Send(
-                    subject,
-                    body,
-                    new List<string> { email }, // to
-                    new List<string> { e.EmailCC }, // CC 
-                    new List<string> { ConfigurationManager.AppSettings["SystemEmail"], e.EmailBCC }, // Allways send BCC to SystemEmail + additional set 
-                    new List<string> { replyTo }
-                    );
-            }
-        }
-
+        
        
         /// <summary>
         /// Create a new event registration
@@ -532,17 +491,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 EmailHelper.SendEmailNotification(notificationType, email, ref_id,data, e, url);
         }
     }
-
-
-        #region Validation
-
-
-
-
-
-        #endregion
-
-
 
         #region Helper
 

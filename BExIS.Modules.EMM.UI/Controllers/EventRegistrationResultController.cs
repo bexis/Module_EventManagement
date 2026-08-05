@@ -1,41 +1,20 @@
 ﻿using BExIS.App.Bootstrap.Attributes;
-using BExIS.Dcm.CreateDatasetWizard;
-using BExIS.Dcm.Wizard;
-using BExIS.Dim.Entities.Export.GBIF;
 using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
-using BExIS.IO.Transform.Output;
 using BExIS.Modules.EMM.UI.Helper;
 using BExIS.Modules.EMM.UI.Models;
-using BExIS.Security.Entities.Authorization;
-using BExIS.Security.Entities.Objects;
 using BExIS.Security.Entities.Subjects;
-using BExIS.Security.Services.Authorization;
-using BExIS.Security.Services.Objects;
 using BExIS.Security.Services.Subjects;
-using BExIS.Security.Services.Utilities;
 using BExIS.UI.Helpers;
-using BExIS.Xml.Helpers;
-using Microsoft.AspNet.Identity;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
-using System.IO;
 using System.Linq;
-using System.Net.Configuration;
-using System.Security.Cryptography;
-using System.Text;
-using System.Web;
 using System.Web.Mvc;
-using System.Xml;
-using System.Xml.Linq;
-using Vaiona.Utils.Cfg;
 using Vaiona.Web.Extensions;
 using Vaiona.Web.Mvc.Models;
-using Entry = BExIS.Modules.EMM.UI.Models.Entry;
 
 namespace BExIS.Modules.EMM.UI.Controllers
 {
@@ -127,7 +106,18 @@ namespace BExIS.Modules.EMM.UI.Controllers
             using (EventRegistrationManager eventRegistrationManager = new EventRegistrationManager())
             {
                 var e = eManger.GetEventById(id);
-                var registrations = eventRegistrationManager.GetAllWaitingListRegsByEvent(id).Select(r => r.Data);
+                var registrations = eventRegistrationManager
+                        .GetAllWaitingListRegsByEvent(id)
+                        .Select(r =>
+                        {
+                            var root = JObject.Parse(r.Data);
+
+                            // Neues Feld "id" auf Root-Ebene hinzufügen
+                            root["id"] = r.Id;
+
+                            return root.ToString(); // JSON mit Root-ID
+                        });
+               
                 if (registrations.Count() > 0)
                 {
                     var merged = mergeForTable(registrations);
@@ -156,7 +146,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 {
                     reg.Deleted = true;
                     erManager.UpdateEventRegistration(reg);
-                    MoveFromWaitingList(reg.Event.Id);
+                    MoveWaitingList(reg.Event.Id);
                 }
 
                 string url = Request.Url.GetLeftPart(UriPartial.Authority);
@@ -224,7 +214,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         [JsonNetFilter]
         [HttpGet]
-        public JsonResult MoveFromWaitingList(long id, long eventId)
+        public JsonResult MoveFromWaitingList(long id)
         {
             using (EventRegistrationManager erManager = new EventRegistrationManager())
             using (EventManager eventManager = new EventManager())
@@ -235,8 +225,19 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 erManager.UpdateEventRegistration(registration);
 
-                var e = eventManager.GetEventById(eventId);
-                SendNotification(registration.Data, e);
+                var e = eventManager.GetEventById(registration.Event.Id);
+
+                var model = JsonConvert.DeserializeObject<Dictionary<string, List<Registration>>>(registration.Data)["registration"];
+
+                EmailStructure emailStructure = new EmailStructure();
+                emailStructure = EmailHelper.ReadFile(e.EventLanguage);
+                //string email = model[0].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
+                string email = model.SelectMany(r => r.Entries)
+                                                 .FirstOrDefault(a => a.Title == emailStructure.lableEmail).Value;
+                string url = Request.Url.GetLeftPart(UriPartial.Authority);
+
+
+                EmailHelper.SendEmailNotification("remove_from_waiting_list", email, registration.Token, registration.Data, registration.Event, url);
 
             }
             return Json(true, JsonRequestBehavior.AllowGet);
@@ -276,7 +277,8 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             EmailStructure emailStructure = new EmailStructure();
             emailStructure = EmailHelper.ReadFile(e.EventLanguage);
-            string email = model[0].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
+            string email = model.SelectMany(r => r.Entries)
+                                                 .FirstOrDefault(a => a.Title == emailStructure.lableEmail).Value;
             string ref_id = EmailHelper.GetRefIdFromEmail(email);
             string url = Request.Url.GetLeftPart(UriPartial.Authority);
             EmailHelper.SendEmailNotification("resend", email, ref_id, data, e, url);
@@ -322,60 +324,10 @@ namespace BExIS.Modules.EMM.UI.Controllers
             return new JArray(items).ToString(Newtonsoft.Json.Formatting.None);
         }
 
-        private void SendNotification(string data, Event e)
-        {
-            // todo: add not allowed / log in info to mail
-
-            EmailStructure emailStructure = new EmailStructure();
-            emailStructure = EmailHelper.ReadFile(e.EventLanguage);
-
-            JsonEventModel model = (JsonEventModel)JsonConvert.DeserializeObject(data);
-            string first_name = model.Registration[1].Entries.Where(a => a.Title == emailStructure.lableFirstName).FirstOrDefault().Value;  
-            string last_name = model.Registration[1].Entries.Where(a => a.Title == emailStructure.lableLastname).FirstOrDefault().Value;
-            string email = model.Registration[1].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
-
-            string url = Request.Url.GetLeftPart(UriPartial.Authority);
-
-            string mail_message = "";
-            string subject = emailStructure.removeFromWaitingListSubject + e.Name;
-
-            string body = emailStructure.bodyTitle + first_name + " " + last_name + ", " + "<br/><br/>" +
-                emailStructure.removeFromWaitingList1 + "<br/><br/>" +
-                 emailStructure.bodyClosing + "<br/>" +
-                 emailStructure.bodyClosingName;
-
-
-            using (var es = new EmailService())
-            {
-
-                // If no explicit Reply to mail is set use the SystemEmail
-                string replyTo = "";
-                if (String.IsNullOrEmpty(e.EmailReply))
-                {
-                    replyTo = ConfigurationManager.AppSettings["SystemEmail"];
-                }
-                else
-                {
-                    replyTo = e.EmailReply;
-                }
-
-                es.Send(
-                    subject,
-                    body,
-                    new List<string> { email }, // to
-                    new List<string> { e.EmailCC }, // CC 
-                    new List<string> { ConfigurationManager.AppSettings["SystemEmail"], e.EmailBCC }, // Allways send BCC to SystemEmail + additional set 
-                    new List<string> { replyTo }
-                    );
-            }
-        }
-
         #endregion
 
-        private void MoveFromWaitingList(long eventId)
+        private void MoveWaitingList(long eventId)
         {
-            string url = Request.Url.GetLeftPart(UriPartial.Authority);
-
             using (var erManager = new EventRegistrationManager())
             using (var eventManager = new EventManager())
             {
@@ -391,13 +343,13 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         email = reg.Person.Email;
                     else
                     {
-                        JsonEventModel model = (JsonEventModel)JsonConvert.DeserializeObject(reg.Data);
-
+                        var model = JsonConvert.DeserializeObject<Dictionary<string, List<Registration>>>(reg.Data)["registration"];
                         EmailStructure emailStructure = new EmailStructure();
-                        emailStructure = EmailHelper.ReadFile(reg.Event.EventLanguage);
-                        email = model.Registration[1].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
+                        emailStructure = EmailHelper.ReadFile(e.EventLanguage);
+                        email = model[0].Entries.Where(a => a.Title == emailStructure.lableEmail).FirstOrDefault().Value;
                     }
 
+                    string url = Request.Url.GetLeftPart(UriPartial.Authority);
 
                     //change Sataus if event if there is again space on waiting list
                     if ((countWaitingList <= e.WaitingListLimitation) && e.Closed == true)
@@ -406,7 +358,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         eventManager.UpdateEvent(e);
                     }
 
-                    EmailHelper.SendEmailNotification("remove_from_waiting_list", email, "", reg.Data, reg.Event, url);
+                    EmailHelper.SendEmailNotification("remove_from_waiting_list", email, reg.Token, reg.Data, reg.Event, url);
 
                 }
             }

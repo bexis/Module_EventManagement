@@ -26,7 +26,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
             _groupManager = groupManager;
 
         }
-
         public ActionResult Index()
         {
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("", this.Session.GetTenant());
@@ -57,9 +56,6 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
             return View();
         }
-
-
-
 
         [JsonNetFilter]
         [HttpGet]

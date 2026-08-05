@@ -125,9 +125,16 @@ namespace BExIS.Emm.Services.Event
 
         public E.EventRegistration GetLatestWaitingListEntry(long id)
         {
-            var lastestDates = EventRegistrationRepo.Query(d=>d.Event.Id == id && d.WaitingList == true && d.Deleted == false).ToList();
-            var date = lastestDates.Max(a => a.InsertDate);
-            return EventRegistrationRepo.Query(a => a.Event.Id == id && a.WaitingList == true && a.InsertDate == date).FirstOrDefault();
+            return  EventRegistrationRepo
+                .Query(d => d.Event.Id == id &&
+                d.WaitingList &&
+                !d.Deleted)
+                .OrderBy(d => d.InsertDate)
+                .FirstOrDefault();
+
+            //var lastestDates = EventRegistrationRepo.Query(d=>d.Event.Id == id && d.WaitingList == true && d.Deleted == false).ToList();
+            //var date = lastestDates.Max(a => a.InsertDate);
+            //return EventRegistrationRepo.Query(a => a.Event.Id == id && a.WaitingList == true && a.InsertDate == date).FirstOrDefault();
         }
 
 

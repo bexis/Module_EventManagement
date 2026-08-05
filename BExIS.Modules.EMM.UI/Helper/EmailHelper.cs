@@ -73,8 +73,10 @@ namespace BExIS.Modules.EMM.UI.Helper
             string details = "";
             //read xml file and format email output
             JsonEventModel model = JsonConvert.DeserializeObject<JsonEventModel>(data);
-            last_name = model.Registration[1].Entries.Where(a=>a.Key == emailStructure.lableLastname).FirstOrDefault()?.Value;
-            first_name = model.Registration[1].Entries.Where(a => a.Key == emailStructure.lableFirstName).FirstOrDefault()?.Value;
+            var entries = model.Registration.SelectMany(r => r.Entries);
+            last_name = entries.FirstOrDefault(a => a.Title == emailStructure.lableLastname)?.Value;
+            first_name = entries.FirstOrDefault(a => a.Title == emailStructure.lableFirstName)?.Value;
+
             string displayNameRoot = "";
 
             foreach (var section in model.Registration)
