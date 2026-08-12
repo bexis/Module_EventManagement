@@ -1,11 +1,8 @@
 import { Api } from '@bexis2/bexis2-core-ui';
-import { setApiConfig } from '@bexis2/bexis2-core-ui';
 import type { EventRegistration } from '../models/eventregistrationModel';
 
 
 export const getEvents = async () => {
-  
-   // setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
     let url = "/EMM/EventRegistration/GetEvents";
     
     const res = await Api.get(url);
@@ -15,8 +12,6 @@ export const getEvents = async () => {
 }
 
 export const getEventRegistrationJson = async (eventId: number) => {
-  
-    //setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
     let url = "/EMM/EventRegistration/GetEventRegistrationJson/" + eventId;
 
     const res = await Api.get(url);
@@ -27,7 +22,6 @@ export const getEventRegistrationJson = async (eventId: number) => {
 
 
 export const saveEventRegistration = async (eventReg: EventRegistration) => {
-    //setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
     try {
         const response = await Api.post('/emm/EventRegistration/Create', eventReg);
         return response.data;
@@ -56,7 +50,6 @@ export const getEventRegistration = async (
 };
 
 export const getEventRegistrationPassword = async (id: number) => {
-    //setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
     try {
         const response = await Api.get(`/emm/EventRegistration/GetEventPassword/${id}`);
         return response.data;
@@ -67,7 +60,6 @@ export const getEventRegistrationPassword = async (id: number) => {
 };
 
 export const editEventRegistration = async (eventReg: EventRegistration) => {
-    //setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
     try {
         const response = await Api.post('/emm/EventRegistration/Edit', eventReg);
         return response.data;
@@ -78,7 +70,6 @@ export const editEventRegistration = async (eventReg: EventRegistration) => {
 };
 
 export const deleteEventRegistration = async (id: number) => {
-    //setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
     try {
         const response = await Api.get(`/emm/EventRegistration/Delete/${id}`);
         return response.data;
@@ -89,7 +80,6 @@ export const deleteEventRegistration = async (id: number) => {
 };
 
 export const userAllreadyRegister = async (eventReg: EventRegistration) => {
-    //setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
     try {
         const response = await Api.post(`/emm/EventRegistration/UserAlreadyRegistered/`, eventReg);
         return response.data;

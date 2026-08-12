@@ -4,7 +4,7 @@
   import * as dataCaller from '../../../services/eventCaller';
   import { goto } from '$app/navigation';
   import { notificationStore, notificationType } from '@bexis2/bexis2-core-ui';
-  // ... weitere Imports und Logik ...
+
 let event: EditEvent = {
   id: 0,
   name: '',

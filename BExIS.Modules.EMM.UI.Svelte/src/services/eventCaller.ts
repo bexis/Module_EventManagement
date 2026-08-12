@@ -1,10 +1,8 @@
 import { Api } from '@bexis2/bexis2-core-ui';
-import { setApiConfig } from '@bexis2/bexis2-core-ui';
 import type { EditEvent } from '../models/eventModels';
 // Fetch data from API and return as JSON object
 export const getEvents = async () => {
-  
-    //setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
+
     let url = "/EMM/Events/GetEvents";
     
     const res = await Api.get(url);
@@ -14,8 +12,7 @@ export const getEvents = async () => {
 }
 
 export const getEvent = async (id) => {
-  
-    //setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
+
     let url = "/EMM/Events/Get/" + id;
     
     const res = await Api.get(url);
@@ -25,8 +22,6 @@ export const getEvent = async (id) => {
 }
 
 export const saveEvent = async (event: EditEvent) => {
-	console.log("saveEvent called with:", event);
-    setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
 	try {
 		const response = await Api.post('/EMM/Events/Create', event);
 		return response.data;
@@ -37,7 +32,6 @@ export const saveEvent = async (event: EditEvent) => {
 };
 
 export const updateEvent = async (event: EditEvent) => {
-   // setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
 	try {
 		const response = await Api.post('/EMM/Events/Update', event);
 		return response.data;
@@ -48,7 +42,6 @@ export const updateEvent = async (event: EditEvent) => {
 };
 
 export const deleteEvent = async (id) => {
-    //setApiConfig('http://localhost:44345/', 'epetzold', '2021.B2.Go$On');
 	try {
         console.log("deleteEvent called with id:", id);
         // Ensure id is a number or string that can be converted to a number

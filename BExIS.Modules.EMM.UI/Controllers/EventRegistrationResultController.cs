@@ -259,6 +259,9 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 List<EventRegistration> eventRegistrations = eventRegistrationManager.GetAllRegistrationsByEvent(id);
                 eventRegistrations.ForEach(a => eventRegistrationManager.DeleteEventRegistration(a));
 
+                List<EventRegistration> waitinglist = eventRegistrationManager.GetAllWaitingListRegsByEvent(id);
+                waitinglist.ForEach(a => eventRegistrationManager.DeleteEventRegistration(a));
+
                 var e = eventManager.GetEventById(id);
                 if (e.Closed == true)
                 {

@@ -98,12 +98,6 @@ onMount(async () => {
 const link = [...document.querySelectorAll('a')]
 	.find(a => a.textContent?.trim() === 'Event Registration');
 
-console.log({
-	attribute: link?.getAttribute('href'),
-	resolved: link?.href,
-	baseURI: document.baseURI
-});
-
 
 </script>
 

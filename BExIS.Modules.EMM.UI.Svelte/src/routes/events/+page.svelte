@@ -25,15 +25,12 @@ function handleTableAction(e: CustomEvent<{ type: string, row: any }>) {
 }
 
 function handleEdit(row) {
-  goto('/emm/events/edit', {
-	state: {
-		id: row.id
-	}});
+  goto(`/emm/events/edit/?id=${row.id}`);
 }
 
 function handleDelete(row) {
 console.log('Delete row:', row.id);
-  if (confirm(`Event "${row.name}" wirklich löschen?`)) {
+  if (confirm(`Really delete event: "${row.name}"?`)) {
     dataCaller.deleteEvent(row.id).then(() => reload());
   }
 }
