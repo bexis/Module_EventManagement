@@ -55,12 +55,6 @@ namespace BExIS.Emm.Entities.Event
         public virtual string Data { get; set; }
         #endregion
 
-        #region Associations
-
-        //public virtual MetadataStructure MetadataStructure { get; set; }
-
-        #endregion
-
 
         #region Methods
 

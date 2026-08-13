@@ -45,8 +45,6 @@ namespace BExIS.Modules.EMM.UI.Helpers
                     entity.Name = "Event";
                     entity.EntityType = typeof(Event);
                     entity.EntityStoreType = typeof(EventStore);
-                    entity.UseMetadata = true;
-                    entity.Securable = true;
 
                     entityManager.Create(entity);
                 }

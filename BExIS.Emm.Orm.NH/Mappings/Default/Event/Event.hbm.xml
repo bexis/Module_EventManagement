@@ -140,10 +140,5 @@
 		 <column name="Data" not-null="false"/>
 	 </property>
 	  
-    <!-- Mapping Entity Associations -->
-
-    <!--<many-to-one name="MetadataStructure" class="BExIS.Dlm.Entities.MetadataStructure.MetadataStructure" not-null="true"  column="MetadataStructure"/>-->
-
-
   </class>
 </hibernate-mapping>
