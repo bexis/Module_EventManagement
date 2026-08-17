@@ -2,6 +2,7 @@
 export interface EventRegistration{
   eventId: number;
   jsonFile: string;   
+  refId ?: string;
 }
 
 

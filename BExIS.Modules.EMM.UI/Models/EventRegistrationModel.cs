@@ -49,6 +49,8 @@ namespace BExIS.Modules.EMM.UI.Models
         public long EventId { get; set; }
         public string JsonFile { get; set; }
 
+        public string refId { get; set; }
+
         public EventRegistrationModel()
         {           
 

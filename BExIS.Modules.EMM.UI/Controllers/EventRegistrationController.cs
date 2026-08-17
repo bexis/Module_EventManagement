@@ -1,5 +1,7 @@
 ﻿using BExIS.App.Bootstrap.Attributes;
 using BExIS.App.Bootstrap.Helpers;
+using BExIS.Dim.Entities.Export.GBIF;
+using BExIS.Dlm.Entities.Party;
 using BExIS.Dlm.Services.Party;
 using BExIS.Emm.Entities.Event;
 using BExIS.Emm.Services.Event;
@@ -219,8 +221,23 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
                 // Check for logged in user
                 User user = BExISAuthorizeHelper.GetUserFromAuthorization(HttpContext);
+                bool userHasParty = false;
+                if (user != null)
+                {
+                    using (var partyManager = new PartyManager())
+                    {
+                        Party party = partyManager.GetPartyByUser(user.Id);
+                        if (party != null)
+                        {
+                            userHasParty = true;
+                        }
+                    }
+                }
+                if(userHasParty)
+                    CreateNewEventRegistration(e, data, user, email, notificationType, ref_id);
+                else
+                    CreateNewEventRegistration(e, data, null, email, notificationType, ref_id);
 
-                CreateNewEventRegistration(e,data, user, email, notificationType, ref_id);
 
                 return Json(new { success = true, id = 0 });
             }
@@ -264,14 +281,21 @@ namespace BExIS.Modules.EMM.UI.Controllers
             using (EventRegistrationManager erManager = new EventRegistrationManager())
             using (SubjectManager subManager = new SubjectManager())
             {
+                var reg = new EventRegistration();
                 string data = JsonStringNormalizer.Normalize(model.JsonFile);
                 JObject obj = JObject.Parse(data);
 
-                // Check for logged in user
                 User user = BExISAuthorizeHelper.GetUserFromAuthorization(HttpContext);
+                if (model.refId != null)
+                    reg = erManager.GetRegistrationsByRefIdAndEvent(model.refId, model.EventId).FirstOrDefault();
+
+                else if (user != null)
+                    reg = erManager.GetRegistrationByUserAndEvent(user.Id, model.EventId).FirstOrDefault();
+                else
+                    return Json(new { success = false, id = 0 });
 
                 var e = eManager.EventRepo.Get(model.EventId);
-                var reg = erManager.GetRegistrationByUserAndEvent(user.Id, model.EventId).FirstOrDefault();
+                
                 if (reg != null)
                 {
 
