@@ -1,11 +1,13 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import { page } from '$app/state';
   import EventForm from '../../../components/EventForm.svelte';
   import type { EditEvent } from '../../../models/eventModels';
   import * as dataCaller from '../../../services/eventCaller';
   import { goto } from '$app/navigation';
-  import { notificationStore, notificationType } from '@bexis2/bexis2-core-ui';
+ 
 
-let event: EditEvent = {
+  let event: EditEvent = {
   id: 0,
   name: '',
   eventDate: '',
@@ -33,17 +35,41 @@ let event: EditEvent = {
   jsonKeyFirstName: '',
   jsonKeyLastName: ''
 };
-let languages: string[] = ['English', 'German'];
-  let target = languages[0];
+  let languages: string[] = ['English', 'German'];
+
   let selectedFile: File | null = null;
   let loading = false;
 
+  const eventId = Number(page.url.searchParams.get('id'));
+  $: target = languages.find(l => l === event.selectedEventLanguage) ?? languages[0];
+
+ onMount(async () => {
+  loading = true;
+  const loadedEvent = await dataCaller.getEvent(eventId);
+  console.log('API Response:', loadedEvent);
+
+  if (loadedEvent) {
+  event = { ...loadedEvent };
+  if (event.startDate) {
+    event.startDate = new Date(event.startDate).toISOString().slice(0, 10);
+  }
+  if (event.deadline) {
+    event.deadline = new Date(event.deadline).toISOString().slice(0, 10);
+  }
+  if (!event.selectedEventLanguage || event.selectedEventLanguage === null) {
+    event.selectedEventLanguage = languages[0];
+  }
+  target = languages.find(l => l === event.selectedEventLanguage) ?? languages[0];
+}
+  loading = false;
+});
+
   function onFileChange(file: File) {
     selectedFile = file;
-    event.jsonFile = "";
+    event.jsonFile = '';
   }
 
-  function onCancel() {
+    function onCancel() {
     goto('/emm/events');
   }
 
@@ -52,27 +78,23 @@ let languages: string[] = ['English', 'German'];
     if (selectedFile) {
       event.jsonFile = await selectedFile.text();
     }
-    dataCaller.saveEvent(event)
-      .then(() => {
-        notificationStore.showNotification({
-          notificationType: notificationType.success,
-          message: `Event "${event.name}" saved successfully.`
-        });
-        goto('/emm/events');
-      })
-      .catch((error) => {
-        // Handle error, e.g., show an error message
-        console.error('Error saving event:', error);
-      }); 
+    await dataCaller.updateEvent(event);
+   
+
+    goto('/emm/events');
   }
 </script>
 
-<EventForm
+{#if !loading}
+  <EventForm
   {event}
   {languages}
   {selectedFile}
   {loading}
   onFileChange={onFileChange}
   onSubmit={handleSubmit}
-  onCancel={onCancel}
+   onCancel={onCancel}
 />
+{:else}
+  <p>Lade Eventdaten ...</p>
+{/if}
