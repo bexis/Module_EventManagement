@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { TextInput, TextArea, NumberInput, DropdownKVP, DateInput } from '@bexis2/bexis2-core-ui';
+  import { TextInput, TextArea, NumberInput, Dropdown, DateInput } from '@bexis2/bexis2-core-ui';
   import { SlideToggle } from '@skeletonlabs/skeleton';
   import type { EditEvent } from '../models/eventModels';
   import { Page, pageContentLayoutType, MultiSelect } from '@bexis2/bexis2-core-ui';
@@ -11,7 +11,7 @@
 	import { faSave, faXmark } from '@fortawesome/free-solid-svg-icons';
 
   export let event: EditEvent;
-  export let languages: { id: number; text: string }[] = [];
+ export let languages: string[] = [];
 
   export let selectedFile: File | null = null;
   export let loading: boolean = false;
@@ -76,7 +76,17 @@ function validateJson(value: string): void {
     // Übergibt nur die ausgewählte Datei an die übergeordnete Seite.
     onFileChange(file);
 
-    const fileContent = await file.text();
+    let fileContent: string;
+
+    try {
+      fileContent = await file.text();
+    } catch (error) {
+      jsonError =
+        error instanceof Error
+          ? `Die Datei konnte nicht gelesen werden: ${error.message}`
+          : 'Die ausgewählte Datei konnte nicht gelesen werden.';
+      return;
+    }
 
     try {
       const parsedJson = JSON.parse(fileContent);
@@ -90,15 +100,12 @@ function validateJson(value: string): void {
 
       updateJsonEditor(formattedJson);
     } catch (error) {
-      // Ungültiges JSON trotzdem anzeigen,
-      // damit es im Editor korrigiert werden kann.
-      event.jsonFile = fileContent;
-
       jsonError =
         error instanceof Error
           ? `Ungültiges JSON: ${error.message}`
           : 'Die ausgewählte Datei enthält kein gültiges JSON.';
 
+      event.jsonFile = fileContent;
       updateJsonEditor(fileContent);
     }
   }
@@ -180,8 +187,6 @@ function validateJson(value: string): void {
   });
 
 
-
- 
 </script>
 
 <Page >
@@ -199,11 +204,13 @@ function validateJson(value: string): void {
       label="Event time period and time"
       placeholder="Event time period and time"
       bind:value={event.eventDate}
+      required
     />
     <TextInput
       label="Location"
       placeholder="Location"
       bind:value={event.location}
+      required
     />
     <TextArea
       label="Important information"
@@ -215,24 +222,24 @@ function validateJson(value: string): void {
       placeholder="Additional Mail information"
       bind:value={event.mailInformation}
     />
-    <!-- <DropdownKVP
+    <Dropdown
       id="eventLanguage"
-      title="SelectedEventLanguage"
-      bind:target
+      title="Language"
+      bind:target= {event.selectedEventLanguage}
       source={languages}
       required={true}
-    /> -->
+    />
 
-    <label for="eventLanguage">Language</label>
+    <!-- <label for="eventLanguage">Language</label>
     <select
       id="eventLanguage"
       bind:value={event.selectedEventLanguage}
-      required
+      required = {true}
     >
       {#each languages as lang}
         <option value={lang.text}>{lang.text}</option>
       {/each}
-    </select>
+    </select> -->
 	
     <DateInput id="deadline" label="Deadline" required={true} bind:value={event.deadline} />
     <DateInput id="startdate" label="Start date" required={true} bind:value={event.startDate} />
@@ -240,6 +247,7 @@ function validateJson(value: string): void {
       label="Participants limitation"
       placeholder="Enter max participants"
       bind:value={event.participantsLimitation}
+      min={0}
     />
     <SlideToggle name="allowWaitingList" bind:checked={event.waitingList} on:change>
       Allow waiting list
@@ -248,6 +256,7 @@ function validateJson(value: string): void {
       label="Waiting list limitation"
       placeholder="Waiting list limitation"
       bind:value={event.waitingListLimitation}
+      min={0}
     />
     <SlideToggle name="allowEdit" bind:checked={event.editAllowed} on:change>
       Allow edit
@@ -256,6 +265,7 @@ function validateJson(value: string): void {
       label="Event password"
       placeholder="Event password"
       bind:value={event.logInPassword}
+      required
     />
 
      <div>

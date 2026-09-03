@@ -32,7 +32,7 @@ let table= {
 		 id: 'eventregistrationresults',
 		 data: writable<any[]>([]),
 		resizable: 'both',
-		rowHeight: 70,
+		rowHeight: 50,
 		exportable: true,
     optionsComponent: tableActions as unknown as typeof SvelteComponent
 	 } as TableConfig<(any)>;
@@ -41,7 +41,7 @@ let table= {
 		 id: 'eventwaitinglistresults',
 		 data: writable<any[]>([]),
 		resizable: 'both',
-		rowHeight: 70,
+		rowHeight: 50,
 		exportable: true,
     optionsComponent: tableActionsWaitingList as unknown as typeof SvelteComponent
 	 } as TableConfig<(any)>;

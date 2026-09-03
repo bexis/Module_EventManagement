@@ -49,9 +49,6 @@ let languages: string[] = ['English', 'German'];
 
   async function handleSubmit() {
      console.log(event.selectedEventLanguage);
-    if (selectedFile) {
-      event.jsonFile = await selectedFile.text();
-    }
     dataCaller.saveEvent(event)
       .then(() => {
         notificationStore.showNotification({

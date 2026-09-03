@@ -75,9 +75,6 @@
 
   async function handleSubmit() {
      console.log(event.selectedEventLanguage);
-    if (selectedFile) {
-      event.jsonFile = await selectedFile.text();
-    }
     await dataCaller.updateEvent(event);
    
 
