@@ -76,7 +76,6 @@
 					source={entry.options}
 					bind:target={entry.value}
 					isMulti={false}
-					required={entry.required}
 				/>
 			</div>
 		{:else if entry.type.toLowerCase() === 'string'}

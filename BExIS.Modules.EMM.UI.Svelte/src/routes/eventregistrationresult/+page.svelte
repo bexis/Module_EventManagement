@@ -22,7 +22,7 @@ function toTableRows(data: unknown): EventResultTableItem[] {
   return data.map((event) => ({
     id: event.id,
     name: event.name
-  }));
+  })).sort((firstEvent, secondEvent) => secondEvent.id - firstEvent.id);
 }
 
 onMount(async () => {

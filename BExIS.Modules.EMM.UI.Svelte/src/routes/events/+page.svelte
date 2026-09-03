@@ -41,14 +41,22 @@ let table: TableConfig<eventregistrationModel.EventListItem> = {
   optionsComponent: tableOptions as unknown as typeof SvelteComponent
 };
 
+function sortEventsByIdDescending(data: unknown): eventregistrationModel.EventListItem[] {
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  return [...data].sort((firstEvent, secondEvent) => secondEvent.id - firstEvent.id);
+}
+
 onMount(async () => {
   const data = await dataCaller.getEvents();
-  tableStore.set(Array.isArray(data) ? data : []);
+  tableStore.set(sortEventsByIdDescending(data));
 });
 
 async function reload() {
   const newData = await dataCaller.getEvents();
-  tableStore.set(Array.isArray(newData) ? newData : []);
+  tableStore.set(sortEventsByIdDescending(newData));
 }
 </script>
 
