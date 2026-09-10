@@ -19,7 +19,7 @@ const id = Number(page.url.searchParams.get('id'));
 // Typdefinition für die Struktur der Daten
 interface RegistrationEntry { key: string; title: string; value: any; }
 interface RegistrationSection { entries: RegistrationEntry[]; }
-interface ParsedItem { registration?: RegistrationSection[]; [key: string]: any; }
+interface ParsedItem { registration?: RegistrationSection[]; deleted?: boolean; [key: string]: any; }
 
 const hiddenColumnKeys = new Set(['id', 'refId']);
 
@@ -84,26 +84,21 @@ onMount(async () => {
   if (typeof item.id !== "undefined") {
     row.id = item.id;
   }
+  if (typeof item.deleted !== "undefined") {
+    row.deleted = item.deleted;
+  }
   return row;
 });
+
+    columns.push({ key: 'deleted', title: 'Deleted' });
 
     // 3. TableConfig anpassen
     table2.columns = columns.filter(({ key }) => !hiddenColumnKeys.has(key)).reduce((acc, col) => {
       acc[col.key] = {
         header: col.title,      // Titel der Spalte
         // weitere Optionen nach Bedarf, z.B. sortable:
-        disableSorting: false
-      };
-      return acc;
-    }, {
-      id: { exclude: true },
-      refId: { exclude: true }
-    } as Columns);
-
-    table2.columns = columns.filter(({ key }) => !hiddenColumnKeys.has(key)).reduce((acc, col) => {
-      acc[col.key] = {
-        header: col.title,
-        disableSorting: false
+        disableSorting: false,
+        disableFiltering: col.key === 'deleted'
       };
       return acc;
     }, {
@@ -148,14 +143,20 @@ const rows = parsed.map(item => {
    if (typeof item.refId !== "undefined") {
     row.refId = item.refId;
   }
+  if (typeof item.deleted !== "undefined") {
+    row.deleted = item.deleted;
+  }
   return row;
 });
+
+  columns.push({ key: 'deleted', title: 'Deleted' });
 
   // 3. TableConfig anpassen
   table.columns = columns.filter(({ key }) => !hiddenColumnKeys.has(key)).reduce((acc, col) => {
     acc[col.key] = {
       header: col.title,
-      disableSorting: false
+      disableSorting: false,
+      disableFiltering: col.key === 'deleted'
     };
     return acc;
   }, {
@@ -167,17 +168,20 @@ const rows = parsed.map(item => {
 });
 
 function handleTableAction(e: CustomEvent<{ type: string, row: any }>) {
-  const { type, row } = e.detail;
+  const { type, row } = e.detail ?? {};
+  if (!row || typeof row.id === 'undefined') return;
+
   if (type === 'EDIT') goto(`/emm/eventregistration/edit/?id=${id}&ref_id=${row.refId}`);
   if (type === 'DELETE') handleDelete(row);
   if (type === 'MOVE') handleMove(row);
   if (type === 'RESEND') handleResend(row);
 }
 
-function handleDelete(row) {
-console.log('Delete row:', row.id);
+async function handleDelete(row) {
+  console.log('Delete row:', row.id);
   if (confirm(`Really delete event registration with id: "${row.name}"?`)) {
-    dataCaller.deleteRegistration(row.id).then(() => reload());
+    await dataCaller.deleteRegistration(row.id);
+    window.location.reload();
   }
 }
 
@@ -214,10 +218,10 @@ function back() {
   </div>
 
    <div class="table table-compact w-full">
-    <Table config={table}  on:action={e => handleTableAction(e)}/>
+    <Table config={table} on:action={e => handleTableAction(e)} />
   </div>
   <div class="h3 h-9">Waiting List</div>
    <div class="table table-compact w-full">
-    <Table config={table2}  on:action={e => handleTableAction(e)}/>
+    <Table config={table2} on:action={e => handleTableAction(e)} />
   </div>
 </Page>
