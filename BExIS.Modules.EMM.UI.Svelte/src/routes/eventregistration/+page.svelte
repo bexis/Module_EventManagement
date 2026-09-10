@@ -30,7 +30,7 @@ async function reload() {
   tableStore.set(Array.isArray(newData) ? newData : []);
 }
 
-function handleTableAction(e: CustomEvent<{ type?: string, row: any }>) {
+async function handleTableAction(e: CustomEvent<{ type?: string, row: any }>) {
   const { type, row } = e.detail;
   if (!row) return;
 
@@ -45,9 +45,8 @@ function handleTableAction(e: CustomEvent<{ type?: string, row: any }>) {
  goto(`/emm/eventregistration/edit/?id=${row.id}`);
   } else if (type === 'DELETE') {
     if (confirm(`Really delete registration for "${row.name}"?`)) {
-
-      dataCaller.deleteEventRegistration(row.id);
-      reload();
+      await dataCaller.deleteEventRegistration(row.id);
+      await reload();
     }
   }
 }

@@ -12,7 +12,17 @@ import { goto } from '$app/navigation';
 const eventId = ($page.state as any).id;
 
 let validationErrors: string[] = [];
+let registrationDataSource = '';
+let registrationData: any;
 
+function getRegistrationData(jsonFile: string) {
+	if (registrationDataSource !== jsonFile) {
+		registrationDataSource = jsonFile;
+		registrationData = JSON.parse(jsonFile);
+	}
+
+	return registrationData;
+}
 
 function isEmpty(value: any) {
 	return (
@@ -75,7 +85,7 @@ async function handleSave(registrationData: any) {
 	{#await dataCaller.getEventRegistrationJson(eventId)}
 		<div id="spinner">... loading ...</div>
 	{:then data}
-		{@const registrationData = JSON.parse(data.jsonFile)}
+		{@const registrationData = getRegistrationData(data.jsonFile)}
 
 		<div class="p-6 space-y-6">
 			<div class="rounded-xl shadow-md border p-5 bg-white">
