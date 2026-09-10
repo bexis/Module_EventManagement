@@ -82,17 +82,20 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         .Select(r =>
                             {
                                 var root = JObject.Parse(r.Data);
+                                var refId = r.Token;
 
-                            // Neues Feld "id" auf Root-Ebene hinzufügen
                             root["id"] = r.Id;
+                            root["refId"] = r.Token;
+                            root["deleted"] = r.Deleted;
 
-                            return root.ToString(); // JSON mit Root-ID
+                                return root.ToString();
                             });
                 var merged = mergeForTable(registrations);
 
                 EventRegistrationsModel model = new EventRegistrationsModel();
                 model.EventId = id;
                 model.JsonFiles = merged;
+                
 
                 return Json(model, JsonRequestBehavior.AllowGet);
             }
@@ -112,10 +115,11 @@ namespace BExIS.Modules.EMM.UI.Controllers
                         {
                             var root = JObject.Parse(r.Data);
 
-                            // Neues Feld "id" auf Root-Ebene hinzufügen
                             root["id"] = r.Id;
+                            root["refId"] = r.Token;
+                            root["deleted"] = r.Deleted;
 
-                            return root.ToString(); // JSON mit Root-ID
+                            return root.ToString(); 
                         });
                
                 if (registrations.Count() > 0)
@@ -169,7 +173,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
                 EmailHelper.SendEmailNotification("deleted", email, "", reg.Data, reg.Event, url);
             }
 
-            return Json(new { success = true, id = id });
+            return Json(new { success = true }, JsonRequestBehavior.AllowGet);
         }
 
         /// <summary>

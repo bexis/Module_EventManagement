@@ -324,7 +324,7 @@ namespace BExIS.Modules.EMM.UI.Controllers
 
         [JsonNetFilter]
         [HttpGet]
-        public JsonResult Delete(long id, string ref_id)
+        public JsonResult Delete(long id)
         {
             string url = Request.Url.GetLeftPart(UriPartial.Authority);
 
@@ -352,31 +352,34 @@ namespace BExIS.Modules.EMM.UI.Controllers
                             //else
                             //    email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
 
-                            EmailHelper.SendEmailNotification("deleted", email, ref_id, reg.Data, reg.Event, url);
+                            EmailHelper.SendEmailNotification("deleted", email, reg.Token, reg.Data, reg.Event, url);
                         }
                     }
-                    else if (ref_id.Length > 0)
-                    {
-                        List<EventRegistration> regs = erManager.GetRegistrationsByRefIdAndEvent(ref_id, id);
-                        EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
-                        if (reg != null)
-                        {
-                            reg.Deleted = true;
-                            erManager.UpdateEventRegistration(reg);
-                            MoveFromWaitingList(reg.Event.Id);
-                            string email = "";
-                            if (user != null)
-                                email = user.Email;
-                            //else
-                            //    email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
+                    else
+                        return Json(new { success = false }, JsonRequestBehavior.AllowGet);
 
-                            EmailHelper.SendEmailNotification("deleted", email, ref_id, reg.Data, reg.Event, url);
-                        }
-                    }
+                    //else if (ref_id.Length > 0)
+                    //{
+                    //    List<EventRegistration> regs = erManager.GetRegistrationsByRefIdAndEvent(ref_id, id);
+                    //    EventRegistration reg = regs.Where(a => a.Deleted == false).FirstOrDefault();
+                    //    if (reg != null)
+                    //    {
+                    //        reg.Deleted = true;
+                    //        erManager.UpdateEventRegistration(reg);
+                    //        MoveFromWaitingList(reg.Event.Id);
+                    //        string email = "";
+                    //        if (user != null)
+                    //            email = user.Email;
+                    //        //else
+                    //        //    email = reg.Data.GetElementsByTagName("Email")[0].InnerText;
+
+                    //        EmailHelper.SendEmailNotification("deleted", email, ref_id, reg.Data, reg.Event, url);
+                    //    }
+                    //}
                 }
-
-                return Json(new { success = true, id = id });
             }
+
+                return Json(new { success = true }, JsonRequestBehavior.AllowGet);
         }
 
 

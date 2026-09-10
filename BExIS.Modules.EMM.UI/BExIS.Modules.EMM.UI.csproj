@@ -300,7 +300,7 @@
   </ProjectExtensions>
   <PropertyGroup>
     <PostBuildEvent>mkdir "$(SolutionDir)Console\Workspace\Modules\EMM"
-C:\Windows\System32\xcopy "$(ProjectDir)Emm.Settings.xml" "$(SolutionDir)Console\Workspace\Modules\EMM" /C /Y /I</PostBuildEvent>
+C:\Windows\System32\xcopy "$(ProjectDir)Emm.Settings.json" "$(SolutionDir)Console\Workspace\Modules\EMM" /C /Y /I</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
