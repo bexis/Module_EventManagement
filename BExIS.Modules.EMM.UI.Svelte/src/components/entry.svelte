@@ -63,10 +63,13 @@
 	<div class:rounded-md={hasError} class:border={hasError} class:border-red-500={hasError} class:p-2={hasError}>
 		{#if entry.options && entry.options.length >= 1}
 			<div id={entry.key} on:mouseover={() => helpStore.show(entry.key)}>
-				<div class="mb-1 font-medium">
-					{entry.title}
-					{#if entry.required}
-						<span class="text-red-600">*</span>
+				<div class="mb-1 flex items-center gap-2 font-medium">
+					<span>{entry.title}</span>
+					{#if entry.required}<span class="text-red-600">*</span>{/if}
+					{#if entry.description}
+						<span class="inline-flex h-5 w-5 cursor-help items-center justify-center rounded-full border border-current text-xs text-surface-500 hover:text-primary-600" title={entry.description} aria-label={entry.description}>
+							i
+						</span>
 					{/if}
 				</div>
 
@@ -79,23 +82,31 @@
 				/>
 			</div>
 		{:else if entry.type.toLowerCase() === 'string'}
-			<TextInput
-				id={entry.key}
-				label={entry.title}
-				bind:value={entry.value}
-				on:input
-				help={true}
-				required={entry.required}	
-			/>
+			<div id={entry.key} on:mouseover={() => helpStore.show(entry.key)}>
+				<div class="mb-1 flex items-center gap-2 font-medium">
+					<span>{entry.title}</span>
+					{#if entry.required}<span class="text-red-600">*</span>{/if}
+					{#if entry.description}
+						<span class="inline-flex h-5 w-5 cursor-help items-center justify-center rounded-full border border-current text-xs text-surface-500 hover:text-primary-600" title={entry.description} aria-label={entry.description}>
+							i
+						</span>
+					{/if}
+				</div>
+				<TextInput id={entry.key} label="" bind:value={entry.value} on:input required={entry.required} />
+			</div>
 		{:else if entry.type.toLowerCase().includes('int')}
-			<NumberInput
-				id={entry.key}
-				label={entry.title}
-				bind:value={entry.value}
-				on:input
-				help={true}
-				required={entry.required}
-			/>
+			<div id={entry.key} on:mouseover={() => helpStore.show(entry.key)}>
+				<div class="mb-1 flex items-center gap-2 font-medium">
+					<span>{entry.title}</span>
+					{#if entry.required}<span class="text-red-600">*</span>{/if}
+					{#if entry.description}
+						<span class="inline-flex h-5 w-5 cursor-help items-center justify-center rounded-full border border-current text-xs text-surface-500 hover:text-primary-600" title={entry.description} aria-label={entry.description}>
+							i
+						</span>
+					{/if}
+				</div>
+				<NumberInput id={entry.key} label="" bind:value={entry.value} on:input required={entry.required} />
+			</div>
 		{:else if entry.type.toLowerCase() === 'boolean'}
 			<div id={entry.key} on:mouseover={() => helpStore.show(entry.key)}>
 				<SlideToggle active="bg-primary-500" name="slider-label" size="sm" bind:checked={entry.value} required={entry.required}>
@@ -103,10 +114,13 @@
 			</div>
 		{:else if entry.type.toLowerCase() === 'json'}
 			<div id={entry.key} on:mouseover={() => helpStore.show(entry.key)}>
-				<div class="mb-1 font-medium">
-					{entry.title}
-					{#if entry.required}
-						<span class="text-red-600">*</span>
+				<div class="mb-1 flex items-center gap-2 font-medium">
+					<span>{entry.title}</span>
+					{#if entry.required}<span class="text-red-600">*</span>{/if}
+					{#if entry.description}
+						<span class="inline-flex h-5 w-5 cursor-help items-center justify-center rounded-full border border-current text-xs text-surface-500 hover:text-primary-600" title={entry.description} aria-label={entry.description}>
+							i
+						</span>
 					{/if}
 				</div>
 
