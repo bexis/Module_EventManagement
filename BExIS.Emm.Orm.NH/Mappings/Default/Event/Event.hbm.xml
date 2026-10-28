@@ -59,10 +59,11 @@
     <property name="EventDate" type="string">
       <column name="EventDate" />
     </property>
-    
-    <property name="ImportantInformation" type="string">
-      <column name="ImportantInformation" />
-    </property>
+
+	  <property name="ImportantInformation"
+			type="String"
+			column="ImportantInformation"
+			length="1024" />
 
 	  <property name="Location" type="string">
 		  <column name="Location" />
